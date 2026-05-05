@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Alocação Dinâmica — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #7c6af7;
+    --accent3: #6af7c4;
+    --accent4: #f76a9a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a0f08 0%, #221508 50%, #180d06 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: '*'; position: absolute; right: 50px; top: 10px;
+    font-size: 260px; font-family: 'Fraunces', serif;
+    color: rgba(247,162,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent);  border-color: var(--accent);  background: rgba(247,162,106,0.08); }
+  .badge-purple { color: var(--accent2); border-color: var(--accent2); background: rgba(124,106,247,0.08); }
+  .badge-green  { color: var(--accent3); border-color: var(--accent3); background: rgba(106,247,196,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.purple { border-left-color: var(--accent2); }
+  .concept-card.green  { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(247,162,106,0.07), rgba(124,106,247,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .steps { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+  .step { display: flex; gap: 16px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+  .step-num { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 900; color: var(--accent); line-height: 1; min-width: 36px; }
+  .step-content h4 { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-content p { margin: 0; font-size: 0.9rem; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '⚠ '; color: var(--accent4); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '💡 '; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .compare-header { padding: 10px 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .compare-header.orange { background: rgba(247,162,106,0.12); color: var(--accent); }
+  .compare-header.purple { background: rgba(124,106,247,0.12); color: var(--accent2); }
+  .compare-header.green  { background: rgba(106,247,196,0.12); color: var(--accent3); }
+  .compare-header.pink   { background: rgba(247,106,154,0.12); color: var(--accent4); }
+  .compare-card pre { margin: 0; border: none; border-radius: 0; padding: 16px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent3); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* SIMULADOR */
+  #mem-demo { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; }
+  .mem-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+  .mem-btn { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px 18px; border-radius: 8px; border: 1px solid var(--accent); background: rgba(247,162,106,0.08); color: var(--accent); cursor: pointer; transition: all .2s; }
+  .mem-btn:hover { background: rgba(247,162,106,0.18); }
+  .mem-btn.purple { border-color: var(--accent2); background: rgba(124,106,247,0.08); color: var(--accent2); }
+  .mem-btn.purple:hover { background: rgba(124,106,247,0.18); }
+  .mem-btn.green { border-color: var(--accent3); background: rgba(106,247,196,0.08); color: var(--accent3); }
+  .mem-btn.green:hover { background: rgba(106,247,196,0.18); }
+  .mem-btn.red { border-color: var(--accent4); background: rgba(247,106,154,0.08); color: var(--accent4); }
+  .mem-btn.red:hover { background: rgba(247,106,154,0.18); }
+  .mem-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .mem-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .mem-col-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
+  #heap-visual { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 180px; }
+  .heap-label-top { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); text-align: center; margin-bottom: 8px; }
+  .heap-blocks { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+  .heap-block { border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; transition: all .3s; white-space: nowrap; }
+  .heap-block.alloc  { background: rgba(247,162,106,0.15); border: 1px solid var(--accent); color: var(--accent); animation: fadeIn .35s ease; }
+  .heap-block.alloc2 { background: rgba(124,106,247,0.15); border: 1px solid var(--accent2); color: var(--accent2); animation: fadeIn .35s ease; }
+  .heap-block.realloc { background: rgba(106,247,196,0.15); border: 1px solid var(--accent3); color: var(--accent3); animation: fadeIn .35s ease; }
+  .heap-block.freed  { background: rgba(247,106,154,0.08); border: 1px dashed var(--accent4); color: var(--accent4); animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:scale(.9); } to { opacity:1; transform:scale(1); } }
+  #mem-log { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.9; min-height: 180px; max-height: 240px; overflow-y: auto; color: var(--text-muted); }
+  .ml-alloc  { color: var(--accent); }
+  .ml-alloc2 { color: var(--accent2); }
+  .ml-realloc { color: var(--accent3); }
+  .ml-free   { color: var(--accent4); }
+  .ml-warn   { color: var(--yellow); }
+  .mem-desc  { font-size: 0.85rem; color: var(--text-muted); margin-top: 12px; padding: 10px 14px; background: var(--code-bg); border-radius: 8px; min-height: 40px; }
+
+  /* VETOR DEMO */
+  .vec-demo { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .vec-row { display: flex; gap: 4px; align-items: stretch; margin: 12px 0; flex-wrap: wrap; }
+  .vec-cell { min-width: 48px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 13px; border-radius: 6px; transition: all .3s; }
+  .vec-cell.filled    { background: rgba(247,162,106,0.15); border: 1px solid var(--accent); color: var(--accent); }
+  .vec-cell.highlight { background: rgba(106,247,196,0.2); border: 1px solid var(--accent3); color: var(--accent3); animation: pulse .5s ease; }
+  .vec-cell.deleted   { background: rgba(247,106,154,0.12); border: 1px dashed var(--accent4); color: var(--accent4); }
+  .vec-cell.empty     { background: rgba(255,255,255,0.03); border: 1px dashed var(--border); color: var(--text-muted); }
+  @keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.12)} }
+  .vec-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .vec-meta .tm { color: var(--accent2); margin-right: 16px; }
+  .vec-meta .oc { color: var(--accent); }
+
+  /* QUIZ */
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent3); color: var(--accent3); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .compare-grid, .mem-layout { grid-template-columns: 1fr; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Luana Almeida</div>
+    <h1>Alocação <span>Dinâmica</span><br>de Memória</h1>
+    <p class="subtitle">Ponteiros, Heap, malloc, calloc, realloc, free e structs</p>
+    <div class="badge-row">
+      <span class="badge badge-orange">ponteiros</span>
+      <span class="badge badge-purple">malloc</span>
+      <span class="badge badge-green">calloc</span>
+      <span class="badge badge-orange">realloc</span>
+      <span class="badge badge-pink">free</span>
+      <span class="badge badge-purple">structs</span>
+      <span class="badge badge-green">memory leak</span>
+      <span class="badge badge-pink">ponteiro para ponteiro</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Por que alocar memória dinamicamente?</a></li>
+      <li><a href="#sec2">Mapa da memória de um programa</a></li>
+      <li><a href="#sec3">Ponteiros — o controle remoto da memória</a></li>
+      <li><a href="#sec4">malloc() — alocando memória</a></li>
+      <li><a href="#sec5">calloc() — alocando e zerando</a></li>
+      <li><a href="#sec6">realloc() — redimensionando o bloco</a></li>
+      <li><a href="#sec7">free() e memory leak — devolvendo a memória</a></li>
+      <li><a href="#sec8">Simulador interativo do Heap</a></li>
+      <li><a href="#sec9">Structs com ponteiros — . vs -></a></li>
+      <li><a href="#sec10">Ponteiro para ponteiro e matrizes dinâmicas</a></li>
+      <li><a href="#sec11">Vetores dinâmicos — ordenados e desordenados</a></li>
+      <li><a href="#sec12">Resumo das funções</a></li>
+      <li><a href="#sec13">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <!-- 01 -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Por que alocar memória dinamicamente?</h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Imagine que você vai fazer uma festa e precisa reservar mesas. Se você reservar sempre 100 mesas, vai desperdiçar espaço quando só vier 10 pessoas. Se reservar só 10, vai faltar espaço quando vierem 200. A solução ideal é reservar mesas conforme as pessoas chegam. Isso é alocação dinâmica.</p>
+    </div>
+
+    <p>Quando você escreve <code style="color:var(--accent3)">int vetor[100];</code>, está reservando espaço para exatamente 100 inteiros em tempo de compilação. O problema é que às vezes o tamanho necessário só é conhecido quando o programa já está rodando.</p>
+
+    <div class="concept-card">
+      <p>📌 <strong>Alocação estática:</strong> tamanho definido no código, em tempo de compilação. Simples, mas inflexível.</p>
+      <p>📌 <strong>Alocação dinâmica:</strong> tamanho definido em tempo de execução. Flexível, mas exige cuidado com o gerenciamento da memória.</p>
+    </div>
+
+    <p>Exemplos práticos onde o tamanho só é conhecido em tempo de execução:</p>
+    <div class="concept-card">
+      <p>✔ Carregar todos os registros de um arquivo (quantos tem? depende do arquivo)</p>
+      <p>✔ Criar uma matriz cujas dimensões o usuário digita</p>
+      <p>✔ Construir uma lista que cresce conforme dados são inseridos</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 02 -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Mapa da memória de um programa</h2>
+
+    <p>Todo programa em execução divide a memória RAM em regiões com funções bem definidas. Entender isso é essencial para compreender onde a alocação dinâmica acontece.</p>
+
+    <div class="diagram">  Endereços altos
+  ┌──────────────────────────────────────────┐
+  │                                          │
+  │   HEAP (Montículo)                       │  alocação dinâmica
+  │   malloc / calloc / realloc atuam AQUI   │  cresce para baixo
+  │   Você controla manualmente              │
+  │                                          │
+  ├──────────────────────────────────────────┤
+  │   (espaço livre entre heap e pilha)      │
+  ├──────────────────────────────────────────┤
+  │                                          │
+  │   PILHA (Stack)                          │  variáveis locais e
+  │   Variáveis locais e parâmetros          │  frames de funções
+  │   Gerenciada automaticamente pelo C      │  cresce para cima
+  │                                          │
+  ├──────────────────────────────────────────┤
+  │   Segmento de Dados                      │  variáveis globais
+  ├──────────────────────────────────────────┤
+  │   Segmento de Código (código compilado)  │  instruções do programa
+  └──────────────────────────────────────────┘
+  Endereços baixos</div>
+
+    <div class="concept-card purple">
+      <p>A <strong>Pilha (Stack)</strong> é automática: o C cria e destrói os frames sozinho. O <strong>Heap</strong> é manual: você pede a memória com <code>malloc</code> e deve devolvê-la com <code>free</code>. Esquecer de devolver é um <em>memory leak</em> (vazamento de memória).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 03 -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Ponteiros — o controle remoto da memória</h2>
+
+    <p>Para usar alocação dinâmica, você precisa de ponteiros. Um <strong>ponteiro</strong> é uma variável que armazena um endereço de memória. Ele não guarda o dado em si, mas sim a localização de onde o dado está.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia</div>
+      <p>Um ponteiro é como o <strong>endereço de uma casa</strong>. Você não carrega a casa no bolso. Você carrega o endereço que te diz onde ela está. Com o endereço em mãos, você consegue ir lá e modificar o que está dentro.</p>
+    </div>
+
+    <div class="code-label">declaração e uso básico de ponteiros</div>
+    <pre><code><span class="kw">int</span>  x = <span class="num">42</span>;         <span class="cmt">/* variável comum: guarda o valor 42           */</span>
+<span class="kw">int</span> *p = &x;         <span class="cmt">/* ponteiro: guarda o endereço de x            */</span>
+
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, x);   <span class="cmt">/* imprime 42  (o valor direto)                */</span>
+<span class="fn">printf</span>(<span class="str">"%p\n"</span>, p);   <span class="cmt">/* imprime 0x7fff... (o endereço)              */</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *p);  <span class="cmt">/* imprime 42  (desreferência: vai ao endereço)*/</span>
+
+*p = <span class="num">100</span>;            <span class="cmt">/* muda o valor em x através do ponteiro       */</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, x);   <span class="cmt">/* imprime 100 (x foi modificado!)             */</span></code></pre>
+
+    <div class="diagram">  Memória RAM:
+
+  Endereço   Conteúdo    Variável
+  ──────────────────────────────────
+  0x1000  |    42    |  x   (o inteiro)
+  0x1004  |  0x1000  |  p   (guarda o endereço de x)
+
+  p  ──────────────────────► x (42)
+     "p aponta para x"</div>
+
+    <div class="concept-card">
+      <p><code style="color:var(--accent)">*</code> na declaração: <strong>cria</strong> um ponteiro. Exemplo: <code>int *p;</code></p>
+      <p><code style="color:var(--accent)">*</code> em uso: <strong>acessa o valor</strong> apontado (desreferência). Exemplo: <code>*p = 100;</code></p>
+      <p><code style="color:var(--accent)">&amp;</code> em uso: obtém o <strong>endereço</strong> de uma variável. Exemplo: <code>&amp;x</code></p>
+    </div>
+
+    <h3>Ponteiros e vetores em C</h3>
+    <p>Em C, o nome de um vetor é um ponteiro para o primeiro elemento. Por isso vetores dinâmicos funcionam com ponteiros.</p>
+
+    <pre><code><span class="kw">int</span> vet[<span class="num">5</span>] = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>};
+<span class="kw">int</span> *p = vet;           <span class="cmt">/* p aponta para vet[0]                       */</span>
+
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, vet[<span class="num">2</span>]); <span class="cmt">/* 30 — notação de índice                     */</span>
+<span class="fn">printf</span>(<span class="str">"%d\n"</span>, *(p+<span class="num">2</span>)); <span class="cmt">/* 30 — aritmética de ponteiro (equivalente!) */</span></code></pre>
+
+    <p>Passar por referência usando ponteiro permite que uma função modifique o valor original de uma variável, em vez de trabalhar com uma cópia.</p>
+
+    <div class="code-label">passagem por referência — modificando struct dentro de uma função</div>
+    <pre><code><span class="kw">void</span> <span class="fn">dobrarIdade</span>(Aluno *a) {
+    a->idade = a->idade * <span class="num">2</span>;  <span class="cmt">/* modifica o original, não uma cópia */</span>
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    Aluno al = {<span class="str">"Ana"</span>, <span class="num">20</span>};
+    <span class="fn">dobrarIdade</span>(&al);          <span class="cmt">/* passa o endereço de al             */</span>
+    <span class="fn">printf</span>(<span class="str">"%d\n"</span>, al.idade);  <span class="cmt">/* imprime 40                         */</span>
+}</code></pre>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 04 -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>malloc() — alocando memória</h2>
+
+    <p><code style="color:var(--accent3)">malloc</code> (Memory ALLOCation) reserva um bloco de bytes contíguos no Heap e retorna um ponteiro para o início desse bloco. A memória alocada não é inicializada e pode conter qualquer valor ("lixo").</p>
+
+    <div class="code-label">sintaxe</div>
+    <pre><code><span class="kw">void</span>* <span class="fn">malloc</span>(size_t qtde_bytes);
+<span class="cmt">/* Retorna ponteiro para o bloco, ou NULL se falhar */</span></code></pre>
+
+    <div class="code-label">padrão de uso</div>
+    <pre><code><span class="tp">tipo</span> *nome = (<span class="tp">tipo</span> *) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">tipo</span>) * quantidade);</code></pre>
+
+    <div class="code-label">exemplo completo com verificação de erro</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span>  n;
+    <span class="kw">int</span> *vetor;
+
+    <span class="fn">printf</span>(<span class="str">"Quantos elementos? "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &n);
+
+    vetor = (<span class="kw">int</span> *) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="kw">int</span>) * n);
+
+    <span class="kw">if</span> (vetor == <span class="kw">NULL</span>) {          <span class="cmt">/* SEMPRE verifique! */</span>
+        <span class="fn">printf</span>(<span class="str">"Sem memoria!\n"</span>);
+        <span class="kw">return</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++)
+        vetor[i] = i * <span class="num">10</span>;         <span class="cmt">/* usa igual a um vetor normal */</span>
+
+    <span class="fn">free</span>(vetor);
+    vetor = <span class="kw">NULL</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="diagram">  Depois de malloc(sizeof(int) * 4):
+
+  Heap: [ bloco alocado     ....... livre ....... ]
+          ↑
+          vetor aponta aqui
+
+  vetor[0]  vetor[1]  vetor[2]  vetor[3]
+  [  ???  ] [  ???  ] [  ???  ] [  ???  ]
+  conteúdo indefinido (lixo) — não inicializado!</div>
+
+    <div class="tip">O cast <code>(int *)</code> antes do malloc não é obrigatório em C, mas é boa prática incluí-lo para deixar o código mais legível e explícito.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 05 -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>calloc() — alocando e zerando</h2>
+
+    <p><code style="color:var(--accent3)">calloc</code> (Contiguous ALLOCation) funciona como malloc, mas recebe dois argumentos separados (quantidade e tamanho de cada elemento) e <strong>inicializa toda a memória com zero</strong>.</p>
+
+    <div class="code-label">sintaxe</div>
+    <pre><code><span class="kw">void</span>* <span class="fn">calloc</span>(size_t qtde_elementos, size_t tamanho_cada);
+<span class="cmt">/* Retorna ponteiro para o bloco zerado, ou NULL se falhar */</span></code></pre>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header orange">malloc — memória com lixo</div>
+        <pre><code><span class="kw">int</span> *v = (<span class="kw">int</span>*)
+  <span class="fn">malloc</span>(<span class="num">4</span> * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+<span class="cmt">/* v[0..3] = ??? (lixo) */</span></code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header purple">calloc — tudo zero</div>
+        <pre><code><span class="kw">int</span> *v = (<span class="kw">int</span>*)
+  <span class="fn">calloc</span>(<span class="num">4</span>, <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+<span class="cmt">/* v[0..3] = 0  garantido */</span></code></pre>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Função</th><th>Argumentos</th><th>Inicializa?</th><th>Quando usar</th></tr></thead>
+      <tbody>
+        <tr><td>malloc</td><td>total de bytes</td><td>Não (lixo)</td><td>Quando vai preencher todos os valores logo em seguida</td></tr>
+        <tr><td>calloc</td><td>quantidade + tamanho unitário</td><td>Sim (zeros)</td><td>Quando precisa garantir que começa com tudo zerado</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-label">exemplo comparando os dois</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> *Vet1, *Vet2;
+
+    Vet1 = (<span class="kw">int</span>*) <span class="fn">malloc</span>(<span class="num">100</span> * <span class="kw">sizeof</span>(<span class="kw">int</span>));  <span class="cmt">/* 100 ints com lixo */</span>
+    Vet2 = (<span class="kw">int</span>*) <span class="fn">calloc</span>(<span class="num">100</span>, <span class="kw">sizeof</span>(<span class="kw">int</span>));   <span class="cmt">/* 100 ints zerados  */</span>
+
+    <span class="fn">free</span>(Vet1);  Vet1 = <span class="kw">NULL</span>;
+    <span class="fn">free</span>(Vet2);  Vet2 = <span class="kw">NULL</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 06 -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>realloc() — redimensionando o bloco</h2>
+
+    <p>E quando o vetor fica cheio e você precisa de mais espaço? É para isso que existe o <code style="color:var(--accent3)">realloc</code>. Ele redimensiona um bloco de memória já existente, preservando o conteúdo original.</p>
+
+    <div class="code-label">sintaxe</div>
+    <pre><code><span class="kw">void</span>* <span class="fn">realloc</span>(<span class="kw">void</span> *ptr, size_t novo_tamanho_em_bytes);
+<span class="cmt">/* ptr: ponteiro para o bloco existente
+   novo_tamanho: tamanho desejado em bytes
+   Retorna: ponteiro para o novo bloco (pode ser diferente do original!) */</span></code></pre>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia</div>
+      <p>Imagine que você alugou um apartamento de 2 quartos. Quando a família cresceu, você precisou de 4 quartos. O realloc é como o processo de mudar para um apartamento maior, carregando todos os móveis. Se houver espaço no mesmo corredor, fica no mesmo lugar. Se não houver, você se muda para outro andar e o endereço muda.</p>
+    </div>
+
+    <div class="code-label">exemplo — vetor que cresce sob demanda</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span>  tamanho = <span class="num">4</span>;
+    <span class="kw">int</span>  ocupacao = <span class="num">0</span>;
+    <span class="kw">int</span> *vetor = (<span class="kw">int</span>*) <span class="fn">malloc</span>(tamanho * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < <span class="num">10</span>; i++) {
+
+        <span class="kw">if</span> (ocupacao == tamanho) {       <span class="cmt">/* vetor cheio! */</span>
+            tamanho = tamanho * <span class="num">2</span>;       <span class="cmt">/* dobra o tamanho */</span>
+
+            <span class="kw">int</span> *tmp = (<span class="kw">int</span>*) <span class="fn">realloc</span>(vetor, tamanho * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+            <span class="kw">if</span> (tmp == <span class="kw">NULL</span>) {           <span class="cmt">/* realloc falhou */</span>
+                <span class="fn">free</span>(vetor);
+                <span class="kw">return</span> <span class="num">1</span>;
+            }
+            vetor = tmp;                 <span class="cmt">/* atualiza o ponteiro! */</span>
+        }
+
+        vetor[ocupacao] = i * <span class="num">10</span>;
+        ocupacao++;
+    }
+
+    <span class="fn">free</span>(vetor);
+    vetor = <span class="kw">NULL</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="warn">
+      <strong>Nunca faça:</strong> <code>vetor = realloc(vetor, novo_tam);</code> diretamente. Se o realloc falhar, ele retorna NULL e você perde o ponteiro original, causando memory leak. Sempre use uma variável temporária como no exemplo acima.
+    </div>
+
+    <div class="diagram">  Antes do realloc (tamanho=4, cheio):
+  Heap: [ 0 | 10 | 20 | 30 ]
+                             ↑ sem espaço para inserir
+
+  Depois de realloc(vetor, 8 * sizeof(int)):
+  Caso 1 — havia espaço contíguo:
+  Heap: [ 0 | 10 | 20 | 30 |    |    |    |    ]  mesmo endereço
+
+  Caso 2 — sem espaço contíguo:
+  Heap: [livre]  [ 0 | 10 | 20 | 30 |    |    |    |    ]
+                  novo endereço — vetor aponta para cá agora</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 07 -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>free() e memory leak — devolvendo a memória</h2>
+
+    <p><code style="color:var(--accent3)">free()</code> libera o bloco apontado pelo ponteiro, devolvendo-o ao Heap. Sem ela, a memória continua ocupada até o programa encerrar.</p>
+
+    <div class="code-label">sintaxe</div>
+    <pre><code><span class="kw">void</span> <span class="fn">free</span>(<span class="kw">void</span> *ptr);</code></pre>
+
+    <h3>Memory Leak — o que acontece quando você esquece o free</h3>
+
+    <p>Observe o exemplo abaixo. A cada chamada da função, 1000 inteiros são alocados e nunca liberados. Em um loop de 1 milhão de iterações, isso consome aproximadamente 4 GB de RAM.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header pink">❌ Memory Leak — sem free</div>
+        <pre><code><span class="kw">void</span> <span class="fn">processaDados</span>() {
+  <span class="kw">int</span> *buf = (<span class="kw">int</span>*)
+    <span class="fn">malloc</span>(<span class="num">1000</span>*<span class="kw">sizeof</span>(<span class="kw">int</span>));
+  <span class="cmt">/* ... processa ... */</span>
+  <span class="cmt">/* esqueceu o free! */</span>
+}
+<span class="cmt">/* a cada chamada, 4KB
+   vaza para sempre */</span></code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header green">✔ Correto — com free</div>
+        <pre><code><span class="kw">void</span> <span class="fn">processaDados</span>() {
+  <span class="kw">int</span> *buf = (<span class="kw">int</span>*)
+    <span class="fn">malloc</span>(<span class="num">1000</span>*<span class="kw">sizeof</span>(<span class="kw">int</span>));
+  <span class="cmt">/* ... processa ... */</span>
+  <span class="fn">free</span>(buf);
+  buf = <span class="kw">NULL</span>;
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Sempre libere o que alocou</h4>
+          <p>Para cada malloc ou calloc deve haver um free correspondente.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Nunca libere duas vezes (double free)</h4>
+          <p>Chamar free(p) duas vezes no mesmo ponteiro causa comportamento indefinido e pode corromper o heap silenciosamente.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Nunca use após liberar (use-after-free)</h4>
+          <p>Após free(p), o ponteiro aponta para memória inválida. Atribua <code>p = NULL</code> logo após para evitar esse bug.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 08 SIMULADOR -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Simulador interativo do Heap</h2>
+    <p>Clique nos botões para simular alocações, realocações e liberações. Observe o que acontece no Heap a cada operação.</p>
+
+    <div id="mem-demo">
+      <div class="mem-controls">
+        <button class="mem-btn" onclick="memAlloc('Vet1', 4, 'alloc')">malloc Vet1 (4 ints)</button>
+        <button class="mem-btn purple" onclick="memAlloc('Vet2', 3, 'alloc2')">calloc Vet2 (3 ints)</button>
+        <button class="mem-btn green" id="btn-realloc" onclick="memRealloc('Vet1')" disabled>realloc Vet1 (8 ints)</button>
+        <button class="mem-btn red" id="btn-free1" onclick="memFree('Vet1')" disabled>free(Vet1)</button>
+        <button class="mem-btn red" id="btn-free2" onclick="memFree('Vet2')" disabled>free(Vet2)</button>
+        <button class="mem-btn" style="border-color:var(--border);color:var(--text-muted)" onclick="memReset()">&#8635; Reiniciar</button>
+      </div>
+      <div class="mem-layout">
+        <div>
+          <div class="mem-col-title">// heap (memória dinâmica)</div>
+          <div id="heap-visual">
+            <div class="heap-label-top">[ heap vazio ]</div>
+            <div class="heap-blocks" id="heap-blocks"></div>
+          </div>
+          <div class="mem-desc" id="mem-desc">Clique em "malloc Vet1" para começar.</div>
+        </div>
+        <div>
+          <div class="mem-col-title">// log de operações</div>
+          <div id="mem-log"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 09 STRUCTS -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Structs com ponteiros — . vs -></h2>
+
+    <p>Structs são usados frequentemente com alocação dinâmica. Quando você tem um ponteiro para uma struct, precisa saber qual operador usar para acessar os campos.</p>
+
+    <div class="concept-card">
+      <p>📌 <code style="color:var(--accent)">variavel.campo</code>: acessa o campo quando você tem a <strong>variável diretamente</strong>.</p>
+      <p>📌 <code style="color:var(--accent)">ponteiro->campo</code>: acessa o campo quando você tem um <strong>ponteiro</strong> para a struct. É um atalho para <code>(*ponteiro).campo</code>.</p>
+    </div>
+
+    <div class="code-label">definindo struct com typedef</div>
+    <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="kw">int</span>   idade;
+    <span class="kw">float</span> ira;
+} Aluno;   <span class="cmt">/* typedef cria um apelido — não precisa escrever "struct Aluno" */</span></code></pre>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header orange">Variável direta — usa ponto (.)</div>
+        <pre><code>Aluno a;
+a.idade = <span class="num">20</span>;
+<span class="fn">printf</span>(<span class="str">"%d"</span>, a.idade);</code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header purple">Ponteiro — usa seta (->)</div>
+        <pre><code>Aluno *p = &a;
+p->idade = <span class="num">20</span>;
+<span class="fn">printf</span>(<span class="str">"%d"</span>, p->idade);</code></pre>
+      </div>
+    </div>
+
+    <h3>Alocando struct dinamicamente</h3>
+
+    <div class="code-label">criar e destruir struct no heap</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    Aluno *p = (Aluno *) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(Aluno));
+
+    <span class="kw">if</span> (p == <span class="kw">NULL</span>) { <span class="kw">return</span> <span class="num">1</span>; }
+
+    <span class="fn">strcpy</span>(p->nome, <span class="str">"Ana"</span>);   <span class="cmt">/* acessa campo pelo ponteiro */</span>
+    p->idade = <span class="num">20</span>;
+    p->ira   = <span class="num">3.85</span>;
+
+    <span class="fn">printf</span>(<span class="str">"%s tem %d anos, IRA %.2f\n"</span>, p->nome, p->idade, p->ira);
+
+    <span class="fn">free</span>(p);
+    p = <span class="kw">NULL</span>;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <h3>Vetor de structs dinamicamente alocado</h3>
+    <pre><code>Aluno *turma = (Aluno *) <span class="fn">malloc</span>(n * <span class="kw">sizeof</span>(Aluno));
+
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++) {
+    <span class="fn">scanf</span>(<span class="str">"%s %d"</span>, turma[i].nome, &turma[i].idade);
+    <span class="cmt">/* turma[i] já é a struct, não ponteiro — usa ponto (.) */</span>
+}
+
+<span class="fn">free</span>(turma);
+turma = <span class="kw">NULL</span>;</code></pre>
+
+    <div class="tip">Use <code>-></code> quando a variável for um ponteiro. Use <code>.</code> quando for a struct direta. A dúvida some se você perguntar: "tenho a struct ou tenho o endereço dela?"</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 10 PONTEIRO PARA PONTEIRO -->
+  <section id="sec10">
+    <div class="section-number">// 10</div>
+    <h2>Ponteiro para ponteiro e matrizes dinâmicas</h2>
+
+    <p>Um ponteiro pode apontar para qualquer tipo, inclusive para outro ponteiro. Isso é declarado com dois asteriscos: <code style="color:var(--accent3)">int **p</code>. Esse conceito é a base para criar matrizes dinâmicas em C.</p>
+
+    <div class="diagram">  int **mat;   (ponteiro para ponteiro de int)
+
+  mat  ──► [ *linha0 | *linha1 | *linha2 ]  (vetor de ponteiros)
+                │          │          │
+                ▼          ▼          ▼
+             [0|1|2]    [3|4|5]    [6|7|8]  (linhas no heap)</div>
+
+    <div class="code-label">alocando uma matriz NxM dinamicamente</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">int</span> N = <span class="num">3</span>, M = <span class="num">4</span>;
+    <span class="kw">int</span> i, j;
+
+    <span class="cmt">/* Passo 1: aloca vetor de N ponteiros (as linhas) */</span>
+    <span class="kw">int</span> **mat = (<span class="kw">int</span> **) <span class="fn">malloc</span>(N * <span class="kw">sizeof</span>(<span class="kw">int</span> *));
+
+    <span class="cmt">/* Passo 2: para cada linha, aloca M inteiros (as colunas) */</span>
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < N; i++)
+        mat[i] = (<span class="kw">int</span> *) <span class="fn">malloc</span>(M * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+
+    <span class="cmt">/* Usa a matriz normalmente com mat[linha][coluna] */</span>
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < N; i++)
+        <span class="kw">for</span> (j = <span class="num">0</span>; j < M; j++)
+            mat[i][j] = i * M + j;
+
+    <span class="cmt">/* Passo 3: libera em ordem inversa — primeiro as linhas */</span>
+    <span class="kw">for</span> (i = <span class="num">0</span>; i < N; i++) {
+        <span class="fn">free</span>(mat[i]);
+        mat[i] = <span class="kw">NULL</span>;
+    }
+    <span class="fn">free</span>(mat);    <span class="cmt">/* depois o vetor de ponteiros */</span>
+    mat = <span class="kw">NULL</span>;
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="warn">
+      A liberação deve ser feita em ordem inversa à alocação: primeiro libere cada linha com free(mat[i]), depois libere o vetor de ponteiros com free(mat). Inverter a ordem causa memory leak ou acesso a memória inválida.
+    </div>
+
+    <div class="concept-card purple">
+      <p>A grande vantagem desta abordagem é que as linhas não precisam ser contíguas na memória, e cada linha pode ter um tamanho diferente. Isso permite matrizes triangulares e outras estruturas irregulares.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 11 VETORES -->
+  <section id="sec11">
+    <div class="section-number">// 11</div>
+    <h2>Vetores dinâmicos — operações e limitações</h2>
+
+    <p>Um vetor dinâmico mantém dois valores separados: o <strong>tamanho</strong> (capacidade total alocada) e a <strong>ocupação</strong> (quantos elementos estão em uso de fato). O vetor não guarda essas informações sozinho. Você precisa passá-las como parâmetro para qualquer função que opere sobre o vetor.</p>
+
+    <h3>Vetor Desordenado</h3>
+    <p>Na inserção desordenada, o novo elemento vai direto na próxima posição livre. Na remoção de um elemento qualquer, o truque é sobrescrever a posição removida com o último elemento, evitando deslocar tudo.</p>
+
+    <div id="vec-demo-section">
+      <div class="vec-demo">
+        <div class="vec-meta"><span class="tm">Tamanho: 8</span><span class="oc" id="oc-unordered">Ocupação: 3</span></div>
+        <div class="vec-row" id="vec-unordered"></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="mem-btn" onclick="vecInsert()">+ Inserir 1.5</button>
+          <button class="mem-btn red" id="btn-del-last" onclick="vecDeleteLast()">Remover último</button>
+          <button class="mem-btn red" id="btn-del-any" onclick="vecDeleteAny()">Remover pos 1 (truque)</button>
+          <button class="mem-btn" style="border-color:var(--border);color:var(--text-muted)" onclick="vecReset()">&#8635;</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept-card">
+      <p><strong>Inserção desordenada:</strong> O(1). Coloca direto na posição ocupacao e incrementa.</p>
+      <p><strong>Remoção do último:</strong> O(1). Só decrementa a ocupação.</p>
+      <p><strong>Remoção de qualquer elemento:</strong> O(1) no desordenado. Copia o último para a posição removida, sem precisar deslocar nada.</p>
+    </div>
+
+    <h3>Vetor Ordenado</h3>
+    <p>A inserção ordenada exige encontrar a posição correta e deslocar os elementos maiores para abrir espaço. A remoção também exige deslocar para fechar o buraco.</p>
+
+    <div class="diagram">  Inserir 15 no vetor [10, 20, 40] (ordenado):
+
+  Antes:   [ 10 | 20 | 40 |    |    |    |    |    ]  ocupacao=3
+
+  Passo 1: Encontrar a posição correta: 15 vai entre 10 e 20, posição 1
+  Passo 2: Deslocar os maiores para a direita: 40 vai para pos 2, 20 para pos 2
+  Passo 3: Inserir na posição 1
+
+  Depois:  [ 10 | 15 | 20 | 40 |    |    |    |    ]  ocupacao=4
+
+  E se o vetor estiver cheio? Usar realloc para expandir!</div>
+
+    <div class="concept-card purple">
+      <p><strong>Inserção ordenada:</strong> O(n). Precisa deslocar elementos.</p>
+      <p><strong>Remoção ordenada:</strong> O(n). Precisa deslocar para fechar o buraco.</p>
+      <p><strong>Vetor cheio:</strong> use realloc para dobrar o tamanho e continuar inserindo.</p>
+    </div>
+
+    <div class="warn">
+      Um vetor (estático ou dinâmico) não sabe seu próprio tamanho. Sempre passe o tamanho como parâmetro extra para funções que recebem vetores.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 12 RESUMO -->
+  <section id="sec12">
+    <div class="section-number">// 12</div>
+    <h2>Resumo das funções</h2>
+
+    <table>
+      <thead><tr><th>Função</th><th>O que faz</th><th>Inicializa?</th><th>Biblioteca</th></tr></thead>
+      <tbody>
+        <tr><td>malloc(n)</td><td>Aloca n bytes no Heap</td><td>Não (lixo)</td><td>stdlib.h</td></tr>
+        <tr><td>calloc(q, t)</td><td>Aloca q elementos de t bytes, zerados</td><td>Sim (zeros)</td><td>stdlib.h</td></tr>
+        <tr><td>realloc(p, n)</td><td>Redimensiona bloco apontado por p para n bytes</td><td>Não (preserva conteúdo)</td><td>stdlib.h</td></tr>
+        <tr><td>free(p)</td><td>Libera bloco apontado por p de volta ao Heap</td><td>N/A</td><td>stdlib.h</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Fluxo padrão completo</h3>
+    <div class="diagram">  1. Declarar ponteiro:     int *v;
+  2. Alocar:                v = malloc(n * sizeof(int));
+  3. Verificar NULL:        if (v == NULL) { trata erro }
+  4. Usar normalmente:      v[0] = 10; v[1] = 20; ...
+  5. Realocar se precisar:  tmp = realloc(v, novo_tam); if (tmp) v = tmp;
+  6. Liberar:               free(v);
+  7. Anular ponteiro:       v = NULL;</div>
+
+    <h3>Referência rápida</h3>
+    <table>
+      <thead><tr><th>Conceito</th><th>Ponto de atenção</th></tr></thead>
+      <tbody>
+        <tr><td>Pilha (Stack)</td><td>Variáveis locais e controle de chamadas. Automática.</td></tr>
+        <tr><td>Heap (Montículo)</td><td>Alocação dinâmica. Você controla com malloc/free.</td></tr>
+        <tr><td>Passagem por referência</td><td>Use ponteiros para alterar o valor original de uma struct dentro de uma função.</td></tr>
+        <tr><td>. vs -></td><td>Ponto para variável direta, seta para ponteiro para struct.</td></tr>
+        <tr><td>realloc seguro</td><td>Sempre use variável temporária. Nunca faça ptr = realloc(ptr, ...).</td></tr>
+        <tr><td>Matriz dinâmica</td><td>Ponteiro para ponteiro. Libere as linhas antes do vetor de ponteiros.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 13 EXERCÍCIOS -->
+  <section id="sec13">
+    <div class="section-number">// 13</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual região da memória é usada por malloc e calloc para alocar memória?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) Segmento de código</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) Pilha (Stack)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) Montículo (Heap)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) Segmento de dados globais</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent3)">✔ Correto! malloc e calloc sempre alocam no Heap, que é a área reservada para alocações dinâmicas.</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent4)">✘ A memória dinâmica fica no Heap (Montículo), não na pilha nem no segmento de código.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Por que nunca se deve fazer <code style="color:var(--accent3)">ptr = realloc(ptr, novo_tam)</code> diretamente?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) Porque realloc não funciona com ponteiros já alocados</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) Porque se realloc falhar e retornar NULL, o ponteiro original é perdido causando memory leak</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) Porque realloc sempre muda o endereço do bloco</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) Porque o compilador não aceita essa sintaxe</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent3)">✔ Exato! Se realloc falha, retorna NULL. Ao atribuir diretamente a ptr, você perde a referência ao bloco original e causa memory leak.</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent4)">✘ O problema é que realloc pode retornar NULL em caso de falha. Se você atribuir direto a ptr, o endereço original é perdido para sempre.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Quando você tem um ponteiro para struct, qual operador usa para acessar um campo?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Ponto ( . )</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Seta ( -> )</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Asterisco ( * )</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Ambos funcionam do mesmo jeito</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent3)">✔ Correto! Para ponteiro use seta (->). Para variável direta use ponto (.). Seta é atalho para (*ptr).campo.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent4)">✘ Para ponteiro usa-se seta (->). O ponto é para variável direta. Seta equivale a (*ptr).campo.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Na alocação de uma matriz dinâmica com ponteiro para ponteiro, qual é a ordem correta de liberação?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) Libera o vetor de ponteiros primeiro, depois as linhas</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) Libera cada linha com free(mat[i]) primeiro, depois libera o vetor de ponteiros com free(mat)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Libera tudo com uma única chamada free(mat)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Não precisa liberar matrizes</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent3)">✔ Correto! Libere as linhas primeiro. Se liberar o vetor de ponteiros antes, você perde as referências para as linhas e causa memory leak.</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent4)">✘ Libere as linhas individualmente primeiro, depois o vetor de ponteiros. Inverter a ordem provoca memory leak.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p>5. Qual é a diferença entre calloc e malloc para alocar 10 inteiros?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) calloc é mais rápido porque usa menos memória</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) malloc é para C, calloc é exclusivo de C++</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) calloc garante que todos os valores começam com zero; malloc deixa lixo na memória</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) Não há diferença funcional</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q5" style="color:var(--accent3)">✔ Correto! calloc zera a memória alocada. malloc deixa o conteúdo anterior. calloc também recebe dois parâmetros separados: quantidade e tamanho.</div>
+        <div class="quiz-feedback" id="fb_wrong_q5" style="color:var(--accent4)">✘ A diferença principal é que calloc inicializa a memória com zeros. malloc deixa lixo na memória.</div>
+      </div>
+    </div>
+
+    <h3>Desafios para programar</h3>
+
+    <div class="concept-card yellow">
+      <p><strong>Desafio 1 — Leitura dinâmica</strong><br>
+      Peça ao usuário um número N, aloque dinamicamente um vetor de N floats com malloc, leia N valores do teclado, calcule a média e libere a memória.</p>
+    </div>
+    <div class="concept-card orange">
+      <p><strong>Desafio 2 — Crescimento sob demanda</strong><br>
+      Crie um programa que começa com um vetor de 4 posições. Quando o vetor encher, use realloc para dobrar o tamanho. Continue inserindo até o usuário parar. Exiba o tamanho atual a cada realocação.</p>
+    </div>
+    <div class="concept-card purple">
+      <p><strong>Desafio 3 — Vetor de structs</strong><br>
+      Crie uma struct Aluno com nome e IRA. Aloque dinamicamente um vetor de N alunos com malloc. Leia os dados, encontre o aluno com maior IRA e libere a memória ao final.</p>
+    </div>
+    <div class="concept-card green">
+      <p><strong>Desafio 4 — Matriz dinâmica</strong><br>
+      Aloque dinamicamente uma matriz NxM onde N e M são lidos em tempo de execução usando ponteiro para ponteiro. Preencha com valores, imprima e libere corretamente em ordem inversa.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Alocação Dinâmica de Memória</strong>
+</footer>
+
+<script>
+/* QUIZ */
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+
+/* SIMULADOR DE HEAP */
+const heapState = { Vet1: null, Vet2: null };
+const heapSizes = { Vet1: 4, Vet2: 3 };
+
+function memLog(msg, cls) {
+  const el = document.getElementById('mem-log');
+  el.innerHTML += `<div class="${cls}">${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderHeap() {
+  const container = document.getElementById('heap-blocks');
+  const label = document.querySelector('.heap-label-top');
+  container.innerHTML = '';
+  const entries = Object.entries(heapState).filter(([,v]) => v !== null);
+  if (entries.length === 0) { label.textContent = '[ heap vazio ]'; return; }
+  label.textContent = '';
+  entries.forEach(([name, cls]) => {
+    const count = heapSizes[name];
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('div');
+      d.className = 'heap-block ' + cls;
+      d.textContent = i === 0 ? `${name}[0]` : `[${i}]`;
+      container.appendChild(d);
+    }
+  });
+}
+
+function memAlloc(name, count, cls) {
+  if (heapState[name]) { memLog(`Aviso: ${name} ja esta alocado!`, 'ml-warn'); return; }
+  heapState[name] = cls;
+  heapSizes[name] = count;
+  renderHeap();
+  const init = cls === 'alloc2' ? 'zeros (calloc)' : 'lixo (malloc)';
+  memLog(`${cls === 'alloc2' ? 'calloc' : 'malloc'}: ${name} alocado com ${count * 4} bytes. Conteudo: ${init}.`, cls === 'alloc2' ? 'ml-alloc2' : 'ml-alloc');
+  document.getElementById('btn-free' + (name === 'Vet1' ? '1' : '2')).disabled = false;
+  if (name === 'Vet1') document.getElementById('btn-realloc').disabled = false;
+  document.getElementById('mem-desc').textContent = `${name} alocado no Heap com ${count} elementos (${count*4} bytes). Use ${name}[0] ate ${name}[${count-1}].`;
+}
+
+function memRealloc(name) {
+  if (!heapState[name] || heapState[name] === 'freed') { memLog('Aviso: precisa alocar Vet1 primeiro!', 'ml-warn'); return; }
+  const oldCount = heapSizes[name];
+  const newCount = oldCount * 2;
+  heapSizes[name] = newCount;
+  heapState[name] = 'realloc';
+  renderHeap();
+  memLog(`realloc: ${name} expandido de ${oldCount} para ${newCount} ints (${newCount*4} bytes). Conteudo original preservado.`, 'ml-realloc');
+  document.getElementById('mem-desc').textContent = `${name} realocado! Novo tamanho: ${newCount} elementos. O conteudo original foi preservado nos primeiros ${oldCount} indices.`;
+}
+
+function memFree(name) {
+  if (!heapState[name]) { memLog(`Aviso: ${name} ja foi liberado!`, 'ml-warn'); return; }
+  heapState[name] = 'freed';
+  renderHeap();
+  memLog(`free(${name}): memoria devolvida ao Heap.`, 'ml-free');
+  document.getElementById('btn-free' + (name === 'Vet1' ? '1' : '2')).disabled = true;
+  if (name === 'Vet1') document.getElementById('btn-realloc').disabled = true;
+  document.getElementById('mem-desc').textContent = `${name} liberado. Boa pratica: atribua ${name} = NULL para evitar use-after-free.`;
+  setTimeout(() => { heapState[name] = null; renderHeap(); }, 1400);
+}
+
+function memReset() {
+  heapState.Vet1 = null; heapState.Vet2 = null;
+  heapSizes.Vet1 = 4; heapSizes.Vet2 = 3;
+  renderHeap();
+  document.getElementById('mem-log').innerHTML = '';
+  document.getElementById('mem-desc').textContent = 'Clique em "malloc Vet1" para comecar.';
+  document.getElementById('btn-free1').disabled = true;
+  document.getElementById('btn-free2').disabled = true;
+  document.getElementById('btn-realloc').disabled = true;
+  document.querySelector('.heap-label-top').textContent = '[ heap vazio ]';
+}
+
+/* VETOR DEMO */
+let vecData = [10.7, 5.9, 9.9];
+const VEC_MAX = 8;
+
+function renderVec(highlightIdx = -1, deletedIdx = -1) {
+  const container = document.getElementById('vec-unordered');
+  container.innerHTML = '';
+  for (let i = 0; i < VEC_MAX; i++) {
+    const d = document.createElement('div');
+    d.className = 'vec-cell';
+    if (i < vecData.length) {
+      if (i === highlightIdx) d.classList.add('highlight');
+      else if (i === deletedIdx) d.classList.add('deleted');
+      else d.classList.add('filled');
+      d.textContent = vecData[i];
+    } else {
+      d.classList.add('empty');
+      d.textContent = 'vazio';
+    }
+    container.appendChild(d);
+  }
+  document.getElementById('oc-unordered').textContent = 'Ocupacao: ' + vecData.length;
+  document.getElementById('btn-del-last').disabled = vecData.length === 0;
+  document.getElementById('btn-del-any').disabled = vecData.length < 2;
+}
+
+function vecInsert() {
+  if (vecData.length >= VEC_MAX) { alert('Vetor cheio! Usaria realloc aqui.'); return; }
+  vecData.push(1.5);
+  renderVec(vecData.length - 1);
+}
+
+function vecDeleteLast() {
+  if (vecData.length === 0) return;
+  renderVec(-1, vecData.length - 1);
+  setTimeout(() => { vecData.pop(); renderVec(); }, 600);
+}
+
+function vecDeleteAny() {
+  if (vecData.length < 2) return;
+  vecData[1] = vecData[vecData.length - 1];
+  renderVec(1);
+  setTimeout(() => { vecData.pop(); renderVec(); }, 600);
+}
+
+function vecReset() {
+  vecData = [10.7, 5.9, 9.9];
+  renderVec();
+}
+
+renderVec();
+memReset();
+</script>
+</body>
+</html>
