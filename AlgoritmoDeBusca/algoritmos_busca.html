@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritmos de Busca — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --accent5: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a0f08 0%, #2a1a0a 50%, #180e08 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'O(log n)'; position: absolute; right: 50px; top: 10px;
+    font-size: 200px; font-family: 'Fraunces', serif;
+    color: rgba(247,162,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent); border-color: var(--accent); background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent2);  border-color: var(--accent2);  background: rgba(106,247,196,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-purple { color: var(--accent5); border-color: var(--accent5); background: rgba(247,224,106,0.08); }
+  .badge-yellow { color: #f7e06a; border-color: #f7e06a; background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: #f7e06a; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(247,162,106,0.07), rgba(106,247,196,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '\26A0 '; color: var(--accent4); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '\1F4A1 '; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Nilton Correia da Silva</div>
+    <h1>Algoritmos de<br><span>Busca</span></h1>
+    <p class="subtitle">Busca sequencial em vetor desordenado, busca sequencial em vetor ordenado e busca binária com códigos e comparações</p>
+    <div class="badge-row">
+      <span class="badge badge-orange">Busca Sequencial</span>
+      <span class="badge badge-green">Busca Binária</span>
+      <span class="badge badge-pink">O(n) × O(log n)</span>
+      <span class="badge badge-purple">Divisão e Conquista</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Busca — visão geral</a></li>
+      <li><a href="#sec2">Busca sequencial em vetor desordenado</a></li>
+      <li><a href="#sec3">Busca sequencial em vetor ordenado</a></li>
+      <li><a href="#sec4">Busca binária</a></li>
+      <li><a href="#sec5">Tabela comparativa</a></li>
+      <li><a href="#sec6">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Busca — <span style="color:var(--accent)">visão geral</span></h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Buscar um dado em um vetor é como procurar um livro em uma estante: se os livros estão bagunçados (desordenados), você precisa olhar um por um (busca sequencial). Se estão ordenados por título, você pode ir direto ao meio e decidir se o livro está antes ou depois (busca binária).</p>
+    </div>
+
+    <p>A busca é uma das operações mais frequentes em computação. A eficiência de uma busca depende diretamente de <strong>como os dados estão organizados</strong> na memória.</p>
+
+    <p>A aula aborda três cenários:</p>
+    <ul style="color:#c8c8e0; margin-left:20px; margin-bottom:14px;">
+      <li><strong>Busca sequencial</strong> em vetor <em>desordenado</em> — sem pré-requisitos</li>
+      <li><strong>Busca sequencial</strong> em vetor <em>ordenado</em> — pode parar antes</li>
+      <li><strong>Busca binária</strong> em vetor <em>ordenado</em> — salto direto ao meio</li>
+    </ul>
+
+    <div class="concept-card">
+      <p><strong>Por que ordenação importa?</strong> Um vetor ordenado permite estrategias de busca muito mais eficientes (O(log n) contra O(n)), economizando tempo — especialmente em grandes volumes de dados.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Busca sequencial em <span style="color:var(--accent)">vetor desordenado</span></h2>
+
+    <p>Não há qualquer restrição sobre o vetor. A busca percorre todos os elementos do início ao fim até encontrar o valor desejado (<strong>ou até chegar ao final</strong> sem sucesso).</p>
+
+    <div class="code-label">busca sequencial em vetor desordenado — C</div>
+    <pre><code><span class="cmt">/* Busca por 'valor' em vetor 'v' de tamanho 'n'.
+ * Retorna o índice se encontrar, -1 caso contrário. */</span>
+<span class="kw">int</span> <span class="fn">buscaSequencialDesordenado</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (v[i] == valor)
+            <span class="kw">return</span> i;
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+
+    <div class="diagram">  Exemplo: v = [34, 12, 7, 98, 3, 21], busca por 7
+  i=0: v[0]=34 ≠ 7
+  i=1: v[1]=12 ≠ 7
+  i=2: v[2]=7  == 7 → retorna 2
+
+  Busca por 99:
+  i=0: 34, i=1: 12, i=2: 7, i=3: 98, i=4: 3, i=5: 21
+  Fim do vetor → retorna -1</div>
+
+    <div class="concept-card green">
+      <p><strong>Complexidade:</strong> Melhor caso O(1) | Pior caso O(n) | Caso médio O(n)</p>
+      <p>Se o elemento está na primeira posição, uma única comparação resolve. Se não existe ou está no final, percorre o vetor inteiro. <strong>Não há ganho</strong> com ordenação aqui, pois não podemos assumir nada sobre a posição dos elementos.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Busca sequencial em <span style="color:var(--accent)">vetor ordenado</span></h2>
+
+    <p>Quando o vetor está <strong>ordenado</strong>, podemos interromper a busca precocemente: se o valor na posição atual já é <strong>maior que o procurado</strong>, certamente o valor não está no restante do vetor.</p>
+
+    <div class="code-label">busca sequencial em vetor ordenado — C</div>
+    <pre><code><span class="cmt">/* Vetor v está ordenado crescentemente.
+ * Retorna o índice ou -1 se não encontrado. */</span>
+<span class="kw">int</span> <span class="fn">buscaSequencialOrdenado</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+        <span class="kw">if</span> (v[i] == valor)  <span class="kw">return</span> i;
+        <span class="kw">if</span> (v[i] &gt; valor)   <span class="kw">break</span>;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+
+    <div class="diagram">  Exemplo: v = [3, 7, 12, 21, 34, 98], busca por 7
+  i=0: v[0]=3  <  7 → continua
+  i=1: v[1]=7  == 7 → retorna 1
+
+  Busca por 15:
+  i=0: v[0]=3  <  15 → continua
+  i=1: v[1]=7  <  15 → continua
+  i=2: v[2]=12 <  15 → continua
+  i=3: v[3]=21 >  15 → break → retorna -1</div>
+
+    <div class="concept-card orange">
+      <p><strong>Complexidade:</strong> Melhor caso O(1) | Pior caso O(n) | Caso médio O(n/2)</p>
+      <p>A ordenação permite encerrar a busca <strong>antes</strong> do final quando o elemento procurado não existe, mas no pior caso (elemento no final) ainda é O(n).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2><span style="color:var(--accent)">Busca binária</span></h2>
+
+    <p>A busca binária (<em>binary search</em>) é um algoritmo de <strong>divisão e conquista</strong> que explora o fato de o vetor estar ordenado. A cada passo, compara o valor procurado com o elemento do meio e:</p>
+    <ul style="color:#c8c8e0; margin-left:20px; margin-bottom:14px;">
+      <li>Se igual → encontrou (retorna o índice)</li>
+      <li>Se menor → busca na metade esquerda</li>
+      <li>Se maior → busca na metade direita</li>
+    </ul>
+
+    <div class="code-label">busca binária — C (iterativa e recursiva)</div>
+    <pre><code><span class="cmt">/* Versão iterativa */</span>
+<span class="kw">int</span> <span class="fn">buscaBinariaIterativa</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">int</span> esq = <span class="num">0</span>, dir = n - <span class="num">1</span>, meio;
+    <span class="kw">while</span> (esq &lt;= dir) {
+        meio = (esq + dir) / <span class="num">2</span>;
+        <span class="kw">if</span> (valor == v[meio])     <span class="kw">return</span> meio;
+        <span class="kw">else</span> <span class="kw">if</span> (valor &lt; v[meio]) dir  = meio - <span class="num">1</span>;
+        <span class="kw">else</span>                     esq = meio + <span class="num">1</span>;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}
+
+<span class="cmt">/* Versão recursiva */</span>
+<span class="kw">int</span> <span class="fn">buscaBinariaRecursiva</span>(<span class="kw">int</span> v[], <span class="kw">int</span> esq, <span class="kw">int</span> dir, <span class="kw">int</span> valor) {
+    <span class="kw">if</span> (esq &gt; dir) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="kw">int</span> meio = (esq + dir) / <span class="num">2</span>;
+    <span class="kw">if</span> (valor == v[meio])
+        <span class="kw">return</span> meio;
+    <span class="kw">else</span> <span class="kw">if</span> (valor &lt; v[meio])
+        <span class="kw">return</span> <span class="fn">buscaBinariaRecursiva</span>(v, esq, meio - <span class="num">1</span>, valor);
+    <span class="kw">else</span>
+        <span class="kw">return</span> <span class="fn">buscaBinariaRecursiva</span>(v, meio + <span class="num">1</span>, dir, valor);
+}</code></pre>
+
+    <div class="diagram">  Exemplo: v = [3, 7, 12, 21, 34, 98], busca por 12
+
+  esq=0, dir=5, meio=2: v[2]=12 == 12 → retorna 2
+
+  Busca por 34:
+  esq=0, dir=5, meio=2: v[2]=12 < 34 → esq=3
+  esq=3, dir=5, meio=4: v[4]=34 == 34 → retorna 4
+
+  Busca por 8 (não existe):
+  esq=0, dir=5, meio=2: v[2]=12 > 8 → dir=1
+  esq=0, dir=1, meio=0: v[0]=3  < 8 → esq=1
+  esq=1, dir=1, meio=1: v[1]=7  < 8 → esq=2
+  esq=2, dir=1: esq > dir → retorna -1</div>
+
+    <div class="concept-card pink">
+      <p><strong>Complexidade:</strong> Melhor caso O(1) | Pior caso O(log n) | In-place: sim | Recursivo/iterativo: ambos</p>
+      <p>A cada iteração, o espaço de busca é reduzido à metade. Para um vetor de 1 milhão de elementos, a busca binária precisa de no máximo ~20 comparações contra até 1 milhão da busca sequencial.</p>
+    </div>
+
+    <div class="warn">A busca binária exige que o vetor esteja ordenado. Se for necessário ordenar primeiro, considere o custo da ordenação no custo total da operação.</div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">busca</span></h2>
+
+    <table>
+      <thead><tr><th>Algoritmo</th><th>Vetor</th><th>Melhor caso</th><th>Pior caso</th><th>Pré-requisito</th></tr></thead>
+      <tbody>
+        <tr><td>Sequencial (desordenado)</td><td>Qualquer</td><td>O(1)</td><td>O(n)</td><td>Nenhum</td></tr>
+        <tr><td>Sequencial (ordenado)</td><td>Ordenado</td><td>O(1)</td><td>O(n)</td><td>Ordenação</td></tr>
+        <tr><td>Binária</td><td>Ordenado</td><td>O(1)</td><td>O(log n)</td><td>Ordenação</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card green">
+      <p><strong>Resumo prático:</strong> Para vetores pequenos (n &lt; 30), a busca sequencial é competitiva pela simplicidade e baixo overhead. Para vetores grandes, a busca binária é amplamente superior. A busca sequencial ordenada só é vantajosa quando o elemento não existe — a parada antecipada evita percorrer o vetor inteiro.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual a complexidade da busca binária no pior caso?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) O(1)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent2)">✔ Correto! A busca binária reduz o espaço pela metade a cada passo — O(log n).</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent4)">✘ Busca binária é O(log n). Cada iteração descarta metade do vetor.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Qual a principal diferença entre busca sequencial em vetor desordenado e ordenado?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) Não há diferença</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) No ordenado, podemos parar quando o valor atual ultrapassa o procurado</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) No desordenado, o melhor caso é O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) No ordenado, não precisamos comparar valores</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent2)">✔ Sim! Em vetor ordenado, se v[i] &gt; valor, o elemento não existe — podemos interromper a busca.</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent4)">✘ A ordenação permite a parada antecipada: se v[i] &gt; valor, o elemento procurado não está à direita.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Em um vetor de 1024 elementos, quantas comparações a busca binária faz no máximo?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 512</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) 1024</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">c) 11</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 10</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent2)">✔ Exato! log₂(1024) = 10, e o pior caso executa 10 + 1 = 11 comparações (considerando a última comparação de igualdade).</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent4)">✘ log₂(1024) = 10 → no máximo 11 comparações (incluindo a verificação final).</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Qual pré-requisito a busca binária exige?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) Vetor com poucos elementos</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) Vetor ordenado</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Vetor sem elementos repetidos</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Vetor alocado dinamicamente</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent2)">✔ Correto! A busca binária só funciona corretamente em vetores ordenados.</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent4)">✘ Sem a ordenação, a premissa "se é menor está à esquerda" não se sustenta.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Algoritmos de Busca</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>

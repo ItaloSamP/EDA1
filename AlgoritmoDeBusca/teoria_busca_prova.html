@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria — Busca para a Prova · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a0f08 0%, #2a1a0a 50%, #180e08 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'PROVA'; position: absolute; right: 40px; top: 10px;
+    font-size: 160px; font-family: 'Fraunces', serif;
+    color: rgba(247,162,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent); border-color: var(--accent); background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent2); border-color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow); border-color: var(--yellow); background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  h4 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; color: var(--accent); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  ul, ol { color: #c8c8e0; margin-left: 22px; margin-bottom: 14px; }
+  li { margin: 5px 0; }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green  { border-left-color: var(--accent2); }
+  .concept-card.purple { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .hl  { background: rgba(247,162,106,0.15); border-radius: 3px; padding: 0 3px; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.35); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  /* Seção de pegadinhas — estilo especial */
+  .pegadinha-box { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.05)); border: 1px solid rgba(247,106,154,0.3); border-radius: 12px; padding: 24px 28px; margin: 28px 0; }
+  .pegadinha-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .pegadinha-box h4 { color: var(--accent4); margin-top: 16px; }
+
+  /* Trace interativo */
+  .trace-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 0; margin: 20px 0; overflow: hidden; }
+  .trace-header { background: rgba(124,106,247,0.12); padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent3); text-transform: uppercase; letter-spacing: 1px; }
+  .trace-body { padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+
+  /* Tabela */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Quiz */
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; padding: 10px 14px; border-radius: 6px; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); display: none; }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .toc, .quiz { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Preparação para Prova 2</div>
+    <h1>Teoria de <span>Algoritmos de Busca</span></h1>
+    <p class="subtitle">Guia focado em prova: como cada algoritmo funciona por dentro, onde estão as pegadinhas e como interpretar qualquer variação de código.</p>
+    <div class="badge-row">
+      <span class="badge badge-orange">Busca Sequencial</span>
+      <span class="badge badge-green">Busca Binária</span>
+      <span class="badge badge-purple">Índice × Valor</span>
+      <span class="badge badge-pink">Pegadinhas</span>
+      <span class="badge badge-yellow">Traces Completos</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que a prova pede — leia antes de tudo</a></li>
+      <li><a href="#sec2">Busca sequencial — vetor desordenado</a></li>
+      <li><a href="#sec3">Busca sequencial — vetor ordenado</a></li>
+      <li><a href="#sec4">Busca binária — teoria completa</a></li>
+      <li><a href="#sec5">Busca binária — trace passo a passo</a></li>
+      <li><a href="#sec6">Pegadinhas da prova — busca</a></li>
+      <li><a href="#sec7">Tabela de complexidades</a></li>
+      <li><a href="#sec8">Questões no estilo da prova</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== SEÇÃO 1 ===== -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que a prova pede — <span style="color:var(--accent)">leia antes de tudo</span></h2>
+
+    <p>A prova do professor Nilton é predominantemente de <strong>análise de código</strong>. Você recebe uma função em C e precisa dizer o que ela imprime, o que retorna ou qual o estado das variáveis num ponto específico.</p>
+
+    <div class="concept-card">
+      <p><strong>Padrão recorrente das questões:</strong></p>
+      <ul>
+        <li>Função recebe como parâmetros seu <strong>nome</strong> e/ou <strong>matrícula</strong></li>
+        <li>O código faz algum processamento com os dígitos da matrícula ou letras do nome</li>
+        <li>Pergunta: "qual a saída?" ou "qual o valor de X ao final?"</li>
+        <li>Existe quase sempre <strong>uma pegadinha</strong> — um detalhe que muda tudo</li>
+      </ul>
+    </div>
+
+    <p>Para busca, os padrões mais comuns são:</p>
+    <ul>
+      <li>Dado um vetor construído a partir da matrícula, qual o índice encontrado pela busca?</li>
+      <li>O algoritmo busca por um valor — mas o código usa <code>índice</code>, não <code>valor</code>. Muita atenção.</li>
+      <li>A busca retorna <code>-1</code> ou o índice? E se não encontrar?</li>
+      <li>Contar quantas comparações/iterações o loop executa para uma entrada específica</li>
+    </ul>
+
+    <div class="warn">
+      <div class="warn-title">Erro clássico — índice vs valor</div>
+      <p>Na prova anterior, o código separava dígitos pares e ímpares da matrícula. A pegadinha era: o vetor acumulava os <strong>índices</strong> (posições) dos dígitos pares/ímpares, não os <strong>valores</strong> deles. Sempre leia o código inteiro antes de assumir o que ele faz.</p>
+    </div>
+
+    <div class="tip">
+      <div class="tip-title">Método seguro para questões de código</div>
+      <ol>
+        <li>Leia a assinatura da função — parâmetros e tipo de retorno</li>
+        <li>Identifique as variáveis e seus valores iniciais</li>
+        <li>Execute o loop mentalmente <strong>linha por linha</strong>, anotando os valores</li>
+        <li>Não assuma — confirme com o código o que é índice e o que é valor</li>
+        <li>Verifique a condição de parada com cuidado (< vs <=)</li>
+      </ol>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 2 ===== -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Busca sequencial — <span style="color:var(--accent)">vetor desordenado</span></h2>
+
+    <p>Percorre o vetor do índice 0 ao índice n-1, comparando cada elemento com o valor buscado. Para assim que encontra ou chega ao fim.</p>
+
+    <div class="code-label">implementação canônica</div>
+    <pre><code><span class="kw">int</span> <span class="fn">buscaSeq</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (v[i] == valor)
+            <span class="kw">return</span> i;       <span class="cmt">// retorna o ÍNDICE, não o valor</span>
+    <span class="kw">return</span> -<span class="num">1</span>;               <span class="cmt">// não encontrado</span>
+}</code></pre>
+
+    <div class="concept-card green">
+      <p><strong>O que a função retorna:</strong> o <strong>índice</strong> da primeira ocorrência do valor. Se houver elementos repetidos, retorna o índice do primeiro encontrado (menor índice). Se não encontrar, retorna <strong>-1</strong>.</p>
+    </div>
+
+    <h3>Análise linha por linha — matrícula 232037937</h3>
+    <p>Construindo um vetor a partir dos dígitos da matrícula e buscando por 3:</p>
+
+    <div class="trace-box">
+      <div class="trace-header">trace — buscaSeq([2,3,2,0,3,7,9,3,7], 9, 3)</div>
+      <div class="trace-body">i=0: v[0]=2  ==  3? Não → continua
+i=1: v[1]=3  ==  3? SIM → return 1
+
+Resultado: 1   ← ÍNDICE, não o valor 3!</div>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">trace — buscaSeq([2,3,2,0,3,7,9,3,7], 9, 5)</div>
+      <div class="trace-body">i=0: v[0]=2  == 5? Não
+i=1: v[1]=3  == 5? Não
+i=2: v[2]=2  == 5? Não
+i=3: v[3]=0  == 5? Não
+i=4: v[4]=3  == 5? Não
+i=5: v[5]=7  == 5? Não
+i=6: v[6]=9  == 5? Não
+i=7: v[7]=3  == 5? Não
+i=8: v[8]=7  == 5? Não
+i=9: i < 9? Não → sai do loop
+
+Resultado: -1   ← elemento não existe</div>
+    </div>
+
+    <div class="concept-card">
+      <p><strong>Complexidade:</strong></p>
+      <ul>
+        <li><strong>Melhor caso:</strong> O(1) — elemento na posição 0</li>
+        <li><strong>Pior caso:</strong> O(n) — elemento não existe ou está na última posição</li>
+        <li><strong>Caso médio:</strong> O(n) — em média, percorre n/2 elementos</li>
+      </ul>
+    </div>
+
+    <h3>Contando iterações — o que a prova pede</h3>
+    <p>Para responder "quantas comparações foram feitas?", conte cada execução do <code>if</code> dentro do loop:</p>
+    <ul>
+      <li>Se encontrou na posição <strong>k</strong>: fez exatamente <strong>k+1</strong> comparações</li>
+      <li>Se não encontrou: fez exatamente <strong>n</strong> comparações</li>
+    </ul>
+
+    <div class="warn">
+      <div class="warn-title">Pegadinha — retorno de índice</div>
+      <p>A função retorna o <strong>índice</strong> onde achou o elemento. Se buscaSeq encontrou o elemento 3 na posição 1 do vetor, ela retorna <strong>1</strong>, não 3. A questão pode perguntar "qual o retorno da função?" — a resposta é o índice.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 3 ===== -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Busca sequencial — <span style="color:var(--accent)">vetor ordenado</span></h2>
+
+    <p>Igual à busca sequencial desordenada, mas com um <strong>break antecipado</strong>: se o elemento atual for maior que o buscado, o elemento não existe no restante (pois o vetor é crescente). Economiza iterações quando o elemento não está no vetor.</p>
+
+    <div class="code-label">implementação com parada antecipada</div>
+    <pre><code><span class="kw">int</span> <span class="fn">buscaSeqOrdenado</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+        <span class="kw">if</span> (v[i] == valor) <span class="kw">return</span> i;
+        <span class="kw">if</span> (v[i] &gt; valor)  <span class="kw">break</span>;  <span class="cmt">// não pode estar à frente</span>
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+
+    <div class="concept-card green">
+      <p><strong>Por que o break funciona:</strong> Se <code>v[i] &gt; valor</code>, como o vetor está em ordem crescente, todos os elementos a partir de <code>i</code> também são maiores que <code>valor</code>. Logo, o elemento buscado definitivamente não existe no vetor.</p>
+    </div>
+
+    <h3>Comparação de traces: elemento não existe</h3>
+
+    <div class="trace-box">
+      <div class="trace-header">trace — busca de 15 em [3, 7, 12, 21, 34, 98] (n=6)</div>
+      <div class="trace-body">Desordenada: percorre TODOS os 6 elementos → 6 comparações
+  i=0: 3, i=1: 7, i=2: 12, i=3: 21, i=4: 34, i=5: 98 → return -1
+
+Ordenada com break:
+  i=0: v[0]=3  ==15? Não. 3 > 15? Não.
+  i=1: v[1]=7  ==15? Não. 7 > 15? Não.
+  i=2: v[2]=12 ==15? Não. 12 > 15? Não.
+  i=3: v[3]=21 ==15? Não. 21 > 15? SIM → break → return -1
+
+  Apenas 4 comparações de igualdade + 4 comparações de "maior"</div>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Complexidade — não confunda</div>
+      <p>A busca sequencial ordenada tem pior caso <strong>O(n)</strong> — igual à desordenada. O break só ajuda quando o elemento não está no vetor. Se o elemento procurado for o maior de todos, ainda percorre o vetor inteiro antes de encontrar (ou não encontrar). A melhoria é no caso médio de ausência, não na complexidade assintótica.</p>
+    </div>
+
+    <div class="concept-card">
+      <p><strong>Complexidade:</strong></p>
+      <ul>
+        <li><strong>Melhor caso:</strong> O(1)</li>
+        <li><strong>Pior caso:</strong> O(n) — elemento no final ou maior que todos</li>
+        <li><strong>Elemento ausente (médio):</strong> O(n/2) — break no meio, em média</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 4 ===== -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Busca binária — <span style="color:var(--accent)">teoria completa</span></h2>
+
+    <p>A busca binária usa o fato de o vetor estar <strong>ordenado</strong> para eliminar metade do espaço de busca a cada passo. Em vez de checar um por um, vai direto ao elemento do meio e decide em qual metade continuar.</p>
+
+    <div class="concept-card purple">
+      <p><strong>Pré-requisito obrigatório:</strong> o vetor <em>deve</em> estar ordenado. Se o vetor não estiver ordenado, a busca binária pode retornar resultados errados silenciosamente — não dá erro, apenas retorna o índice errado ou -1 incorretamente.</p>
+    </div>
+
+    <h3>Variáveis fundamentais — memorize</h3>
+    <div class="concept-card">
+      <ul>
+        <li><strong>esq</strong> (esquerda): índice do início do intervalo atual de busca. Começa em 0.</li>
+        <li><strong>dir</strong> (direita): índice do fim do intervalo atual de busca. Começa em <strong>n-1</strong> (não n!).</li>
+        <li><strong>meio</strong>: índice calculado como <code>(esq + dir) / 2</code> — divisão inteira.</li>
+      </ul>
+    </div>
+
+    <div class="code-label">busca binária iterativa — versão canônica</div>
+    <pre><code><span class="kw">int</span> <span class="fn">buscaBinaria</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> valor) {
+    <span class="kw">int</span> esq = <span class="num">0</span>, dir = n - <span class="num">1</span>, meio;
+    <span class="kw">while</span> (esq &lt;= dir) {                        <span class="cmt">// <= é crucial</span>
+        meio = (esq + dir) / <span class="num">2</span>;               <span class="cmt">// divisão inteira</span>
+        <span class="kw">if</span>      (valor == v[meio]) <span class="kw">return</span> meio; <span class="cmt">// encontrou</span>
+        <span class="kw">else</span> <span class="kw">if</span> (valor &lt;  v[meio]) dir  = meio - <span class="num">1</span>; <span class="cmt">// vai p/ esquerda</span>
+        <span class="kw">else</span>                       esq = meio + <span class="num">1</span>; <span class="cmt">// vai p/ direita</span>
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+
+    <h3>Lógica de cada linha — detalhe a detalhe</h3>
+
+    <div class="concept-card green">
+      <p><strong><code>dir = n - 1</code>, não <code>n</code>:</strong> o índice do último elemento de um vetor de tamanho n é n-1. Usar <code>n</code> como dir causaria acesso a <code>v[n]</code> que está fora do vetor.</p>
+    </div>
+
+    <div class="concept-card purple">
+      <p><strong><code>while (esq &lt;= dir)</code>, não <code>&lt;</code>:</strong> o <code>&lt;=</code> garante que um único elemento restante ainda seja checado. Se fosse apenas <code>&lt;</code>, quando <code>esq == dir</code> (1 elemento restante), o loop não executaria e o elemento seria perdido — o algoritmo retornaria -1 mesmo que o elemento exista.</p>
+    </div>
+
+    <div class="concept-card">
+      <p><strong><code>meio = (esq + dir) / 2</code>:</strong> sempre recalculado a cada iteração. É divisão inteira — com esq=0 e dir=5, meio = (0+5)/2 = 2 (não 2.5).</p>
+    </div>
+
+    <div class="concept-card yellow">
+      <p><strong><code>dir = meio - 1</code> e <code>esq = meio + 1</code>:</strong> após checar que o elemento no meio não é o buscado, o <em>meio</em> em si é excluído da próxima busca. Por isso <code>meio±1</code> e não <code>meio</code>. Se fosse <code>dir = meio</code>, o loop poderia ser infinito quando esq == dir == meio.</p>
+    </div>
+
+    <h3>Versão recursiva</h3>
+    <div class="code-label">busca binária recursiva</div>
+    <pre><code><span class="kw">int</span> <span class="fn">buscaBinRec</span>(<span class="kw">int</span> v[], <span class="kw">int</span> esq, <span class="kw">int</span> dir, <span class="kw">int</span> valor) {
+    <span class="kw">if</span> (esq &gt; dir) <span class="kw">return</span> -<span class="num">1</span>;          <span class="cmt">// caso base: não encontrou</span>
+    <span class="kw">int</span> meio = (esq + dir) / <span class="num">2</span>;
+    <span class="kw">if</span>      (valor == v[meio]) <span class="kw">return</span> meio;
+    <span class="kw">else</span> <span class="kw">if</span> (valor &lt;  v[meio]) <span class="kw">return</span> <span class="fn">buscaBinRec</span>(v, esq,    meio-<span class="num">1</span>, valor);
+    <span class="kw">else</span>                       <span class="kw">return</span> <span class="fn">buscaBinRec</span>(v, meio+<span class="num">1</span>, dir,    valor);
+}
+<span class="cmt">// Chamada inicial: buscaBinRec(v, 0, n-1, valor)</span></code></pre>
+
+    <div class="concept-card green">
+      <p><strong>Diferença da recursiva:</strong> o caso base é <code>esq &gt; dir</code> — quando o intervalo ficou vazio. A lógica interna é idêntica à iterativa, apenas expressa com chamadas recursivas em vez de loop.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 5 ===== -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Busca binária — <span style="color:var(--accent)">trace passo a passo</span></h2>
+
+    <p>Trace completo e metódico. Para a prova, anote sempre os três valores: <strong>esq</strong>, <strong>dir</strong>, <strong>meio</strong> e o que ocorre em cada iteração.</p>
+
+    <h3>Exemplo 1: elemento encontrado</h3>
+    <p>Vetor: <code>[0, 2, 3, 7, 9, 37]</code> (dígitos da matrícula 232037937 ordenados e únicos), n=6, busca por <strong>7</strong>.</p>
+
+    <div class="trace-box">
+      <div class="trace-header">buscaBinaria([0,2,3,7,9,37], 6, 7)</div>
+      <div class="trace-body">Estado inicial: esq=0, dir=5
+
+Iteração 1:
+  meio = (0+5)/2 = 2  ← divisão inteira, não arredonda
+  v[2] = 3
+  7 == 3? Não
+  7 <  3? Não
+  7 >  3? Sim → esq = meio+1 = 3
+
+  esq=3, dir=5
+
+Iteração 2:
+  meio = (3+5)/2 = 4
+  v[4] = 9
+  7 == 9? Não
+  7 <  9? Sim → dir = meio-1 = 3
+
+  esq=3, dir=3
+
+Iteração 3:
+  meio = (3+3)/2 = 3
+  v[3] = 7
+  7 == 7? SIM → return 3
+
+Retorno: 3  ← índice onde está o 7</div>
+    </div>
+
+    <h3>Exemplo 2: elemento não existe</h3>
+    <p>Mesmo vetor, busca por <strong>5</strong>.</p>
+
+    <div class="trace-box">
+      <div class="trace-header">buscaBinaria([0,2,3,7,9,37], 6, 5)</div>
+      <div class="trace-body">esq=0, dir=5
+
+Iteração 1:
+  meio = (0+5)/2 = 2 → v[2]=3
+  5 == 3? Não | 5 < 3? Não | 5 > 3 → esq = 3
+
+Iteração 2:
+  esq=3, dir=5 → meio = (3+5)/2 = 4 → v[4]=9
+  5 == 9? Não | 5 < 9? Sim → dir = 3
+
+Iteração 3:
+  esq=3, dir=3 → meio = (3+3)/2 = 3 → v[3]=7
+  5 == 7? Não | 5 < 7? Sim → dir = 2
+
+Verificação do while: esq=3, dir=2 → 3 <= 2? NÃO → sai do loop
+
+Retorno: -1  ← elemento não existe</div>
+    </div>
+
+    <h3>Exemplo 3: único elemento — o caso crítico</h3>
+
+    <div class="trace-box">
+      <div class="trace-header">buscaBinaria([42], 1, 42) — n=1, 1 único elemento</div>
+      <div class="trace-body">esq=0, dir=0
+
+Iteração 1:
+  while (0 <= 0): Sim ← se fosse '<' ao invés de '<=', não entraria!
+  meio = (0+0)/2 = 0 → v[0]=42
+  42 == 42? SIM → return 0
+
+Retorno: 0 ✓
+
+  Se a condição fosse 'esq < dir':
+  while (0 < 0): Não → loop nunca executa → return -1  ← BUG!</div>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Por que esq &lt;= dir e não esq &lt; dir</div>
+      <p>Com <code>&lt;</code>, quando resta apenas 1 elemento (esq == dir), o loop não executa e o algoritmo retorna -1 mesmo que o elemento exista. O <code>&lt;=</code> garante que o último elemento restante seja verificado.</p>
+    </div>
+
+    <h3>Calculando meio — exercício mental obrigatório</h3>
+    <p>Pratique calcular meio para não errar na prova:</p>
+
+    <div class="diagram">esq=0, dir=7  → meio = (0+7)/2  = 3   (não 3.5!)
+esq=3, dir=7  → meio = (3+7)/2  = 5
+esq=0, dir=6  → meio = (0+6)/2  = 3
+esq=2, dir=5  → meio = (2+5)/2  = 3   (7/2 = 3, descarta .5)
+esq=4, dir=5  → meio = (4+5)/2  = 4   (9/2 = 4, descarta .5)
+esq=5, dir=5  → meio = (5+5)/2  = 5</div>
+
+    <div class="tip">
+      <div class="tip-title">Contando iterações da busca binária</div>
+      <p>Para um vetor de tamanho n, a busca binária faz no máximo ⌊log₂(n)⌋ + 1 iterações. Para n=8: log₂(8)=3, no máximo 4 iterações. Para n=1024: log₂(1024)=10, no máximo 11 iterações. Se a prova pedir o número de iterações para uma entrada específica, faça o trace — não confie só no log₂.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 6 ===== -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Pegadinhas da prova — <span style="color:var(--accent)">busca</span></h2>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #1 — retorno é índice, não valor</div>
+      <p>Todas as buscas retornam o <strong>índice</strong> do elemento no vetor, não o valor encontrado.</p>
+      <pre><code>int v[] = {10, 30, 50, 70};
+int r = buscaBinaria(v, 4, 50);
+// r = 2, não 50!</code></pre>
+      <p>Se a questão perguntar "qual o retorno?", a resposta é 2.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #2 — dir começa em n-1, não n</div>
+      <p>Para um vetor de 5 elementos: <code>dir = 5 - 1 = 4</code>. O índice válido vai de 0 a 4. Se o código inicializar <code>dir = n</code> (errado), acessaria <code>v[5]</code> que está fora do vetor — comportamento indefinido.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #3 — elementos repetidos</div>
+      <p>Com elementos repetidos no vetor, a busca binária não garante qual ocorrência será retornada. Depende de onde o meio cai:</p>
+      <pre><code>int v[] = {1, 3, 3, 3, 5};
+// buscaBinaria de 3:
+// meio=2, v[2]=3 → retorna 2 (a do meio)
+// Não garante o primeiro (índice 1) nem o último (índice 3)</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #4 — busca sequencial em vetor vazio</div>
+      <p>Se <code>n = 0</code>: o loop <code>for (i=0; i&lt;0; i++)</code> não executa. A função retorna imediatamente <strong>-1</strong>. Zero iterações, zero comparações.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #5 — a busca sequencial "ordenada" em vetor desordenado</div>
+      <p>Se o professor passar um vetor desordenado para a busca sequencial "ordenada" (com break), ela pode retornar -1 erroneamente: o break sai do loop antes de encontrar o elemento.</p>
+      <pre><code>int v[] = {9, 3, 1, 7, 5};
+buscaSeqOrdenado(v, 5, 5);
+// i=0: v[0]=9 > 5? SIM → break → return -1
+// Mas 5 existe no índice 4! Resultado ERRADO porque vetor não está ordenado.</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #6 — meio calculado com divisão inteira</div>
+      <p>O meio é sempre <strong>divisão inteira</strong>. Para esq=1 e dir=4: meio = (1+4)/2 = 5/2 = <strong>2</strong>, não 2.5. Em C, divisão entre inteiros trunca para baixo.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #7 — código com variação sutil no loop</div>
+      <p>Se o professor mostrar este código com a condição modificada:</p>
+      <pre><code><span class="kw">while</span> (esq &lt; dir) {  <span class="cmt">// ATENÇÃO: < em vez de <=</span>
+    meio = (esq + dir) / <span class="num">2</span>;
+    <span class="kw">if</span>      (valor == v[meio]) <span class="kw">return</span> meio;
+    <span class="kw">else</span> <span class="kw">if</span> (valor &lt;  v[meio]) dir  = meio;  <span class="cmt">// não é meio-1</span>
+    <span class="kw">else</span>                       esq = meio + <span class="num">1</span>;
+}</code></pre>
+      <p>Esta é outra variante válida (half-open interval). O comportamento é diferente — trace cuidadosamente cada questão. Não assuma que todo código de busca binária tem o mesmo comportamento.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 7 ===== -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Tabela de complexidades — <span style="color:var(--accent)">busca</span></h2>
+
+    <table>
+      <thead>
+        <tr><th>Algoritmo</th><th>Pré-req</th><th>Melhor</th><th>Pior</th><th>Médio</th><th>Retorno</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Seq. desordenada</td><td>Nenhum</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>Índice ou -1</td></tr>
+        <tr><td>Seq. ordenada</td><td>Ordenado</td><td>O(1)</td><td>O(n)</td><td>O(n/2)*</td><td>Índice ou -1</td></tr>
+        <tr><td>Binária</td><td>Ordenado</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td><td>Índice ou -1</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.85rem;color:var(--text-muted);">* O(n/2) para ausência de elemento; pior caso ainda é O(n).</p>
+
+    <div class="concept-card green">
+      <p><strong>O melhor caso O(1):</strong> ocorre quando o elemento buscado está exatamente na primeira posição comparada — índice 0 na busca sequencial, ou exatamente no meio na busca binária (na primeira iteração).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEÇÃO 8 — QUESTÕES ===== -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Questões no estilo da prova</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Analise o código e responda</div>
+
+      <div class="quiz-q" id="q1">
+        <p><strong>Q1.</strong> Dado o código abaixo com matrícula 232037937, qual o retorno de <code>f(v, 9, 9)</code>?</p>
+        <pre><code>int v[] = {2,3,2,0,3,7,9,3,7};  // dígitos da matrícula
+int f(int v[], int n, int x) {
+    for (int i = 0; i &lt; n; i++)
+        if (v[i] == x) return i;
+    return -1;
+}</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 9 (o valor encontrado)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) 6 (o índice onde está o 9)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) -1 (não encontrado)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 7 (próximo índice após o 9)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q1">✔ v[6] = 9. A função retorna o ÍNDICE 6, não o valor 9. Traçando: i=0→2, i=1→3, i=2→2, i=3→0, i=4→3, i=5→7, i=6→9 == 9 → return 6.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q1">✘ A função retorna o ÍNDICE, não o valor. v[6]=9, então retorna 6.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p><strong>Q2.</strong> No trace da busca binária em <code>[0,2,3,7,9,37]</code> (n=6) buscando por <strong>0</strong>, quantas iterações o loop executa?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 1 iteração</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 2 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">c) 3 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 6 iterações</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q2">✔ Iter.1: esq=0,dir=5,meio=2,v[2]=3 → 0&lt;3 → dir=1. Iter.2: esq=0,dir=1,meio=0,v[0]=0 → encontrou → return 0. Na verdade 2 iterações!</div>
+        <div class="quiz-feedback err" id="fb_wrong_q2">✘ Trace: iter1 meio=2 v[2]=3 → 0&lt;3 → dir=1. Iter2: esq=0,dir=1,meio=0 → v[0]=0 == 0 → return 0. São 2 iterações.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p><strong>Q3.</strong> A busca sequencial "ordenada" (com break quando v[i]&gt;valor) é executada no vetor <code>[5, 3, 8, 1, 9]</code> buscando por <strong>3</strong>. Qual o retorno?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 1 (índice do 3)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) -1 (retorno incorreto por vetor não ordenado)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 3 (o valor encontrado)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 0 (primeiro índice)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q3">✔ i=0: v[0]=5. 5==3? Não. 5&gt;3? Sim → break → return -1. O vetor não está ordenado! O break saiu antes de achar o 3 que está em v[1]. Esta é a pegadinha: busca ordenada em vetor desordenado dá resultado errado.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q3">✘ v[0]=5 > 3 → break imediato → return -1. Vetor não está ordenado, então o break corta prematuramente. Resultado incorreto.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p><strong>Q4.</strong> Qual o valor de <code>meio</code> na primeira iteração de <code>buscaBinaria(v, 9, 7)</code> num vetor de 9 elementos?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) meio = 4.5</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) meio = 4</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) meio = 5</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) meio = 8</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q4">✔ esq=0, dir=n-1=8. meio = (0+8)/2 = 4. Divisão inteira em C trunca para baixo. 8/2=4 exato neste caso.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q4">✘ esq=0, dir=8. meio = (0+8)/2 = 4. Divisão inteira — não existe 4.5 em variável int.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p><strong>Q5.</strong> Na busca binária com o vetor <code>[2, 3, 7, 9]</code> (n=4), buscando por <strong>9</strong>, qual índice é retornado e quantas iterações ocorrem?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) retorna 9, 2 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) retorna 3, 2 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) retorna 3, 3 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) retorna 4, 2 iterações</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q5">✔ Iter1: esq=0,dir=3,meio=1,v[1]=3. 9&gt;3 → esq=2. Iter2: esq=2,dir=3,meio=2,v[2]=7. 9&gt;7 → esq=3. Iter3: esq=3,dir=3,meio=3,v[3]=9 == 9 → return 3. São 3 iterações! Retorna o índice 3.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q5">✘ Trace: iter1 meio=1 v[1]=3 →esq=2. Iter2 meio=2 v[2]=7 →esq=3. Iter3 meio=3 v[3]=9 →return 3. São 3 iterações, retorna índice 3.</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p><strong>Q6.</strong> <code>buscaSeq([2,3,2,0,3,7,9,3,7], 9, 7)</code> — vetor com os dígitos da matrícula <strong>232037937</strong>, buscando pelo último dígito (7). Qual o índice retornado?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 7 — o próprio valor buscado</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) 5 — primeira ocorrência de 7 (v[5])</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) 8 — último índice do vetor</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) -1 — não encontrado</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6">✔ Trace: i=0→v[0]=2, i=1→3, i=2→2, i=3→0, i=4→3, i=5→7 == 7 → return 5. A função retorna o ÍNDICE 5, não o valor 7. O outro 7 em v[8] nunca é verificado — a função para na primeira ocorrência.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q6">✘ v[5]=7 é a primeira ocorrência. Retorna índice 5, não o valor 7. Não retorna -1 pois 7 existe no vetor.</div>
+      </div>
+
+      <div class="quiz-q" id="q7">
+        <p><strong>Q7.</strong> <code>buscaSeqOrdenado([2,3,2,0,3,7,9,3,7], 9, 0)</code> — busca pelo 4º dígito da matrícula 232037937 (o zero) num vetor <em>não ordenado</em>. Qual o retorno e por quê?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 3 — índice onde 0 realmente está</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) -1 — break prematuro: v[0]=2 &gt; 0</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 0 — índice do início do vetor</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 1 — quantas comparações antes do break</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q7">✔ i=0: v[0]=2. 2==0? Não. 2&gt;0? SIM → break → return -1. O valor 0 existe em v[3], mas o break saiu antes de chegar lá porque v[0]=2 &gt; 0. O vetor não está ordenado — a condição de parada antecipada é inválida aqui. Este é exatamente o cenário da pegadinha #5 desta apostila.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q7">✘ v[0]=2 &gt; 0 → break imediato → return -1. Mesmo que 0 exista em v[3], nunca chegamos lá. Vetor não ordenado invalida a busca sequencial com parada antecipada.</div>
+      </div>
+
+      <div class="quiz-q" id="q8">
+        <p><strong>Q8.</strong> <code>buscaBinaria([0,2,3,7,9], 5, 3)</code> — dígitos únicos da matrícula 232037937 em ordem crescente, buscando pelo penúltimo dígito (3). Quantas iterações o while executa?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'correct','q8')">a) 1 iteração — acerta de primeira no meio</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) 2 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) 3 iterações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) 5 iterações — percorre o vetor inteiro</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q8">✔ esq=0, dir=4. meio=(0+4)/2=2. v[2]=3. 3==3? SIM → return 2. Uma única iteração! Este é o melhor caso da busca binária O(1): o elemento está exatamente no meio na primeira tentativa. Retorna o índice 2.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q8">✘ meio=(0+4)/2=2, v[2]=3 == 3 → encontrou na 1ª iteração. Melhor caso da busca binária. Retorna índice 2.</div>
+      </div>
+
+      <div class="quiz-q" id="q9">
+        <p><strong>Q9.</strong> A matrícula <strong>232037937</strong> tem 9 dígitos. Para um vetor de <em>n=9</em> elementos, qual o número <em>máximo</em> de iterações que a busca binária pode executar (pior caso)?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) 9 iterações — pior caso linear</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) 3 iterações — log₂(9) truncado</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) 4 iterações — ⌊log₂(9)⌋ + 1</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) 5 iterações</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q9">✔ Fórmula: ⌊log₂(n)⌋ + 1. Para n=9: log₂(9)≈3.17, ⌊3.17⌋=3, +1=4. Trace de pior caso (buscando elemento ausente): [0..8]→meio=4→[5..8]→meio=6→[7..8]→meio=7→[8..8]→meio=8→esq&gt;dir → 4 iterações. Busca binária nunca precisa de 9 iterações para n=9.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q9">✘ Máximo = ⌊log₂(9)⌋+1 = 3+1 = 4. A busca binária é O(log n) — nunca percorre tudo como a sequencial.</div>
+      </div>
+
+      <div class="quiz-q" id="q10">
+        <p><strong>Q10.</strong> Por que a busca binária usa <code>dir = meio - 1</code> e <code>esq = meio + 1</code> em vez de <code>dir = meio</code> e <code>esq = meio</code>? Qual o risco da segunda versão?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) Evita acesso a índice negativo no vetor</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) Garante que o intervalo diminui a cada iteração — evita loop infinito</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) Faz o algoritmo pular o elemento do meio para ser mais rápido</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) Impede que esq e dir assumam o mesmo valor</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q10">✔ Com dir=meio: se esq==dir==meio e v[meio]≠valor, dir ficaria igual a esq — o while(esq&lt;=dir) seria verdadeiro para sempre → loop infinito. Com meio-1: o intervalo [esq..dir] fica estritamente menor a cada iteração, garantindo terminação. Este é o invariante de terminação da busca binária: o intervalo de busca nunca para de encolher.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q10">✘ Com dir=meio quando esq==dir==meio: nenhum update move os ponteiros → loop infinito. meio±1 garante que o intervalo sempre diminui — invariante de terminação do algoritmo.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Teoria para Prova — Algoritmos de Busca</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  const fb_ok  = document.getElementById('fb_' + qid);
+  const fb_err = document.getElementById('fb_wrong_' + qid);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    if (fb_ok) { fb_ok.style.display = 'block'; }
+  } else {
+    btn.classList.add('wrong');
+    if (fb_err) { fb_err.style.display = 'block'; }
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>
