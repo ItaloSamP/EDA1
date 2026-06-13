@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria — Complexidade para a Prova · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7e06a;
+    --accent2: #7c6af7;
+    --accent3: #f76a9a;
+    --accent4: #6af7c4;
+    --accent5: #f7a26a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a1a08 0%, #222008 50%, #161406 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,224,106,0.12) 0%, transparent 70%); }
+  header::after { content: 'O(?)'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(247,224,106,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-yellow { color: var(--accent);  border-color: var(--accent);  background: rgba(247,224,106,0.08); }
+  .badge-purple { color: var(--accent2); border-color: var(--accent2); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent3); border-color: var(--accent3); background: rgba(247,106,154,0.08); }
+  .badge-green  { color: var(--accent4); border-color: var(--accent4); background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent5); border-color: var(--accent5); background: rgba(247,162,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent4); margin: 28px 0 12px; }
+  h4 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; color: var(--accent5); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  ul, ol { color: #c8c8e0; margin-left: 22px; margin-bottom: 14px; }
+  li { margin: 5px 0; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent4); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.purple { border-left-color: var(--accent2); }
+  .concept-card.pink   { border-left-color: var(--accent3); }
+  .concept-card.green  { border-left-color: var(--accent4); }
+  .concept-card.orange { border-left-color: var(--accent5); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.35); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pegadinha-box { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.05)); border: 1px solid rgba(247,106,154,0.3); border-radius: 12px; padding: 24px 28px; margin: 28px 0; }
+  .pegadinha-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent3); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .trace-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+  .trace-header { background: rgba(247,224,106,0.08); padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+  .trace-body { padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent4); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent4); color: var(--accent4); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent3); color: var(--accent3); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 6px; display: none; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent4); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent3); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px;} pre{padding:14px;font-size:12px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Preparação para Prova 2</div>
+    <h1>Teoria de <span>Complexidade Computacional</span></h1>
+    <p class="subtitle">Como ler um código e determinar sua complexidade, o que Big-O significa de verdade, e como o professor testa isso na prova.</p>
+    <div class="badge-row">
+      <span class="badge badge-yellow">Big-O</span>
+      <span class="badge badge-purple">Ω e Θ</span>
+      <span class="badge badge-green">Contar Operações</span>
+      <span class="badge badge-pink">Recorrências</span>
+      <span class="badge badge-orange">Pegadinhas</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que complexidade mede de verdade</a></li>
+      <li><a href="#sec2">Notações: O, Ω e Θ</a></li>
+      <li><a href="#sec3">Como contar operações em código</a></li>
+      <li><a href="#sec4">Padrões de loop e suas complexidades</a></li>
+      <li><a href="#sec5">Recursão e recorrências</a></li>
+      <li><a href="#sec6">Casos: melhor, médio e pior</a></li>
+      <li><a href="#sec7">Tabela de complexidades comuns</a></li>
+      <li><a href="#sec8">Pegadinhas da prova — complexidade</a></li>
+      <li><a href="#sec9">Questões no estilo da prova</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== SEC 1 ===== -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que complexidade mede <span style="color:var(--accent)">de verdade</span></h2>
+
+    <p>Complexidade computacional mede <strong>como o tempo de execução cresce</strong> em função do tamanho da entrada. Não mede segundos — mede crescimento. Um algoritmo O(n²) não é "lento"; ele é "para uma entrada 10x maior, fica 100x mais lento".</p>
+
+    <div class="concept-card">
+      <p><strong>O tamanho da entrada (n):</strong> depende do problema. Para um vetor: n é o número de elementos. Para uma string: n é o comprimento. Para um grafo: pode ser o número de vértices e/ou arestas. A complexidade é sempre expressa em função de n.</p>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>Operação dominante:</strong> em vez de contar cada instrução de máquina, identifica-se a operação que cresce mais rápido e domina o custo total. Em uma busca, a comparação de elementos. Em ordenação, as trocas ou comparações.</p>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Constantes são ignoradas no Big-O</div>
+      <p>Se um algoritmo faz 5n comparações, ainda é O(n). Se faz 3n² + 7n + 42, ainda é O(n²). O Big-O descreve o comportamento assintótico — o que acontece quando n cresce muito. Constantes ficam irrelevantes. Apenas o termo de maior ordem importa.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 2 ===== -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Notações: <span style="color:var(--accent)">O, Ω e Θ</span></h2>
+
+    <div class="concept-card">
+      <p><strong>O (Big-O) — limite superior:</strong> f(n) é O(g(n)) se f cresce no máximo tão rápido quanto g para n suficientemente grande. É o "pior caso" da complexidade. "No máximo faz isso."</p>
+      <p>Exemplo: busca binária é O(log n) — no pior caso, faz log₂n iterações.</p>
+    </div>
+
+    <div class="concept-card purple">
+      <p><strong>Ω (Omega) — limite inferior:</strong> f(n) é Ω(g(n)) se f cresce pelo menos tão rápido quanto g. É o melhor caso. "No mínimo faz isso."</p>
+      <p>Exemplo: busca binária é Ω(1) — no melhor caso, acerta na primeira comparação.</p>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>Θ (Theta) — limite exato:</strong> f(n) é Θ(g(n)) se f cresce exatamente tão rápido quanto g (por cima e por baixo). Isso significa O(g(n)) E Ω(g(n)) ao mesmo tempo.</p>
+      <p>Exemplo: Selection Sort é Θ(n²) — melhor e pior caso são ambos O(n²).</p>
+    </div>
+
+    <div class="tip">
+      <div class="tip-title">Na prova, quando usar qual notação</div>
+      <p>Se a questão perguntar "complexidade no pior caso" → use O. Se perguntar "complexidade" sem especificar → use O (padrão). Se perguntar "melhor caso" → use Ω ou diga O(1), O(n), etc. dependendo do algoritmo.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 3 ===== -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Como contar operações <span style="color:var(--accent)">em código</span></h2>
+
+    <p>O método: identifique o que acontece em cada instrução e some os custos. Para loops, multiplique o custo do corpo pelo número de iterações.</p>
+
+    <h3>Regras básicas</h3>
+
+    <div class="concept-card">
+      <ul>
+        <li><strong>Sequência de instruções:</strong> some os custos → O(f) + O(g) = O(max(f,g))</li>
+        <li><strong>if/else:</strong> custo do if = max(custo do then, custo do else) no pior caso</li>
+        <li><strong>Loop:</strong> custo do loop = número de iterações × custo do corpo</li>
+        <li><strong>Loops aninhados:</strong> multiplique os custos de cada nível</li>
+        <li><strong>Chamada de função:</strong> substitua pelo custo da função chamada</li>
+      </ul>
+    </div>
+
+    <h3>Analisando loops um por um</h3>
+
+    <div class="code-label">caso 1 — loop simples</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {   <span class="cmt">// executa n vezes</span>
+    <span class="fn">operacao</span>();                   <span class="cmt">// custo O(1)</span>
+}
+<span class="cmt">// Total: n × O(1) = O(n)</span></code></pre>
+
+    <div class="code-label">caso 2 — loops aninhados dependentes</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++) {    <span class="cmt">// n iterações</span>
+        <span class="fn">operacao</span>();                   <span class="cmt">// O(1)</span>
+    }
+}
+<span class="cmt">// Total: n × n × O(1) = O(n²)</span></code></pre>
+
+    <div class="code-label">caso 3 — loop interno vai de 0 a i</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++) {
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; i; j++) {    <span class="cmt">// i iterações (não n!)</span>
+        <span class="fn">operacao</span>();
+    }
+}
+<span class="cmt">// i=0: 0 iters. i=1: 1. i=2: 2. ... i=n-1: n-1
+// Total: 0+1+2+...+(n-1) = n(n-1)/2 = O(n²)</span></code></pre>
+
+    <div class="code-label">caso 4 — loop com divisão (logarítmico)</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt;= n; i = i * <span class="num">2</span>) {   <span class="cmt">// i dobra a cada passo</span>
+    <span class="fn">operacao</span>();
+}
+<span class="cmt">// i=1,2,4,8,...,n → log₂(n) iterações = O(log n)</span></code></pre>
+
+    <div class="code-label">caso 5 — loop com n/2 iterações</div>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n / <span class="num">2</span>; i++) {   <span class="cmt">// n/2 iterações</span>
+    <span class="fn">operacao</span>();
+}
+<span class="cmt">// n/2 = (1/2)n → O(n)   ← constante 1/2 é ignorada!</span></code></pre>
+
+    <div class="warn">
+      <div class="warn-title">n/2 ainda é O(n)</div>
+      <p>Muita gente pensa que n/2 iterações resulta em O(n/2) ou O(n²/2). Não. A constante 1/2 é descartada: O(n/2) = O(n). Para virar O(log n), o índice precisa <em>multiplicar ou dividir</em> a cada iteração, não somar/subtrair.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 4 ===== -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Padrões de loop e <span style="color:var(--accent)">suas complexidades</span></h2>
+
+    <table>
+      <thead><tr><th>Padrão do loop</th><th>Iterações</th><th>Complexidade</th></tr></thead>
+      <tbody>
+        <tr><td>i = 0 → n</td><td>n</td><td>O(n)</td></tr>
+        <tr><td>i = 0 → n/2</td><td>n/2</td><td>O(n)</td></tr>
+        <tr><td>i = n → 0</td><td>n</td><td>O(n)</td></tr>
+        <tr><td>i = 0 → n, j = 0 → n</td><td>n²</td><td>O(n²)</td></tr>
+        <tr><td>i = 0 → n, j = 0 → i</td><td>n(n-1)/2</td><td>O(n²)</td></tr>
+        <tr><td>i = 1; i*=2; i&lt;=n</td><td>log₂n</td><td>O(log n)</td></tr>
+        <tr><td>i = n; i/=2; i&gt;=1</td><td>log₂n</td><td>O(log n)</td></tr>
+        <tr><td>i = 1; i*=2; i&lt;=n (aninhado com O(n))</td><td>n × log n</td><td>O(n log n)</td></tr>
+        <tr><td>i = 0 → n, j = 0 → n, k = 0 → n</td><td>n³</td><td>O(n³)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Exemplos para treinar o olho</h3>
+
+    <div class="trace-box">
+      <div class="trace-header">análise de complexidade — exemplos</div>
+      <div class="trace-body">Exemplo A:
+  for (i=0; i<n; i++)        ← O(n)
+    for (j=0; j<n; j+=2)     ← n/2 iterações → O(n) (ignora /2)
+      op();                   ← O(1)
+  Total: O(n × n) = O(n²)
+
+Exemplo B:
+  for (i=1; i<=n; i*=3)      ← log₃(n) iterações → O(log n)
+    op();
+  Total: O(log n)
+
+Exemplo C:
+  for (i=0; i<n; i++)        ← O(n)
+    for (j=i; j<n; j++)      ← n-i iterações cada
+      op();
+  Total: (n-0)+(n-1)+...+1 = n(n+1)/2 → O(n²)
+
+Exemplo D — cuidado com chamada de função:
+  for (i=0; i<n; i++)        ← n iterações
+    buscaBinaria(v, n, x);   ← cada chamada é O(log n)
+  Total: O(n × log n) = O(n log n)</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 5 ===== -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Recursão e <span style="color:var(--accent)">recorrências</span></h2>
+
+    <p>Para funções recursivas, a complexidade é expressa por uma <strong>relação de recorrência</strong> T(n) e depois resolvida.</p>
+
+    <h3>Recorrências importantes — memorize</h3>
+
+    <div class="concept-card">
+      <p><strong>T(n) = T(n-1) + O(1) → O(n)</strong></p>
+      <p>Reduz o problema em 1 a cada chamada, faz O(1) extra. Exemplo: fatorial, impressão de lista encadeada.</p>
+      <pre style="margin:10px 0"><code><span class="kw">int</span> <span class="fn">fat</span>(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n == <span class="num">0</span>) <span class="kw">return</span> <span class="num">1</span>;
+    <span class="kw">return</span> n * <span class="fn">fat</span>(n - <span class="num">1</span>);   <span class="cmt">// T(n) = T(n-1) + O(1)</span>
+}</code></pre>
+    </div>
+
+    <div class="concept-card purple">
+      <p><strong>T(n) = T(n/2) + O(1) → O(log n)</strong></p>
+      <p>Reduz o problema à metade a cada chamada, faz O(1) extra. Exemplo: busca binária recursiva.</p>
+      <pre style="margin:10px 0"><code><span class="cmt">// Busca binária: descarta metade a cada chamada</span>
+<span class="cmt">// T(n) = T(n/2) + O(1) → O(log n)</span></code></pre>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>T(n) = 2T(n/2) + O(n) → O(n log n)</strong></p>
+      <p>Faz 2 chamadas com metade do tamanho, mais O(n) de trabalho. Exemplo: Merge Sort.</p>
+    </div>
+
+    <div class="concept-card orange">
+      <p><strong>T(n) = T(n-1) + O(n) → O(n²)</strong></p>
+      <p>Reduz o problema em 1 mas faz O(n) extra a cada nível. Exemplo: Selection Sort recursivo, QuickSort pior caso.</p>
+    </div>
+
+    <div class="concept-card pink">
+      <p><strong>T(n) = 2T(n-1) + O(1) → O(2ⁿ)</strong></p>
+      <p>Duplica o número de chamadas a cada nível. Exemplo: Fibonacci recursivo ingênuo. MUITO lento.</p>
+    </div>
+
+    <h3>Como verificar pela substituição</h3>
+    <div class="trace-box">
+      <div class="trace-header">verificando T(n) = T(n-1) + 1 → O(n)</div>
+      <div class="trace-body">T(n) = T(n-1) + 1
+     = T(n-2) + 1 + 1
+     = T(n-2) + 2
+     = T(n-3) + 3
+     ...
+     = T(n-k) + k
+     Quando k = n: T(0) + n = 1 + n = O(n) ✓</div>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">verificando T(n) = T(n/2) + 1 → O(log n)</div>
+      <div class="trace-body">T(n) = T(n/2) + 1
+     = T(n/4) + 1 + 1
+     = T(n/4) + 2
+     = T(n/8) + 3
+     ...
+     = T(n/2^k) + k
+     Quando n/2^k = 1, ou seja k = log₂(n): T(1) + log₂n = O(log n) ✓</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 6 ===== -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Casos: melhor, médio <span style="color:var(--accent)">e pior</span></h2>
+
+    <div class="concept-card">
+      <p><strong>Melhor caso (best case):</strong> a entrada que resulta no menor número de operações. Exemplo: busca sequencial com o elemento na posição 0 → 1 comparação.</p>
+    </div>
+    <div class="concept-card purple">
+      <p><strong>Pior caso (worst case):</strong> a entrada que resulta no maior número de operações. O que queremos limitar com Big-O. Exemplo: busca sequencial com elemento ausente → n comparações.</p>
+    </div>
+    <div class="concept-card green">
+      <p><strong>Caso médio (average case):</strong> o comportamento esperado para uma entrada aleatória. Geralmente requer análise probabilística. Em busca sequencial: em média, percorre n/2 elementos.</p>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Quando o melhor caso parece bom mas o pior é ruim</div>
+      <p>O Insertion Sort tem melhor caso O(n) (vetor já ordenado) mas pior caso O(n²) (vetor invertido). Quando a questão perguntar a complexidade sem especificar, assuma pior caso. Se pedir especificamente melhor caso, responda O(n).</p>
+    </div>
+
+    <h3>Comparando para os algoritmos da prova</h3>
+    <table>
+      <thead><tr><th>Algoritmo</th><th>Melhor caso</th><th>Caso médio</th><th>Pior caso</th></tr></thead>
+      <tbody>
+        <tr><td>Busca seq. (desordenada)</td><td>O(1)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Busca binária</td><td>O(1)</td><td>O(log n)</td><td>O(log n)</td></tr>
+        <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td></tr>
+        <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td></tr>
+        <tr><td>Bubble Sort (sem flag)</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td></tr>
+        <tr><td>Bubble Sort (com flag)</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td></tr>
+        <tr><td>QuickSort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td></tr>
+        <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 7 ===== -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Tabela de complexidades <span style="color:var(--accent)">comuns</span></h2>
+
+    <table>
+      <thead><tr><th>Complexidade</th><th>Nome</th><th>n=10</th><th>n=100</th><th>n=1000</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td>O(1)</td><td>Constante</td><td>1</td><td>1</td><td>1</td><td>Acesso por índice</td></tr>
+        <tr><td>O(log n)</td><td>Logarítmica</td><td>3</td><td>7</td><td>10</td><td>Busca binária</td></tr>
+        <tr><td>O(n)</td><td>Linear</td><td>10</td><td>100</td><td>1.000</td><td>Busca seq.</td></tr>
+        <tr><td>O(n log n)</td><td>Linearítmica</td><td>33</td><td>664</td><td>9.966</td><td>Merge Sort</td></tr>
+        <tr><td>O(n²)</td><td>Quadrática</td><td>100</td><td>10.000</td><td>1.000.000</td><td>Bubble Sort</td></tr>
+        <tr><td>O(n³)</td><td>Cúbica</td><td>1.000</td><td>1.000.000</td><td>10⁹</td><td>Loops triplos</td></tr>
+        <tr><td>O(2ⁿ)</td><td>Exponencial</td><td>1.024</td><td>10³⁰</td><td>inviável</td><td>Fibonacci ingênuo</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card green">
+      <p><strong>Hierarquia crescente:</strong> O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ)</p>
+      <p>Um algoritmo de complexidade menor é sempre mais eficiente para n suficientemente grande.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 8 ===== -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Pegadinhas da prova — <span style="color:var(--accent)">complexidade</span></h2>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #1 — n/2 não é O(n/2), é O(n)</div>
+      <p>Um loop que vai de 0 a n/2 tem n/2 iterações. Mas O(n/2) = O(n) porque constantes são ignoradas. Só vira O(log n) se o índice multiplicar ou dividir.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #2 — loop interno de 0 a i é O(n²)</div>
+      <pre><code>for (i=0; i&lt;n; i++)
+    for (j=0; j&lt;i; j++)  // j vai de 0 até i-1
+        op();
+// Parece O(n × n/2) = O(n²/2)... e é O(n²). A /2 some.</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #3 — custo total é o maior, não a soma</div>
+      <p>Se um algoritmo faz uma parte O(n) e depois uma parte O(n²):</p>
+      <pre><code>// Parte 1: O(n)
+for (i=0; i&lt;n; i++) op1();
+// Parte 2: O(n²)
+for (i=0; i&lt;n; i++)
+    for (j=0; j&lt;n; j++) op2();
+// Total: O(n) + O(n²) = O(n²)  ← o maior domina</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #4 — chamada de função dentro do loop multiplica</div>
+      <pre><code>for (i=0; i&lt;n; i++)       // n iterações
+    buscaSeq(v, n, i);    // cada busca é O(n)
+// Total: O(n) × O(n) = O(n²)  ← não O(n) + O(n)!</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #5 — O(log n) não é O(n/log n)</div>
+      <p>Algumas questões tentam confundir com "o algoritmo divide por 2 a cada passo, então é n/2 + n/4 + ... = n". Isso vale para algumas somas, mas o número de <em>iterações</em> de um loop que divide por 2 é log₂(n), não n.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #6 — selection sort: todos os casos são O(n²)</div>
+      <p>O Selection Sort não tem melhor caso melhor que O(n²). Ele sempre percorre o vetor inteiro buscando o mínimo, independente de quão ordenado o vetor está. Isso é diferente do Insertion Sort que tem melhor caso O(n).</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #7 — merge sort pior caso é O(n log n), não O(n²)</div>
+      <p>O Merge Sort garante O(n log n) em <em>todos</em> os casos — melhor, médio e pior. Isso o diferencia do QuickSort que tem pior caso O(n²). Se a questão perguntar qual algoritmo garante O(n log n) no pior caso, é o Merge Sort.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 9 ===== -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Questões no estilo da prova</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Analise e determine a complexidade</div>
+
+      <div class="quiz-q" id="q1">
+        <p><strong>Q1.</strong> Qual a complexidade do trecho abaixo?</p>
+        <pre><code>for (int i = 0; i &lt; n; i++)
+    for (int j = 0; j &lt; n; j += n)
+        printf("%d %d\n", i, j);</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) O(n log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) O(1)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q1">✔ Loop externo: n iterações. Loop interno: j começa em 0 e incrementa n a cada passo. j=0 → j+=n → j=n → j&lt;n? Falso. Loop interno executa apenas 1 vez! Total: n × 1 = O(n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q1">✘ O loop interno faz j+=n, não j++. Com j=0 e n>=1: j=0 (executa), j+=n→j=n, j&lt;n falso. Apenas 1 iteração por loop externo. O(n) total.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p><strong>Q2.</strong> Qual a recorrência e complexidade de:</p>
+        <pre><code>int f(int n) {
+    if (n &lt;= 1) return n;
+    return f(n-1) + f(n-1);
+}</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) T(n) = T(n-1) + O(1) → O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) T(n) = 2T(n-1) + O(1) → O(2ⁿ)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) T(n) = 2T(n/2) + O(1) → O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) T(n) = T(n-1) + T(n-1) → O(n²)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q2">✔ f(n) chama f(n-1) DUAS vezes. T(n) = 2T(n-1) + O(1). Expandindo: 2T(n-1) = 2(2T(n-2)) = 4T(n-2) = ... = 2^k T(n-k). Quando k=n: 2^n T(0) = O(2^n). Exponencial!</div>
+        <div class="quiz-feedback err" id="fb_wrong_q2">✘ Duas chamadas a f(n-1): T(n)=2T(n-1)+O(1). Isso expande para O(2ⁿ). Duas chamadas = exponencial.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p><strong>Q3.</strong> Um loop for com <code>i = n; i >= 1; i /= 2</code> tem complexidade:</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) O(n/2)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">c) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) O(n²)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q3">✔ i começa em n e divide por 2 a cada passo: n → n/2 → n/4 → ... → 1. Número de passos = log₂(n). Qualquer loop que multiplica ou divide o índice por constante é O(log n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q3">✘ i divide por 2 a cada passo → log₂(n) iterações → O(log n). Divisão/multiplicação do índice é sempre O(log n).</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p><strong>Q4.</strong> Qual a complexidade de busca linear em vetor já ordenado, buscando elemento que existe no final?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) O(1) — porque o vetor está ordenado</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) O(log n) — a ordenação permite saltar</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) O(n) — percorre quase tudo antes de achar</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) O(n/2) — a ordenação melhora pela metade</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q4">✔ A busca sequencial, mesmo em vetor ordenado, é O(n) no pior caso. Se o elemento está no final, percorre n-1 comparações antes de achá-lo. A ordenação só melhora quando o elemento NÃO existe (break antecipado) — mas o pior caso continua O(n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q4">✘ Busca sequencial ordenada: pior caso ainda é O(n). A ordenação melhora o caso de ausência (break antecipado), mas não o caso de presença no final.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p><strong>Q5.</strong> O trecho abaixo tem qual complexidade?</p>
+        <pre><code>for (int i = 0; i &lt; n; i++) {
+    for (int j = i; j &lt; n; j++) {
+        op();
+    }
+}</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) O(n log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) O(n³)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q5">✔ i=0: loop interno vai de 0 a n-1 → n iters. i=1: j de 1 a n-1 → n-1 iters. ... i=n-1: j de n-1 a n-1 → 1 iter. Total: n+(n-1)+...+1 = n(n+1)/2 = O(n²).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q5">✘ Somatório de n + (n-1) + ... + 1 = n(n+1)/2. Isso é O(n²), não O(n). O fato do j começar em i não muda a classe de complexidade.</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p><strong>Q6.</strong> O trecho abaixo processa a matrícula <strong>232037937</strong>. Qual sua complexidade em função do valor de entrada <em>m</em>, e quantas vezes <code>op()</code> é chamada para m=232037937?</p>
+        <pre><code>void f(int m) {
+    while (m > 0) {
+        op();
+        m /= 10;
+    }
+}</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) O(m) — loop linear no valor de m; 232037937 chamadas</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) O(n²) onde n é o número de dígitos; 81 chamadas</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">c) O(log m) — cada passo divide por 10; 9 chamadas</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) O(1) — número fixo de iterações independente de m</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6">✔ m /= 10 divide por 10 a cada passo: 232037937→23203793→2320379→232037→23203→2320→232→23→2→0 = 9 chamadas. Generalizado: se m tem d dígitos, executa d = ⌊log₁₀(m)⌋+1 vezes → O(log m). É análogo ao loop i*=2 que dá O(log n) — qualquer divisão por constante é logarítmica.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q6">✘ m /= 10 reduz o problema multiplicativamente. Para m=232037937 (9 dígitos): 9 iterações. Complexidade: O(log m).</div>
+      </div>
+
+      <div class="quiz-q" id="q7">
+        <p><strong>Q7.</strong> O Selection Sort aplicado ao vetor de 9 dígitos da matrícula <strong>232037937</strong> faz n(n-1)/2 comparações. Calcule o valor exato e classifique a complexidade.</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 18 comparações — O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 36 comparações — O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 81 comparações — O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 45 comparações — O(n²)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q7">✔ n(n-1)/2 = 9×8/2 = 36. O loop externo faz smallerIndex(ini=0): 8 comp, ini=1: 7 comp, ..., ini=7: 1 comp, ini=8: 0 comp. Total = 8+7+6+5+4+3+2+1+0 = 36. Complexidade: O(n²) — independente dos valores, sempre 36 comparações para n=9.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q7">✘ n(n-1)/2 = 9×8/2 = 36 comparações. Não confunda com n² = 81 (seria se o loop interno fosse até n, não até i).</div>
+      </div>
+
+      <div class="quiz-q" id="q8">
+        <p><strong>Q8.</strong> O trecho abaixo busca cada dígito da matrícula <strong>232037937</strong> usando busca binária. Se <em>n</em> é o tamanho do vetor e os dígitos têm 9 elementos, qual a complexidade total?</p>
+        <pre><code>int digitos[] = {2,3,2,0,3,7,9,3,7};
+for (int i = 0; i &lt; 9; i++)
+    buscaBinaria(v, n, digitos[i]);  // cada chamada: O(log n)</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) O(log n) — a busca domina, o loop é constante</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) O(n) — 9 iterações fixas, cada uma O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q8')">c) O(n log n) — 9 chamadas × O(log n) cada = O(9 log n) = O(n log n) se 9 fosse n</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) O(n²) — dois loops aninhados implícitos</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q8">✔ Regra: chamada de função dentro de loop multiplica os custos. Loop externo: 9 iterações (constante aqui, mas O(n) se fosse variável). Busca binária: O(log n). Total: O(9 × log n) = O(log n) com 9 fixo. Mas se o problema fosse geral com n dígitos buscando num vetor de tamanho n: O(n × log n) = O(n log n). Esta é a complexidade do HeapSort e MergeSort.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q8">✘ Chamada de função dentro de loop multiplica: 9 × O(log n) = O(9 log n). Como 9 é constante aqui: O(log n). Se fosse n dígitos: O(n log n).</div>
+      </div>
+
+      <div class="quiz-q" id="q9">
+        <p><strong>Q9.</strong> Qual a diferença prática entre O(n²) e O(n log n) para n=9 (dígitos da matrícula 232037937) e para n=1.000.000?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) Para n=9 já há grande diferença; para n=1M a diferença é irrelevante</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) Não há diferença prática — Big-O ignora constantes</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) Para n=9: ~81 vs ~27 ops (próximos). Para n=1M: 10¹² vs ~20M ops (abismal)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) Para n=9: O(n log n) é mais lento. Para n=1M: O(n²) é mais lento</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q9">✔ n=9: O(n²)≈81, O(n log n)≈9×3=27 — razão de 3×, pouco perceptível. n=1.000.000: O(n²)=10¹² (horas), O(n log n)≈20.000.000 (milissegundos). Big-O importa para entradas grandes — para n=9 qualquer algoritmo é "rápido". É por isso que o Selection Sort (O(n²)) é aceitável em listas pequenas como a matrícula.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q9">✘ Para n=9: 81 vs ~27 operações — diferença pequena. Para n=1M: 10¹² vs 20M — diferença de 50.000×. Big-O importa em grande escala.</div>
+      </div>
+
+      <div class="quiz-q" id="q10">
+        <p><strong>Q10.</strong> O trecho abaixo usa os dígitos da matrícula <strong>232037937</strong>. Qual a complexidade — cuidado com a pegadinha no loop interno!</p>
+        <pre><code>int v[] = {2,3,2,0,3,7,9,3,7};
+for (int i = 0; i &lt; 9; i++)
+    for (int j = 0; j &lt; 9; j += 9)
+        printf("%d %d\n", v[i], v[j]);</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) O(n²) — dois loops aninhados</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) O(n) — loop interno executa apenas 1 vez por iteração externa</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) O(n log n) — passo do interno é multiplicativo</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) O(1) — ambos os limites são constantes</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q10">✔ Loop interno: j começa em 0 e incrementa 9 a cada passo. j=0 (executa), j+=9 → j=9, j&lt;9? Falso → para. Apenas 1 iteração por loop externo! Total: 9×1 = O(n). Dois loops aninhados não implicam automaticamente O(n²) — depende de como o índice avança. Com j+=n (passo = n), o interno é O(1).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q10">✘ j+=9 com limite j&lt;9: j=0 executa, j=9 não entra. 1 iteração interna por iteração externa. Total O(n), não O(n²).</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Teoria para Prova — Complexidade Computacional</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

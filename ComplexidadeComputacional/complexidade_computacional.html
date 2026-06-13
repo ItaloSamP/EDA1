@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complexidade Computacional — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7e06a;
+    --accent2: #7c6af7;
+    --accent3: #f76a9a;
+    --accent4: #6af7c4;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a1a08 0%, #222008 50%, #161406 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,224,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'O(n)'; position: absolute; right: 50px; top: 20px;
+    font-size: 200px; font-family: 'Fraunces', serif;
+    color: rgba(247,224,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-yellow { color: var(--accent);  border-color: var(--accent);  background: rgba(247,224,106,0.08); }
+  .badge-purple { color: var(--accent2); border-color: var(--accent2); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent3); border-color: var(--accent3); background: rgba(247,106,154,0.08); }
+  .badge-green  { color: var(--accent4); border-color: var(--accent4); background: rgba(106,247,196,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.purple { border-left-color: var(--accent2); }
+  .concept-card.pink   { border-left-color: var(--accent3); }
+  .concept-card.green  { border-left-color: var(--accent4); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(247,224,106,0.07), rgba(124,106,247,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '⚠ '; color: var(--accent3); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '💡 '; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .compare-header { padding: 10px 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .compare-header.yellow { background: rgba(247,224,106,0.12); color: var(--accent); }
+  .compare-header.purple { background: rgba(124,106,247,0.12); color: var(--accent2); }
+  .compare-header.green  { background: rgba(106,247,196,0.12); color: var(--accent4); }
+  .compare-header.pink   { background: rgba(247,106,154,0.12); color: var(--accent3); }
+  .compare-card pre { margin: 0; border: none; border-radius: 0; padding: 16px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent4); color: var(--accent4); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent3); color: var(--accent3); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .steps { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+  .step { display: flex; gap: 16px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
+  .step-num { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 900; color: var(--accent); line-height: 1; min-width: 36px; }
+  .step-content h4 { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-content p { margin: 0; font-size: 0.9rem; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Luana Almeida</div>
+    <h1>Complexidade<br><span>Computacional</span></h1>
+    <p class="subtitle">Análise assintótica, notação Big O, classes P, NP, NP-Completo e como medir a eficiência de algoritmos</p>
+    <div class="badge-row">
+      <span class="badge badge-yellow">Big O</span>
+      <span class="badge badge-purple">Big Ω</span>
+      <span class="badge badge-pink">Big Θ</span>
+      <span class="badge badge-green">P vs NP</span>
+      <span class="badge badge-yellow">NP-Completo</span>
+      <span class="badge badge-purple">análise assintótica</span>
+      <span class="badge badge-pink">classes de complexidade</span>
+      <span class="badge badge-green">tempo polinomial</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que é complexidade computacional?</a></li>
+      <li><a href="#sec2">Análise assintótica — o comportamento para entradas grandes</a></li>
+      <li><a href="#sec3">Notação Big O (O) — limite superior</a></li>
+      <li><a href="#sec4">Notação Big Ω (Ω) — limite inferior</a></li>
+      <li><a href="#sec5">Notação Big Θ (Θ) — limite justo</a></li>
+      <li><a href="#sec6">Hierarquia das complexidades mais comuns</a></li>
+      <li><a href="#sec7">Análise de algoritmos — exemplos práticos</a></li>
+      <li><a href="#sec8">Classes de complexidade — P, NP, NP-Completo</a></li>
+      <li><a href="#sec9">Tabela resumo</a></li>
+      <li><a href="#sec10">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <!-- 01 -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que é <span style="color:var(--accent)">complexidade computacional</span>?</h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Imagine que você precisa encontrar um livro em uma biblioteca. Se você olhar prateleira por prateleira (busca linear), pode levar até N passos. Se a biblioteca organiza os livros em ordem alfabética (busca binária), você encontra em <strong>log₂(N)</strong> passos. A <strong>complexidade computacional</strong> mede exatamente isso: quantos passos um algoritmo precisa conforme a entrada cresce.</p>
+    </div>
+
+    <p>A complexidade computacional estuda <strong>quão rápido</strong> um algoritmo executa em função do tamanho da entrada (<strong>n</strong>). Não se trata do tempo em segundos (que depende do hardware), mas sim do <strong>número de operações elementares</strong> que o algoritmo realiza.</p>
+
+    <div class="concept-card">
+      <p>📌 <strong>Tempo de execução:</strong> número de operações elementares como função do tamanho da entrada n.</p>
+      <p>📌 <strong>Espaço de memória:</strong> quantidade de memória adicional necessária para executar o algoritmo.</p>
+    </div>
+
+    <p>Por que isso importa?</p>
+    <div class="concept-card purple">
+      <p>✔ Escolher o algoritmo certo pode fazer a diferença entre milissegundos e dias de processamento</p>
+      <p>✔ Permite comparar algoritmos independentemente de hardware ou linguagem</p>
+      <p>✔ É fundamental para projetar soluções escaláveis em problemas do mundo real</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 02 -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Análise assintótica — o comportamento para entradas <span style="color:var(--accent)">grandes</span></h2>
+
+    <p>A análise assintótica responde: <strong>"o que acontece com o tempo de execução quando n tende ao infinito?"</strong> Para valores pequenos de n, qualquer algoritmo é rápido. O que importa é como ele se comporta à medida que a entrada cresce.</p>
+
+    <div class="diagram">  Crescimento das funções típicas (n = tamanho da entrada):
+
+  n        | log n  |  n    | n log n |  n²    |  2ⁿ
+  ─────────────────────────────────────────────────────────
+  1        |   0   |   1   |   0     |   1    |   2
+  10       |   3   |  10   |  33     | 100    | 1.024
+  100      |   7   | 100   | 664     | 10.000 | 1,3e30
+  1.000    |  10   | 1.000 | 9.966   | 10⁶    |  — inviável
+  10⁶      |  20   | 10⁶   | 2×10⁷   | 10¹²   |  — inviável
+
+  ★ Para n = 1.000:
+    n     (1.000 ops)  →  µs
+    n log n (10.000)   →  ms
+    n²   (1.000.000)   →  segundos
+    2ⁿ   (imensurável)→  bilhões de anos</div>
+
+    <div class="concept-card pink">
+      <p>A análise assintótica <strong>ignora constantes</strong> e termos de menor ordem. <code>3n² + 5n + 100</code> é tratado como <strong>O(n²)</strong> — para n grande, o termo <code>n²</code> domina completamente.</p>
+    </div>
+
+    <div class="tip">Constantes importam na prática, mas a análise assintótica foca na <strong>taxa de crescimento</strong>. Um algoritmo O(n²) com constante pequena pode ser mais rápido que um O(n log n) com constante enorme para n pequeno — mas eventualmente o O(n log n) vence.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 03 -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Notação <span style="color:var(--accent)">Big O (O)</span> — limite superior</h2>
+
+    <p>A notação <strong>Big O</strong> descreve o <strong>pior caso</strong> (ou limite superior) de um algoritmo. Ela responde: "no máximo, quantos passos este algoritmo executa?"</p>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia</div>
+      <p>Você está procurando uma pessoa em uma lista telefônica. No pior caso, a pessoa é a última da lista — você vai olhar todas as N entradas. A complexidade é <strong>O(n)</strong>.</p>
+    </div>
+
+    <h3>Definição formal</h3>
+    <div class="concept-card">
+      <p>Dizemos que <code>f(n) = O(g(n))</code> se existem constantes positivas <strong>c</strong> e <strong>n₀</strong> tais que, para todo <code>n ≥ n₀</code>, vale <code>0 ≤ f(n) ≤ c·g(n)</code>.</p>
+    </div>
+
+    <p>Em outras palavras: a partir de um certo ponto n₀, f(n) nunca ultrapassa c·g(n).</p>
+
+    <div class="diagram">  f(n) = O(g(n))
+                ▲
+                │                        c·g(n)
+                │                      ↗
+                │                  ↗      f(n)
+                │              ↗        ↗
+                │          ↗         ↗
+                │      ↗          ↗
+                │  ↗           ↗
+                └──────────────────────────▶  n
+                 n₀</div>
+
+    <h3>Exemplos</h3>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header yellow">f(n) = 3n + 2</div>
+        <pre><code><span class="cmt">/* 3n + 2 ≤ 4n para n ≥ 2         */</span>
+<span class="cmt">/* f(n) = O(n), c = 4, n₀ = 2     */</span></code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header purple">f(n) = n² + 10n</div>
+        <pre><code><span class="cmt">/* n² + 10n ≤ 2n² para n ≥ 10      */</span>
+<span class="cmt">/* f(n) = O(n²), c = 2, n₀ = 10   */</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 04 -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Notação <span style="color:var(--accent)">Big Ω (Ω)</span> — limite inferior</h2>
+
+    <p>A notação <strong>Big Ω</strong> descreve o <strong>melhor caso</strong> (ou limite inferior) de um algoritmo. Ela responde: "no mínimo, quantos passos este algoritmo precisa executar?"</p>
+
+    <h3>Definição formal</h3>
+    <div class="concept-card">
+      <p>Dizemos que <code>f(n) = Ω(g(n))</code> se existem constantes positivas <strong>c</strong> e <strong>n₀</strong> tais que, para todo <code>n ≥ n₀</code>, vale <code>0 ≤ c·g(n) ≤ f(n)</code>.</p>
+    </div>
+
+    <div class="diagram">  f(n) = Ω(g(n))
+                ▲
+                │                 f(n)
+                │               ↗
+                │            ↗     c·g(n)
+                │         ↗     ↗
+                │      ↗     ↗
+                │   ↗   ↗
+                │ ↗ ↗
+                └──────────────────────────▶  n
+                n₀</div>
+
+    <h3>Exemplo prático</h3>
+    <div class="concept-card green">
+      <p><strong>Busca linear</strong> em um vetor: no <strong>melhor caso</strong>, o elemento está na primeira posição — <code>Ω(1)</code>. No <strong>pior caso</strong>, está na última — <code>O(n)</code>.</p>
+    </div>
+
+    <p>Big O e Big Ω podem ser diferentes para o mesmo algoritmo. É por isso que existe uma terceira notação.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 05 -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Notação <span style="color:var(--accent)">Big Θ (Θ)</span> — limite justo</h2>
+
+    <p>A notação <strong>Big Θ</strong> descreve o comportamento quando o limite superior e inferior coincidem — ou seja, a função cresce <strong>exatamente</strong> na mesma taxa para todos os casos.</p>
+
+    <h3>Definição formal</h3>
+    <div class="concept-card">
+      <p>Dizemos que <code>f(n) = Θ(g(n))</code> se <code>f(n) = O(g(n))</code> e <code>f(n) = Ω(g(n))</code> simultaneamente. Existem constantes c₁, c₂, n₀ tais que <code>c₁·g(n) ≤ f(n) ≤ c₂·g(n)</code> para todo n ≥ n₀.</p>
+    </div>
+
+    <div class="diagram">  f(n) = Θ(g(n))
+                ▲
+                │                 c₂·g(n)
+                │              ↗
+                │           ↗   f(n)
+                │        ↗   ↗
+                │     ↗   ↗
+                │  ↗   ↗
+                │↗   c₁·g(n)
+                └──────────────────────────▶  n
+                n₀</div>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header yellow">Θ(n) — acesso a vetor</div>
+        <pre><code><span class="cmt">/* Percorrer vetor de n elementos  */</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++)
+    <span class="fn">printf</span>(<span class="str">"%d\n"</span>, vet[i]);
+<span class="cmt">/* Sempre faz exatamente n iterações
+   → Θ(n)                            */</span></code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header purple">O(n²) mas Ω(1)</div>
+        <pre><code><span class="cmt">/* Busca em vetor desordenado      */</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++)
+    <span class="kw">if</span> (vet[i] == alvo) <span class="kw">break</span>;
+<span class="cmt">/* Melhor caso: Ω(1) (1º elemento)
+   Pior caso:   O(n) (último)
+   NÃO é Θ(n) — depende do caso!   */</span></code></pre>
+      </div>
+    </div>
+
+    <div class="tip">Use Θ quando o algoritmo <strong>sempre</strong> executa o mesmo número de operações independentemente da entrada. Use O quando o pior caso é o que importa (é o mais comum na prática).</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 06 -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Hierarquia das complexidades mais comuns</h2>
+
+    <p>As complexidades são ordenadas da mais eficiente para a menos eficiente:</p>
+
+    <div class="diagram">  O(1)       ← constante    (acesso a vetor: vet[i])
+    │
+  O(log n)   ← logarítmica  (busca binária)
+    │
+  O(n)       ← linear       (busca sequencial)
+    │
+  O(n log n) ← linearítmica (mergesort, quicksort médio)
+    │
+  O(n²)      ← quadrática   (bubble sort, inserção direta)
+    │
+  O(n³)      ← cúbica       (multiplicação de matrizes ingênua)
+    │
+  O(2ⁿ)      ← exponencial  (Fibonacci ingênuo, subset sum)
+    │
+  O(n!)      ← fatorial     (caixeiro viajante força bruta)
+
+  ─────────────────────────────────────────
+  Eficientes (polinomiais)     ← O(1) a O(n^k)
+  Ineficientes (exponenciais)  ← O(2ⁿ) e O(n!)</div>
+
+    <div class="concept-card pink">
+      <p>Algoritmos <strong>polinomiais</strong> (O(1), O(log n), O(n), O(n log n), O(n²), etc.) são considerados <strong>eficientes</strong> ou <strong>tratáveis</strong>. Algoritmos <strong>exponenciais</strong> (O(2ⁿ), O(n!)) são <strong>intratáveis</strong> para valores grandes de n.</p>
+    </div>
+
+    <div class="warn">Cuidado: O(n²) pode ser aceitável para n pequeno (n ≤ 10³), mas inviável para n grande (n = 10⁶). Conhecer a complexidade ajuda a decidir se o algoritmo escala para o tamanho do problema.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 07 -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Análise de algoritmos — exemplos práticos</h2>
+
+    <h3>Operações elementares</h3>
+    <p>Para calcular a complexidade, contamos <strong>operações elementares</strong>: atribuições, comparações, operações aritméticas, acesso a vetor. Cada uma conta como O(1).</p>
+
+    <div class="code-label">exemplo 1 — soma de elementos (O(n) → Θ(n))</div>
+    <pre><code><span class="kw">int</span> <span class="fn">soma</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> total = <span class="num">0</span>;                 <span class="cmt">/* O(1) */</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n; i++)   <span class="cmt">/* n vezes: */</span>
+        total += vet[i];          <span class="cmt">/* O(1) cada */</span>
+    <span class="kw">return</span> total;                 <span class="cmt">/* O(1) */</span>
+}
+<span class="cmt">/* Total: 1 + n*1 + 1 = n + 2 = O(n) = Θ(n) */</span></code></pre>
+
+    <div class="code-label">exemplo 2 — laços aninhados (O(n²))</div>
+    <pre><code><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> n) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < n - <span class="num">1</span>; i++) {      <span class="cmt">/* n-1 vezes */</span>
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j < n - i - <span class="num">1</span>; j++) { <span class="cmt">/* ≈ n/2 médio */</span>
+            <span class="kw">if</span> (vet[j] > vet[j+<span class="num">1</span>]) {
+                <span class="kw">int</span> tmp = vet[j];
+                vet[j] = vet[j+<span class="num">1</span>];
+                vet[j+<span class="num">1</span>] = tmp;
+            }
+        }
+    }
+}
+<span class="cmt">/* Soma: (n-1) * (n/2) ≈ n²/2 = O(n²) */</span></code></pre>
+
+    <div class="code-label">exemplo 3 — busca binária (O(log n))</div>
+    <pre><code><span class="kw">int</span> <span class="fn">buscaBinaria</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> n, <span class="kw">int</span> alvo) {
+    <span class="kw">int</span> esq = <span class="num">0</span>, dir = n - <span class="num">1</span>;
+    <span class="kw">while</span> (esq <= dir) {                  <span class="cmt">/* a cada iteração: */</span>
+        <span class="kw">int</span> meio = (esq + dir) / <span class="num">2</span>;      <span class="cmt">/* O(1) */</span>
+        <span class="kw">if</span> (vet[meio] == alvo)
+            <span class="kw">return</span> meio;                   <span class="cmt">/* O(1) */</span>
+        <span class="kw">if</span> (vet[meio] < alvo)
+            esq = meio + <span class="num">1</span>;                <span class="cmt">/* descarta metade */</span>
+        <span class="kw">else</span>
+            dir = meio - <span class="num">1</span>;                <span class="cmt">/* descarta metade */</span>
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}
+<span class="cmt">/* A cada iteração, o espaço de busca é dividido por 2.
+   Número de iterações: log₂(n). Logo O(log n). */</span></code></pre>
+
+    <div class="code-label">exemplo 4 — Fibonacci ingênuo (O(2ⁿ))</div>
+    <pre><code><span class="kw">int</span> <span class="fn">fib</span>(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n <= <span class="num">1</span>) <span class="kw">return</span> n;            <span class="cmt">/* caso base */</span>
+    <span class="kw">return</span> <span class="fn">fib</span>(n-<span class="num">1</span>) + <span class="fn">fib</span>(n-<span class="num">2</span>);   <span class="cmt">/* 2 chamadas recursivas */</span>
+}
+<span class="cmt">/* Árvore de recursão: dobra a cada nível.
+   T(n) = T(n-1) + T(n-2) + O(1)
+   T(n) = O(2ⁿ)  — exponencial!
+
+   Versão iterativa: O(n) — diferença brutal. */</span></code></pre>
+
+    <h3>Regras práticas para calcular complexidade</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Laço simples de 1 a n</h4>
+          <p>Um for de 0 a n-1 → O(n).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Laços aninhados</h4>
+          <p>For dentro de for → multiplique: externo (n) × interno (n) = O(n²). Se o interno depende do externo, calcule a soma (ex: n + (n-1) + ... + 1 = n(n+1)/2 = O(n²)).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Divisão ao meio</h4>
+          <p>Se o problema é dividido pela metade a cada passo → O(log n). Ex: busca binária, árvores balanceadas.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Divide and conquer</h4>
+          <p>Divide em 2 metades (log n níveis) e faz O(n) trabalho por nível → O(n log n). Ex: mergesort, quicksort.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Recursão com múltiplas chamadas</h4>
+          <p>Se uma chamada gera 2 ou mais subchamadas, a complexidade tende a ser exponencial O(2ⁿ) se não houver memoização.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 08 -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Classes de complexidade — <span style="color:var(--accent)">P</span>, <span style="color:var(--accent)">NP</span>, <span style="color:var(--accent)">NP-Completo</span></h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia</div>
+      <p><strong>P</strong> são problemas fáceis de resolver (ex: ordenar uma lista). <strong>NP</strong> são problemas cuja solução é fácil de <em>verificar</em>, mas não necessariamente fácil de <em>encontrar</em> (ex: descobrir a senha de um cadeado — difícil de achar, mas se alguém te der a senha, você verifica em segundos). <strong>NP-Completo</strong> são os problemas mais difíceis dentro de NP.</p>
+    </div>
+
+    <h3>Classe P (Polinomial)</h3>
+    <div class="concept-card green">
+      <p>Problemas que podem ser <strong>resolvidos</strong> em tempo polinomial O(n^k) por uma máquina determinística. São considerados "tratáveis" ou "eficientes".</p>
+      <p>Exemplos: ordenação, busca em vetor, caminho mínimo em grafo, árvore geradora mínima.</p>
+    </div>
+
+    <h3>Classe NP (Nondeterministic Polynomial)</h3>
+    <div class="concept-card purple">
+      <p>Problemas cuja solução pode ser <strong>verificada</strong> em tempo polinomial. Ou seja: se alguém te der uma resposta candidata, você confere se ela está correta rapidamente.</p>
+      <p>Exemplos: problema da mochila, SAT (satisfabilidade booleana), caixeiro viajante (versão decisão).</p>
+    </div>
+
+    <div class="concept-card pink">
+      <p>Todo problema P está em NP (se é fácil resolver, também é fácil verificar). A grande questão em aberto da Ciência da Computação: <strong>P = NP?</strong> — isto é, todo problema cuja solução é fácil de verificar também é fácil de resolver?</p>
+    </div>
+
+    <h3>NP-Completo — os problemas mais difíceis de NP</h3>
+    <p>Um problema X é <strong>NP-Completo</strong> se:</p>
+    <div class="concept-card">
+      <p>1. X está em NP (a solução é verificável em tempo polinomial)</p>
+      <p>2. X é <strong>NP-difícil</strong>: todo problema em NP pode ser reduzido a X em tempo polinomial</p>
+    </div>
+
+    <p>A consequência prática: se alguém encontrar um algoritmo polinomial para <strong>um</strong> problema NP-Completo, então <strong>todos</strong> os problemas em NP teriam solução polinomial (P = NP). Por isso, acredita-se que problemas NP-Completos não têm solução polinomial.</p>
+
+    <div class="diagram">  Relação entre as classes:
+
+        ┌──────────────────────────────┐
+        │         NP                   │
+        │  ┌──────────────────────┐    │
+        │  │    P (polinomiais)   │    │
+        │  │ ordenação, busca,    │    │
+        │  │ caminho mínimo, etc  │    │
+        │  └──────────────────────┘    │
+        │  ┌──────────────────────┐    │
+        │  │   NP-Completo        │    │
+        │  │ SAT, mochila,        │    │
+        │  │ caixeiro viajante    │    │
+        │  └──────────────────────┘    │
+        └──────────────────────────────┘
+
+    Se P = NP: os dois círculos internos se fundem.
+    (A maioria dos cientistas acredita que P ≠ NP.)</div>
+
+    <h3>Exemplos de problemas NP-Completos clássicos</h3>
+    <table>
+      <thead><tr><th>Problema</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td>SAT</td><td>Dada uma fórmula booleana, existe uma atribuição de variáveis que a torna verdadeira?</td></tr>
+        <tr><td>Problema da Mochila</td><td>Dado um conjunto de itens com peso e valor, existe um subconjunto com peso ≤ capacidade e valor ≥ alvo?</td></tr>
+        <tr><td>Caixeiro Viajante (decisão)</td><td>Existe um roteiro que visita todas as cidades com distância total ≤ K?</td></tr>
+        <tr><td>Clique</td><td>Dado um grafo, existe um subgrafo completo de tamanho K?</td></tr>
+        <tr><td>Coloração de Grafos</td><td>Dado um grafo, é possível colorir os vértices com K cores sem que adjacentes compartilhem a mesma cor?</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip">Para problemas NP-Completos, não se busca solução ótima exata para entradas grandes. Usam-se <strong>heurísticas</strong>, <strong>algoritmos aproximados</strong> ou programação dinâmica para casos especiais.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 09 -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Tabela resumo</h2>
+
+    <table>
+      <thead><tr><th>Notação</th><th>Nome</th><th>Significado</th><th>Exemplo de algoritmo</th></tr></thead>
+      <tbody>
+        <tr><td>O(1)</td><td>Constante</td><td>Independente do tamanho da entrada</td><td>Acesso direto: vet[i]</td></tr>
+        <tr><td>O(log n)</td><td>Logarítmica</td><td>Divide o problema pela metade</td><td>Busca binária</td></tr>
+        <tr><td>O(n)</td><td>Linear</td><td>Percorre a entrada uma vez</td><td>Busca sequencial, soma de vetor</td></tr>
+        <tr><td>O(n log n)</td><td>Linearítmica</td><td>Divide e conquista com O(n) por nível</td><td>Mergesort, Quicksort (médio)</td></tr>
+        <tr><td>O(n²)</td><td>Quadrática</td><td>Laços aninhados simples</td><td>Bubble sort, insertion sort</td></tr>
+        <tr><td>O(n³)</td><td>Cúbica</td><td>Três laços aninhados</td><td>Multiplicação ingênua de matrizes</td></tr>
+        <tr><td>O(2ⁿ)</td><td>Exponencial</td><td>Cada passo dobra as possibilidades</td><td>Fibonacci ingênuo, subconjuntos</td></tr>
+        <tr><td>O(n!)</td><td>Fatorial</td><td>Todas as permutações possíveis</td><td>Caixeiro viajante (força bruta)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Comparação: O vs Ω vs Θ</h3>
+    <table>
+      <thead><tr><th>Notação</th><th>O que expressa</th><th>Analogia</th></tr></thead>
+      <tbody>
+        <tr><td>O (Big O)</td><td>Limite superior (pior caso)</td><td>"Não vai demorar mais que..."</td></tr>
+        <tr><td>Ω (Big Ω)</td><td>Limite inferior (melhor caso)</td><td>"Vai demorar pelo menos..."</td></tr>
+        <tr><td>Θ (Big Θ)</td><td>Limite justo (caso médio coincide)</td><td>"Sempre demora exatamente..."</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Classes de complexidade</h3>
+    <table>
+      <thead><tr><th>Classe</th><th>Descrição</th><th>Exemplos</th></tr></thead>
+      <tbody>
+        <tr><td>P</td><td>Resolvível em tempo polinomial</td><td>Ordenação, busca, Dijkstra</td></tr>
+        <tr><td>NP</td><td>Solução verificável em tempo polinomial</td><td>SAT, mochila, caixeiro (decisão)</td></tr>
+        <tr><td>NP-Completo</td><td>NP + todo NP se reduz a ele</td><td>SAT, 3-SAT, clique, coloração</td></tr>
+        <tr><td>NP-Difícil</td><td>Pelo menos tão difícil quanto NP (pode não estar em NP)</td><td>Caixeiro viajante (otimização)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 10 EXERCÍCIOS -->
+  <section id="sec10">
+    <div class="section-number">// 10</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual a complexidade de um laço que percorre um vetor de n elementos uma única vez?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) O(2ⁿ)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent4)">✔ Correto! Um único for de 0 a n-1 executa n iterações → O(n).</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent3)">✘ Um laço simples de n iterações é O(n). Relembre: cada iteração é O(1), e são n iterações.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. O que significa dizer que um algoritmo é O(n²)?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) Ele executa exatamente n² operações para qualquer entrada</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) No pior caso, o número de operações cresce proporcionalmente a n² para entradas suficientemente grandes</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) Ele sempre executa mais que n² operações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) Ele nunca executa mais que n operações</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent4)">✔ Exato! Big O é um limite superior assintótico: para n grande, f(n) ≤ c·n².</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent3)">✘ Big O é limite superior, não valor exato. 3n² + 5n + 100 também é O(n²) — ignoramos constantes e termos menores.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Qual a complexidade da busca binária em um vetor ordenado de n elementos?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) O(n log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) O(n²)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent4)">✔ Correto! A cada iteração, o espaço de busca é dividido por 2 → log₂(n) iterações.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent3)">✘ A busca binária descarta metade do vetor a cada passo. log₂(1.000) ≈ 10, log₂(10⁶) ≈ 20. É O(log n).</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Qual a diferença entre as classes P e NP?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) P contém problemas impossíveis; NP contém problemas possíveis</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) P é um subconjunto de algoritmos; NP é um subconjunto de problemas</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) P: problemas resolvíveis em tempo polinomial. NP: problemas verificáveis em tempo polinomial</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Não há diferença — P e NP são sinônimos</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent4)">✔ Correto! P = polinomial para resolver. NP = polinomial para verificar. Sabe-se que P ⊆ NP, mas P = NP? é a grande questão em aberto.</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent3)">✘ P = fácil de resolver (ordenar). NP = fácil de verificar (mochila). Todo P está em NP, mas a recíproca é o problema do milênio.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p>5. Qual a complexidade de <code>for(i=0; i&lt;n; i++) for(j=0; j&lt;n; j++) soma++;</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) O(2ⁿ)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q5" style="color:var(--accent4)">✔ Correto! Laço externo executa n vezes, interno n vezes cada → n × n = n² iterações.</div>
+        <div class="quiz-feedback" id="fb_wrong_q5" style="color:var(--accent3)">✘ São dois laços aninhados independentes: externo n, interno n → n × n = n² = O(n²).</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p>6. Um problema é dito NP-Completo quando:</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) Está em P e é difícil de implementar</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) Está em NP e todo problema em NP pode ser reduzido a ele em tempo polinomial</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) Não pode ser resolvido por nenhum computador</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) É um problema que só executa em tempo exponencial</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q6" style="color:var(--accent4)">✔ Correto! NP-Completo = em NP + NP-difícil (todo NP se reduz a ele). Se qualquer NP-Completo tiver solução polinomial, então P = NP.</div>
+        <div class="quiz-feedback" id="fb_wrong_q6" style="color:var(--accent3)">✘ NP-Completo exige duas propriedades: (1) estar em NP, (2) ser NP-difícil — todo problema de NP se reduz a ele.</div>
+      </div>
+    </div>
+
+    <h3>Desafios para programar</h3>
+
+    <div class="concept-card">
+      <p><strong>Desafio 1 — Contar operações</strong><br>
+      Implemente os algoritmos de bubble sort, busca binária e Fibonacci ingênuo. Para cada um, adicione um contador de operações e execute com n = 10, 100, 1000. Os resultados batem com a complexidade teórica?</p>
+    </div>
+    <div class="concept-card purple">
+      <p><strong>Desafio 2 — Comparar crescimento</strong><br>
+      Escreva um programa que gere uma tabela comparando n, log n, n log n, n², n³ e 2ⁿ para n = 1 até 20. Observe como 2ⁿ explode rapidamente. Qual o maior n para o qual 2ⁿ é viável?</p>
+    </div>
+    <div class="concept-card pink">
+      <p><strong>Desafio 3 — Redução polinomial</strong><br>
+      Pesquise como o problema SAT pode ser reduzido ao problema da mochila (knapsack). (A redução não precisa ser implementada — apenas compreenda a lógica conceitual.)</p>
+    </div>
+    <div class="concept-card green">
+      <p><strong>Desafio 4 — Qual a complexidade?</strong><br>
+      Dado o código abaixo, determine a complexidade assintótica. Justifique.<br>
+      <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+        for (i = 0; i < n; i++)<br>
+        &nbsp;&nbsp;for (j = i + 1; j < n; j++)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;printf("%d %d\n", i, j);
+      </code></p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Complexidade Computacional</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>
