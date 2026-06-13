@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria — Ordenação para a Prova · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #10081a 0%, #1a0f2a 50%, #0e0818 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(124,106,247,0.12) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(124,106,247,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-purple { color: var(--accent);  border-color: var(--accent);  background: rgba(124,106,247,0.08); }
+  .badge-green  { color: var(--accent2); border-color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  h4 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; color: var(--accent3); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  ul, ol { color: #c8c8e0; margin-left: 22px; margin-bottom: 14px; }
+  li { margin: 5px 0; }
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green  { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.35); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pegadinha-box { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.05)); border: 1px solid rgba(247,106,154,0.3); border-radius: 12px; padding: 24px 28px; margin: 28px 0; }
+  .pegadinha-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .trace-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+  .trace-header { background: rgba(124,106,247,0.12); padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+  .trace-body { padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 6px; display: none; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px;} pre{padding:14px;font-size:12px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Preparação para Prova 2</div>
+    <h1>Teoria de <span>Algoritmos de Ordenação</span></h1>
+    <p class="subtitle">Como cada algoritmo funciona por dentro, contagem de passes e trocas, traces completos e as pegadinhas que fazem errar na prova.</p>
+    <div class="badge-row">
+      <span class="badge badge-purple">Selection Sort</span>
+      <span class="badge badge-green">Insertion Sort</span>
+      <span class="badge badge-orange">Bubble Sort</span>
+      <span class="badge badge-pink">QuickSort</span>
+      <span class="badge badge-yellow">Merge Sort</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Conceitos fundamentais — estabilidade e in-place</a></li>
+      <li><a href="#sec2">Selection Sort — análise profunda</a></li>
+      <li><a href="#sec3">Insertion Sort — análise profunda</a></li>
+      <li><a href="#sec4">Bubble Sort — análise profunda</a></li>
+      <li><a href="#sec5">QuickSort — partição linha a linha</a></li>
+      <li><a href="#sec6">Merge Sort — intercalação linha a linha</a></li>
+      <li><a href="#sec7">Pegadinhas da prova — ordenação</a></li>
+      <li><a href="#sec8">Tabela comparativa</a></li>
+      <li><a href="#sec9">Questões no estilo da prova</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== SEC 1 ===== -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Conceitos fundamentais — <span style="color:var(--accent)">estabilidade e in-place</span></h2>
+
+    <div class="concept-card">
+      <p><strong>Estabilidade:</strong> um algoritmo é estável se elementos com chaves iguais mantêm a mesma ordem relativa que tinham antes de ordenar.</p>
+      <p>Exemplo: vetor <code>[(3,A), (1,B), (3,C)]</code> ordenado por número. Estável → <code>[(1,B), (3,A), (3,C)]</code> — A veio antes de C e continua antes. Instável → pode resultar <code>[(1,B), (3,C), (3,A)]</code>.</p>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>In-place:</strong> o algoritmo ordena sem usar memória extra proporcional a n. Usa no máximo algumas variáveis auxiliares (O(1) de espaço extra). Bubble, Selection e Insertion são in-place. Merge Sort <em>não</em> é — precisa de um vetor auxiliar de tamanho O(n).</p>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Cuidado com Selection Sort e estabilidade</div>
+      <p>Na implementação padrão, o Selection Sort <strong>não é estável</strong>. A troca pode pular elementos iguais fora de ordem. Porém, algumas referências classificam como estável — verifique o contexto da sua aula. Para a prova, o importante é entender o comportamento, não apenas memorizar o rótulo.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 2 ===== -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Selection Sort — <span style="color:var(--accent)">análise profunda</span></h2>
+
+    <p>Divide o vetor em duas partes: a parte já ordenada (à esquerda, cresce a cada passo) e a parte não ordenada. A cada passo, encontra o menor elemento da parte não ordenada e o <strong>troca com o primeiro da parte não ordenada</strong>.</p>
+
+    <div class="code-label">implementação completa</div>
+    <pre><code><span class="kw">int</span> <span class="fn">smallerIndex</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam, <span class="kw">int</span> ini) {
+    <span class="kw">int</span> min = ini;
+    <span class="kw">for</span> (<span class="kw">int</span> j = ini + <span class="num">1</span>; j &lt; tam; j++)
+        <span class="kw">if</span> (vet[j] &lt; vet[min])   <span class="cmt">// < não <=: mantém o primeiro</span>
+            min = j;
+    <span class="kw">return</span> min;              <span class="cmt">// retorna ÍNDICE do menor</span>
+}
+
+<span class="kw">void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; tam; i++) {  <span class="cmt">// i vai de 0 até tam-1</span>
+        <span class="kw">int</span> min = <span class="fn">smallerIndex</span>(vet, tam, i);
+        <span class="kw">int</span> aux = vet[i];               <span class="cmt">// troca vet[i] com vet[min]</span>
+        vet[i]  = vet[min];
+        vet[min] = aux;
+    }
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>smallerIndex retorna índice:</strong> a função percorre de <code>ini+1</code> até <code>tam-1</code> e mantém em <code>min</code> o <em>índice</em> do menor valor encontrado até agora. Começa com <code>min = ini</code> (assume que o primeiro é o menor). Retorna um número entre 0 e tam-1 — não um valor do vetor.</p>
+    </div>
+
+    <h3>Trace passo a passo — matrícula como exemplo</h3>
+    <p>Vetor: dígitos da matrícula 232037937 → <code>[2, 3, 2, 0, 3, 7, 9, 3, 7]</code></p>
+
+    <div class="trace-box">
+      <div class="trace-header">selectionSort([2,3,2,0,3,7,9,3,7], 9)</div>
+      <div class="trace-body">i=0: smallerIndex de ini=0 → percorre tudo → min=3 (v[3]=0 é o menor)
+     troca v[0] com v[3]: [0, 3, 2, 2, 3, 7, 9, 3, 7]
+
+i=1: smallerIndex de ini=1 → min=2 (v[2]=2 é o menor a partir de 1)
+     troca v[1] com v[2]: [0, 2, 3, 2, 3, 7, 9, 3, 7]
+
+i=2: smallerIndex de ini=2 → min=3 (v[3]=2 é o menor a partir de 2)
+     troca v[2] com v[3]: [0, 2, 2, 3, 3, 7, 9, 3, 7]
+
+i=3: smallerIndex de ini=3 → min=7 (v[7]=3, primeiro 3 encontrado)
+     troca v[3] com v[7]: [0, 2, 2, 3, 3, 7, 9, 3, 7]
+     (3 trocado com 3 — troca acontece mesmo quando valores são iguais!)
+
+i=4: smallerIndex de ini=4 → min=4 (v[4]=3, já é o menor)
+     troca v[4] com v[4]: [0, 2, 2, 3, 3, 7, 9, 3, 7]  (troca consigo mesmo)
+
+i=5: smallerIndex de ini=5 → min=7 (v[7]=3)
+     troca v[5] com v[7]: [0, 2, 2, 3, 3, 3, 9, 7, 7]
+
+i=6: smallerIndex de ini=6 → min=7 (v[7]=7, menor entre 9 e 7)
+     troca v[6] com v[7]: [0, 2, 2, 3, 3, 3, 7, 9, 7]
+
+i=7: smallerIndex de ini=7 → min=8 (v[8]=7 == v[7]=9, mas 7<9 → min=8)
+     troca v[7] com v[8]: [0, 2, 2, 3, 3, 3, 7, 7, 9]
+
+i=8: smallerIndex de ini=8 → min=8 (só um elemento)
+     troca v[8] com v[8]: [0, 2, 2, 3, 3, 3, 7, 7, 9]
+
+Resultado final: [0, 2, 2, 3, 3, 3, 7, 7, 9] ✓</div>
+    </div>
+
+    <div class="concept-card yellow">
+      <p><strong>Número exato de trocas:</strong> O Selection Sort sempre realiza exatamente <strong>n trocas</strong> (uma por iteração do loop externo), mesmo quando o elemento já está na posição certa. Trocas de elemento consigo mesmo (quando min == i) também acontecem.</p>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>Número de comparações:</strong> o loop interno de <code>smallerIndex</code> faz (n-1) + (n-2) + ... + 1 = n(n-1)/2 comparações no total. Isso vale sempre — melhor e pior caso são O(n²). O Selection Sort nunca para antes.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 3 ===== -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Insertion Sort — <span style="color:var(--accent)">análise profunda</span></h2>
+
+    <p>Para cada elemento <code>list[i]</code> (começando do i=1), guarda o valor em <code>next</code> e faz um <strong>scan para trás</strong> deslocando os elementos maiores que <code>next</code> uma posição à direita, até achar onde inserir.</p>
+
+    <div class="code-label">implementação completa</div>
+    <pre><code><span class="kw">void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span> list[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> i, j, next;
+    <span class="kw">for</span> (i = <span class="num">1</span>; i &lt; n; i++) {
+        next = list[i];              <span class="cmt">// salva o elemento atual</span>
+        <span class="kw">for</span> (j = i - <span class="num">1</span>; j &gt;= <span class="num">0</span> &amp;&amp; next &lt; list[j]; j--)
+            list[j + <span class="num">1</span>] = list[j];  <span class="cmt">// desloca j para j+1</span>
+        list[j + <span class="num">1</span>] = next;         <span class="cmt">// insere na posição j+1</span>
+    }
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Por que <code>list[j+1] = next</code> e não <code>list[j] = next</code>?</strong> O loop for decrementa j <em>antes</em> de sair. Quando a condição <code>j >= 0 &amp;&amp; next &lt; list[j]</code> falha, j já foi decrementado um a mais. A posição correta é j+1, não j.</p>
+      <p>Exemplo: se j chegou a -1 (elemento vai para o início), <code>list[-1+1] = list[0] = next</code> — correto.</p>
+    </div>
+
+    <h3>Trace passo a passo</h3>
+    <p>Vetor: <code>[9, 3, 7, 2]</code></p>
+
+    <div class="trace-box">
+      <div class="trace-header">insertionSort([9, 3, 7, 2], 4)</div>
+      <div class="trace-body">i=1: next = list[1] = 3
+  j=0: j>=0? Sim. next(3) < list[0](9)? Sim → list[1]=list[0]=9 → [9,9,7,2]
+  j=-1: j>=-1: Sim. next(3) < list[-1]? j<0 → PARA o loop
+  list[j+1] = list[-1+1] = list[0] = 3
+  Resultado: [3, 9, 7, 2]
+
+i=2: next = list[2] = 7
+  j=1: j>=0? Sim. 7 < list[1]=9? Sim → list[2]=list[1]=9 → [3,9,9,2]
+  j=0: j>=0? Sim. 7 < list[0]=3? NÃO → para o loop (j fica em 0)
+  list[j+1] = list[0+1] = list[1] = 7
+  Resultado: [3, 7, 9, 2]
+
+i=3: next = list[3] = 2
+  j=2: 2 < 9? Sim → list[3]=9 → [3,7,9,9]
+  j=1: 2 < 7? Sim → list[2]=7 → [3,7,7,9]
+  j=0: 2 < 3? Sim → list[1]=3 → [3,3,7,9]
+  j=-1: j<0 → para
+  list[-1+1] = list[0] = 2
+  Resultado: [2, 3, 7, 9] ✓</div>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>Melhor caso O(n):</strong> quando o vetor já está ordenado, para cada i, a condição <code>next &lt; list[j]</code> é falsa imediatamente (next >= list[j]). O loop interno não executa nenhuma vez. Apenas n-1 comparações no total.</p>
+    </div>
+
+    <div class="concept-card orange">
+      <p><strong>Pior caso O(n²):</strong> quando o vetor está em ordem decrescente, cada elemento i precisa ser deslocado até a posição 0. O loop interno executa i vezes para cada i → 1+2+...+(n-1) = n(n-1)/2 operações.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 4 ===== -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Bubble Sort — <span style="color:var(--accent)">análise profunda</span></h2>
+
+    <p>Percorre o vetor comparando pares adjacentes e trocando quando estão fora de ordem. Após cada passagem completa, o maior elemento ainda não fixado "flutua" até sua posição final.</p>
+
+    <div class="code-label">implementação com loop externo decrescente</div>
+    <pre><code><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam) {
+    <span class="kw">int</span> i, j, temp;
+    <span class="kw">for</span> (i = tam - <span class="num">1</span>; i &gt; <span class="num">0</span>; i--) {    <span class="cmt">// i de tam-1 até 1</span>
+        <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; i; j++) {         <span class="cmt">// j de 0 até i-1</span>
+            <span class="kw">if</span> (vet[j] &gt; vet[j + <span class="num">1</span>]) {
+                temp      = vet[j];
+                vet[j]    = vet[j + <span class="num">1</span>];
+                vet[j + <span class="num">1</span>] = temp;
+            }
+        }
+    }
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Entendendo os loops:</strong></p>
+      <ul>
+        <li><strong>Loop externo (i):</strong> começa em tam-1 e decrementa. Representa o limite superior das comparações — a partir da posição i+1, os elementos já estão na posição final.</li>
+        <li><strong>Loop interno (j):</strong> vai de 0 a i-1. Compara pares adjacentes: j e j+1. Nunca chega a i porque compara j e j+1 (o máximo é j=i-1 comparando v[i-1] com v[i]).</li>
+      </ul>
+    </div>
+
+    <h3>Trace com contagem de passes e trocas</h3>
+    <p>Vetor: <code>[5, 3, 8, 1]</code> (tam=4)</p>
+
+    <div class="trace-box">
+      <div class="trace-header">bubbleSort([5,3,8,1], 4)</div>
+      <div class="trace-body">i=3 (passagem 1, limite j < 3, ou seja j=0,1,2):
+  j=0: v[0]=5 > v[1]=3? Sim → troca: [3,5,8,1]
+  j=1: v[1]=5 > v[2]=8? Não
+  j=2: v[2]=8 > v[3]=1? Sim → troca: [3,5,1,8]
+  Após passagem 1: [3,5,1,8]  ← 8 fixado no final
+  Trocas nesta passagem: 2
+
+i=2 (passagem 2, j=0,1):
+  j=0: v[0]=3 > v[1]=5? Não
+  j=1: v[1]=5 > v[2]=1? Sim → troca: [3,1,5,8]
+  Após passagem 2: [3,1,5,8]  ← 5 fixado
+  Trocas nesta passagem: 1
+
+i=1 (passagem 3, j=0):
+  j=0: v[0]=3 > v[1]=1? Sim → troca: [1,3,5,8]
+  Após passagem 3: [1,3,5,8] ✓
+  Trocas nesta passagem: 1
+
+Total de passagens: 3 (= tam-1 = 3)
+Total de trocas: 4</div>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>Número de passagens:</strong> O loop externo executa exatamente <strong>tam-1</strong> vezes (i de tam-1 até 1 inclusive). Para tam=4: 3 passagens. Para tam=n: n-1 passagens. Isso vale sempre, mesmo que o vetor fique ordenado antes — sem a otimização de flag.</p>
+    </div>
+
+    <h3>Versão otimizada com flag (importante para prova)</h3>
+    <p>Essa variante para mais cedo quando nenhuma troca ocorreu:</p>
+
+    <div class="code-label">bubble sort com flag de troca</div>
+    <pre><code><span class="kw">void</span> <span class="fn">bubbleSortOtimizado</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam) {
+    <span class="kw">int</span> i, j, temp, trocou;
+    <span class="kw">for</span> (i = tam - <span class="num">1</span>; i &gt; <span class="num">0</span>; i--) {
+        trocou = <span class="num">0</span>;                        <span class="cmt">// reseta flag a cada passagem</span>
+        <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; i; j++) {
+            <span class="kw">if</span> (vet[j] &gt; vet[j + <span class="num">1</span>]) {
+                temp = vet[j]; vet[j] = vet[j+<span class="num">1</span>]; vet[j+<span class="num">1</span>] = temp;
+                trocou = <span class="num">1</span>;                   <span class="cmt">// marcou troca</span>
+            }
+        }
+        <span class="kw">if</span> (!trocou) <span class="kw">break</span>;              <span class="cmt">// nenhuma troca → já ordenado</span>
+    }
+}</code></pre>
+
+    <div class="concept-card yellow">
+      <p><strong>Com flag:</strong> melhor caso O(n) — uma única passagem sem trocas e o algoritmo para. Pior caso permanece O(n²). A versão sem flag é sempre O(n²).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 5 ===== -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>QuickSort — <span style="color:var(--accent)">partição linha a linha</span></h2>
+
+    <p>Divide e conquista: escolhe um pivô, particiona o vetor de modo que os elementos menores que o pivô fiquem à esquerda e os maiores à direita (o pivô fica em sua posição final), depois ordena recursivamente cada metade.</p>
+
+    <div class="code-label">funções separa e quicksort</div>
+    <pre><code><span class="cmt">// Pivô = último elemento v[r].
+// Após execução: v[p..j-1] <= v[j] < v[j+1..r]</span>
+<span class="kw">int</span> <span class="fn">separa</span>(<span class="kw">int</span> v[], <span class="kw">int</span> p, <span class="kw">int</span> r) {
+    <span class="kw">int</span> c = v[r];    <span class="cmt">// pivô</span>
+    <span class="kw">int</span> t, j = p;
+    <span class="kw">for</span> (<span class="kw">int</span> k = p; k &lt; r; ++k)   <span class="cmt">// k percorre p até r-1</span>
+        <span class="kw">if</span> (v[k] &lt;= c) {
+            t = v[j]; v[j] = v[k]; v[k] = t;  <span class="cmt">// troca v[j] com v[k]</span>
+            ++j;
+        }
+    t = v[j]; v[j] = v[r]; v[r] = t;  <span class="cmt">// coloca pivô na posição j</span>
+    <span class="kw">return</span> j;
+}
+
+<span class="kw">void</span> <span class="fn">quicksort</span>(<span class="kw">int</span> v[], <span class="kw">int</span> p, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (p &lt; r) {
+        <span class="kw">int</span> j = <span class="fn">separa</span>(v, p, r);
+        <span class="fn">quicksort</span>(v, p, j - <span class="num">1</span>);
+        <span class="fn">quicksort</span>(v, j + <span class="num">1</span>, r);
+    }
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Entendendo a função separa:</strong></p>
+      <ul>
+        <li><code>c = v[r]</code>: o pivô é sempre o <strong>último</strong> elemento do intervalo [p..r]</li>
+        <li><code>j</code>: aponta para a próxima posição disponível na partição "menores que o pivô". Começa em p.</li>
+        <li><code>k</code>: percorre todos os elementos exceto o pivô. Se <code>v[k] &lt;= c</code>, troca com v[j] e incrementa j.</li>
+        <li>Ao final: coloca o pivô em v[j] (trocando com v[r]). Agora v[j] é o pivô e está na posição definitiva.</li>
+        <li>Retorna j — o índice do pivô. Elementos em [p..j-1] são ≤ pivô, em [j+1..r] são > pivô.</li>
+      </ul>
+    </div>
+
+    <h3>Trace da função separa</h3>
+    <p>Vetor <code>[3, 7, 2, 9, 0]</code>, p=0, r=4, pivô = v[4] = 0</p>
+
+    <div class="trace-box">
+      <div class="trace-header">separa([3,7,2,9,0], 0, 4)</div>
+      <div class="trace-body">c = v[4] = 0  ← pivô
+j = 0
+
+k=0: v[0]=3 <= 0? NÃO → j permanece 0
+k=1: v[1]=7 <= 0? NÃO
+k=2: v[2]=2 <= 0? NÃO
+k=3: v[3]=9 <= 0? NÃO
+
+Loop termina. Nenhuma troca ocorreu durante o loop.
+Agora coloca pivô: troca v[j]=v[0] com v[r]=v[4]:
+  troca v[0]=3 com v[4]=0 → [0, 7, 2, 9, 3]
+  retorna j=0
+
+O pivô 0 está na posição 0 (final).
+Partição esquerda: [] (vazia, p=0, j-1=-1)
+Partição direita: [7,2,9,3] (j+1=1 até r=4)</div>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">separa([9,8,1,4,3], 0, 4) — pivô=3</div>
+      <div class="trace-body">c = v[4] = 3
+j = 0
+
+k=0: v[0]=9 <= 3? NÃO
+k=1: v[1]=8 <= 3? NÃO
+k=2: v[2]=1 <= 3? SIM → troca v[0] com v[2]: [1,8,9,4,3], j=1
+k=3: v[3]=4 <= 3? NÃO
+
+Coloca pivô: troca v[j]=v[1] com v[r]=v[4]: [1,3,9,4,8]
+retorna j=1
+
+O pivô 3 está na posição 1.
+Recursão esquerda: [1]  (p=0, j-1=0)
+Recursão direita:  [9,4,8] (j+1=2, r=4)</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 6 ===== -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Merge Sort — <span style="color:var(--accent)">intercalação linha a linha</span></h2>
+
+    <p>Divide recursivamente o vetor ao meio até chegar em subvetores de 1 elemento (trivialmente ordenados), depois <strong>intercala</strong> as metades ordenadas para produzir um resultado maior e ordenado.</p>
+
+    <div class="concept-card">
+      <p><strong>Convenção de intervalo [p..r[:</strong> o mergesort usa intervalos "semi-abertos" — <code>p</code> é inclusivo, <code>r</code> é exclusivo. Um vetor de n elementos: <code>mergesort(0, n, v)</code>. O subvetor vai do índice p ao índice r-1.</p>
+    </div>
+
+    <div class="code-label">intercala e mergesort</div>
+    <pre><code><span class="cmt">// v[p..q-1] e v[q..r-1] já ordenados. Resultado em v[p..r-1]</span>
+<span class="kw">void</span> <span class="fn">intercala</span>(<span class="kw">int</span> p, <span class="kw">int</span> q, <span class="kw">int</span> r, <span class="kw">int</span> v[]) {
+    <span class="kw">int</span> *w = (<span class="kw">int</span>*) <span class="fn">malloc</span>((r - p) * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    <span class="kw">int</span> i = p, j = q, k = <span class="num">0</span>;
+    <span class="kw">while</span> (i &lt; q &amp;&amp; j &lt; r)
+        w[k++] = (v[i] &lt;= v[j]) ? v[i++] : v[j++];
+    <span class="kw">while</span> (i &lt; q) w[k++] = v[i++];   <span class="cmt">// sobras da esquerda</span>
+    <span class="kw">while</span> (j &lt; r) w[k++] = v[j++];   <span class="cmt">// sobras da direita</span>
+    <span class="kw">for</span> (i = p; i &lt; r; ++i) v[i] = w[i - p];
+    <span class="fn">free</span>(w);
+}
+
+<span class="kw">void</span> <span class="fn">mergesort</span>(<span class="kw">int</span> p, <span class="kw">int</span> r, <span class="kw">int</span> v[]) {
+    <span class="kw">if</span> (p &lt; r - <span class="num">1</span>) {               <span class="cmt">// mais de 1 elemento?</span>
+        <span class="kw">int</span> q = (p + r) / <span class="num">2</span>;
+        <span class="fn">mergesort</span>(p, q, v);
+        <span class="fn">mergesort</span>(q, r, v);
+        <span class="fn">intercala</span>(p, q, r, v);
+    }
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Condição de parada: <code>p &lt; r-1</code>:</strong> significa que o subvetor tem mais de 1 elemento. Se p = r-1, tem exatamente 1 elemento — já está ordenado por definição. Se <code>p &lt; r-1</code> é falso quando p+1 = r (1 elemento) ou p = r (0 elementos).</p>
+    </div>
+
+    <div class="concept-card orange">
+      <p><strong>Merge Sort NÃO é in-place:</strong> a função <code>intercala</code> aloca um vetor auxiliar <code>w</code> de tamanho r-p. O total de memória extra é O(n). Esta é a principal desvantagem do Merge Sort frente ao QuickSort.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 7 ===== -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Pegadinhas da prova — <span style="color:var(--accent)">ordenação</span></h2>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #1 — smallerIndex retorna índice, não valor</div>
+      <p>No Selection Sort, <code>smallerIndex</code> retorna o <strong>índice</strong> do menor elemento, não o valor. Se você precisar do valor do menor, é <code>vet[smallerIndex(...)]</code>, não o retorno direto.</p>
+      <pre><code>int min = smallerIndex(vet, 5, 2);
+// min = 4 (por exemplo)      ← índice!
+// vet[min] = vet[4] = 1      ← valor</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #2 — selection sort faz n trocas sempre</div>
+      <p>O loop externo do <code>selectionSort</code> vai de <code>i=0</code> até <code>i &lt; tam</code>, executando uma troca por iteração — inclusive quando <code>min == i</code> (troca consigo mesmo). São sempre tam trocas, não tam-1. Confirme contando no trace.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #3 — insertion sort: list[j+1] não list[j]</div>
+      <p>A inserção final é em <code>list[j+1]</code> porque o for-loop já decrementou j uma vez a mais antes de parar. Este é o erro mais comum ao analisar o Insertion Sort:</p>
+      <pre><code>// j termina em -1 quando o elemento vai para o início
+list[j+1] = next;  // list[-1+1] = list[0] = next ← correto
+// Se fosse list[j] seria list[-1] ← ERRADO (acesso inválido)</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #4 — bubble sort: j &lt; i, não j &lt; tam</div>
+      <p>No Bubble Sort com loop externo decrescente, o loop interno é <code>j &lt; i</code>, não <code>j &lt; tam</code>. A cada passagem, o número de comparações diminui. Passagem 1 (i=tam-1): tam-1 comparações. Passagem 2 (i=tam-2): tam-2 comparações. Etc.</p>
+      <pre><code>// Para tam=5:
+// i=4: j=0,1,2,3 → 4 comparações
+// i=3: j=0,1,2   → 3 comparações
+// i=2: j=0,1     → 2 comparações
+// i=1: j=0       → 1 comparação
+// Total: 4+3+2+1 = 10 comparações</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #5 — mergesort: p &lt; r-1, não p &lt; r</div>
+      <p>A condição de parada do <code>mergesort</code> é <code>p &lt; r-1</code>. Se fosse <code>p &lt; r</code>, tentaria dividir um único elemento indefinidamente. Com <code>p &lt; r-1</code>: para quando há 0 ou 1 elemento.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #6 — quicksort pior caso é vetor ordenado</div>
+      <p>Com pivô = último elemento, se o vetor já está ordenado, cada chamada a <code>separa</code> resulta em uma partição vazia e outra com n-1 elementos. A recursão tem profundidade n, resultando em O(n²). Este é o pior caso do QuickSort.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #7 — após K passes do bubble, os K maiores estão fixados</div>
+      <p>Após 1 passagem: o maior elemento está na posição final. Após 2 passagens: os 2 maiores estão nas posições finais. Após k passagens: os k maiores estão nas últimas k posições. Isso é o que a prova testa quando pergunta "qual o estado do vetor após 2 passagens?".</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 8 ===== -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">ordenação</span></h2>
+
+    <table>
+      <thead><tr><th>Algoritmo</th><th>Melhor</th><th>Médio</th><th>Pior</th><th>In-place</th><th>Estável</th><th>Recursivo</th></tr></thead>
+      <tbody>
+        <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td><td>Sim</td><td>Não*</td><td>Não</td></tr>
+        <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+        <tr><td>Bubble Sort</td><td>O(n)**</td><td>O(n²)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+        <tr><td>QuickSort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n²)</td><td>Sim</td><td>Não</td><td>Sim</td></tr>
+        <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n log n)</td><td>Não</td><td>Sim</td><td>Sim</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.85rem;color:var(--text-muted);">* Instável na implementação padrão. ** Melhor caso O(n) apenas com a variante de flag.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 9 ===== -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Questões no estilo da prova</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Analise o código e responda</div>
+
+      <div class="quiz-q" id="q1">
+        <p><strong>Q1.</strong> Após a <strong>2ª passagem</strong> do bubbleSort (i=tam-2) no vetor <code>[5, 1, 4, 2, 8]</code>, qual o estado do vetor?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) [1, 2, 4, 5, 8]</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) [1, 4, 2, 5, 8]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) [1, 2, 5, 4, 8]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) [1, 4, 2, 8, 5]</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q1">✔ Pass1(i=4): 5>1→troca→[1,5,4,2,8]; 5>4→troca→[1,4,5,2,8]; 5>2→troca→[1,4,2,5,8]; 5>8?Não. Pass2(i=3,j<3): 1>4?Não; 4>2→troca→[1,2,4,5,8]; 4>5?Não. Estado após 2 passes: [1,2,4,5,8]? Trace novamente: Pass1→[1,4,2,5,8]. Pass2: j<3(j=0,1,2): 1>4?N; 4>2→troca→[1,2,4,5,8]; 4>5?N. Final: [1,2,4,5,8].</div>
+        <div class="quiz-feedback err" id="fb_wrong_q1">✘ Pass1: [1,4,2,5,8]. Pass2(j=0,1,2): 1>4?N; 4>2→troca; 4>5?N → [1,2,4,5,8]. A resposta correta é [1,2,4,5,8].</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p><strong>Q2.</strong> No Selection Sort com <code>[4, 2, 6, 1, 3]</code>, qual o estado após a 1ª iteração do loop externo (i=0)?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) [1, 4, 6, 2, 3] — smallerIndex retornou o valor 1</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) [1, 2, 6, 4, 3] — trocou v[0] com v[3]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) [2, 4, 6, 1, 3] — não troca quando min != 0</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) [1, 2, 3, 4, 6] — ordena tudo em uma iteração</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q2">✔ smallerIndex(vet,5,0): menor é v[3]=1, retorna índice 3. Troca v[0]=4 com v[3]=1 → [1,2,6,4,3]. Atenção: smallerIndex retorna índice 3, não o valor 1.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q2">✘ O menor é v[3]=1 (índice 3). Troca v[0] com v[3]: v[0]←1, v[3]←4. Resultado: [1,2,6,4,3].</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p><strong>Q3.</strong> No Insertion Sort com <code>[3, 1, 2]</code>, quando i=2 e next=2, qual o valor de j ao final do loop interno e onde o elemento é inserido?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) j=1, insere em list[1]</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) j=0, insere em list[j+1] = list[1]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) j=-1, insere em list[0]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) j=2, insere em list[2]</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q3">✔ next=2. j=1: 2 < list[1]=1? NÃO → para (condição falsa). j fica em 0. list[j+1] = list[0+1] = list[1] = 2. Resultado: [1,2,3]. j ficou em 0 pois a 2ª condição do &&amp; falhou sem decrementar j de novo.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q3">✘ Após pass1 o vetor está [1,3,2]. next=2. j começa em 1. list[1]=3 > 2 → desloca: [1,3,3]. j=0. list[0]=1 > 2? Não. Para com j=0. list[0+1]=2. Final: [1,2,3].</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p><strong>Q4.</strong> Quantas comparações de igualdade o Selection Sort faz para um vetor de 5 elementos?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 5 comparações</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) 10 comparações (4+3+2+1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) 25 comparações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Depende da entrada</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q4">✔ smallerIndex(ini=0): 4 comp. smallerIndex(ini=1): 3 comp. ini=2: 2 comp. ini=3: 1 comp. ini=4: 0 comp. Total = 4+3+2+1 = 10. Selection Sort sempre faz n(n-1)/2 = 5×4/2 = 10 comparações.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q4">✘ Sempre (n-1)+(n-2)+...+1 = n(n-1)/2. Para n=5: 10 comparações. Independe dos valores.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p><strong>Q5.</strong> O Merge Sort é in-place?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) Sim, ordena no próprio vetor sem memória extra</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) Não — a função intercala aloca um vetor auxiliar de tamanho O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) Depende da implementação</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) Sim, porque divide e conquista usa O(log n) de memória</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q5">✔ A função intercala faz malloc((r-p)*sizeof(int)) — aloca um vetor auxiliar. O total de memória extra é O(n). Merge Sort NÃO é in-place. A pilha de recursão usa O(log n) a mais, mas a maior parte é o vetor auxiliar.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q5">✘ intercala aloca w com malloc — vetor auxiliar de O(n) elementos. Merge Sort usa memória extra O(n), logo não é in-place.</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p><strong>Q6.</strong> Após a <strong>1ª passagem</strong> do bubbleSort (i=tam-1=8) no vetor <code>[2,3,2,0,3,7,9,3,7]</code> (dígitos da matrícula <strong>232037937</strong>), qual o estado do vetor?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) [0,2,2,3,3,3,7,7,9] — completamente ordenado</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) [2,2,0,3,3,7,3,7,9] — 9 fixado na última posição</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) [2,2,3,0,3,7,9,3,7] — apenas primeira troca feita</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) [2,3,2,0,3,7,9,3,7] — nenhuma troca ocorreu</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6">✔ j=0: 2&gt;3? Não. j=1: 3&gt;2? Sim→[2,2,3,0,3,7,9,3,7]. j=2: 3&gt;0? Sim→[2,2,0,3,3,7,9,3,7]. j=3: 3&gt;3? Não. j=4: 3&gt;7? Não. j=5: 7&gt;9? Não. j=6: 9&gt;3? Sim→[2,2,0,3,3,7,3,9,7]. j=7: 9&gt;7? Sim→[2,2,0,3,3,7,3,7,9]. O maior elemento (9) "borbulhou" para a última posição. 3 trocas no total nesta passagem.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q6">✘ Trace passo a passo: trocas em j=1 (3,2), j=2 (3,0), j=6 (9,3), j=7 (9,7). Resultado: [2,2,0,3,3,7,3,7,9].</div>
+      </div>
+
+      <div class="quiz-q" id="q7">
+        <p><strong>Q7.</strong> <code>selectionSort(vet, 9)</code> no vetor dos 9 dígitos da matrícula <strong>232037937</strong>. Quantas trocas (chamadas à operação de swap) são realizadas <em>no total</em>, independente dos valores?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 0 — não troca quando o elemento já está no lugar certo</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) 8 — n-1 trocas (não troca o último)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q7')">c) 9 — sempre exatamente n trocas, uma por iteração</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 36 — n(n-1)/2 como as comparações</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q7">✔ O loop externo do selectionSort vai de i=0 até i&lt;tam, executando swap(vet[i], vet[min]) a cada iteração — mesmo quando min==i (troca consigo mesmo). Para tam=9: exatamente 9 trocas. Este é um fato fixo do Selection Sort: sempre n trocas, independente da entrada. As comparações é que são n(n-1)/2 = 36.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q7">✘ O loop externo executa tam vezes (i=0..tam-1), com uma troca por iteração, mesmo que min==i. Sempre n=9 trocas.</div>
+      </div>
+
+      <div class="quiz-q" id="q8">
+        <p><strong>Q8.</strong> <code>insertionSort([7,9,3,7], 4)</code> — últimos 4 dígitos da matrícula <strong>232037937</strong>. Qual o estado do vetor após processar o elemento na posição i=2 (o valor 3)?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'correct','q8')">a) [3,7,9,7]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) [3,9,7,7]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) [7,3,9,7]</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) [7,9,3,7] — sem mudança nesta iteração</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q8">✔ Estado antes de i=2: após i=1 (next=9, 9&lt;7? Não → sem troca) → [7,9,3,7]. Agora i=2: next=3. j=1: 3&lt;list[1]=9? Sim→list[2]=9=[7,9,9,7]. j=0: 3&lt;list[0]=7? Sim→list[1]=7=[7,7,9,7]. j=-1: para. list[0]=3=[3,7,9,7]. Resultado após i=2: [3,7,9,7].</div>
+        <div class="quiz-feedback err" id="fb_wrong_q8">✘ i=2, next=3: desloca 9 e 7 uma posição à direita, insere 3 em list[0]. Resultado: [3,7,9,7].</div>
+      </div>
+
+      <div class="quiz-q" id="q9">
+        <p><strong>Q9.</strong> O vetor <code>[0,2,3,7,9]</code> (dígitos únicos da matrícula <strong>232037937</strong>, já ordenado) é passado ao quicksort com pivô sempre no último elemento. Por que este é o pior caso do QuickSort?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) Porque a função separa não consegue encontrar o pivô correto em vetores ordenados</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) Porque o pivô sempre cai no meio, gerando mais chamadas recursivas</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) Cada chamada a separa coloca 0 elementos de um lado e n-1 do outro — recursão de profundidade n, O(n²) comparações</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) Porque vetores ordenados violam o pré-requisito do QuickSort</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q9">✔ Com pivô = último elemento em vetor ordenado: todos os elementos são ≤ pivô, então j avança até n-1 e o pivô vai para a posição n-1 (a própria). Partição esquerda tem n-1 elementos, direita tem 0. Recursão: T(n)=T(n-1)+O(n) → O(n²). Para [0,2,3,7,9]: 5→4→3→2→1 chamadas = 5+4+3+2+1=15 comparações no total.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q9">✘ Vetor ordenado + pivô=último: separa sempre produz partição vazia (esquerda) e n-1 (direita). Recursão T(n)=T(n-1)+O(n) → O(n²).</div>
+      </div>
+
+      <div class="quiz-q" id="q10">
+        <p><strong>Q10.</strong> Dentre os algoritmos estudados (Selection, Insertion, Bubble, QuickSort, MergeSort), quais são <em>estáveis</em> — preservam a ordem relativa de elementos com chaves iguais?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) Todos são estáveis</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) Apenas Selection Sort e QuickSort</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q10')">c) Insertion Sort, Bubble Sort e Merge Sort</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) Apenas Merge Sort — os demais são todos instáveis</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q10">✔ Insertion Sort: desloca apenas quando next &lt; list[j] (estrito), preserva iguais. Bubble Sort: troca apenas quando v[j] &gt; v[j+1] (estrito), preserva iguais. Merge Sort: usa v[i] &lt;= v[j] na intercalação, preferindo o da esquerda em empate. Selection Sort: a troca pode pular elementos iguais fora de ordem. QuickSort: a partição embaralha elementos com chave igual ao pivô.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q10">✘ Estáveis: Insertion, Bubble e Merge (todos usam comparação estrita, preservam ordem de iguais). Instáveis: Selection e QuickSort (trocas podem reordenar elementos iguais).</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Teoria para Prova — Algoritmos de Ordenação</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

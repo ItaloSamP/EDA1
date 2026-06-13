@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritmos de Ordenação — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --accent5: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #10081a 0%, #1a0f2a 50%, #0e0818 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(124,106,247,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'O(n²)'; position: absolute; right: 50px; top: 10px;
+    font-size: 200px; font-family: 'Fraunces', serif;
+    color: rgba(124,106,247,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-purple { color: var(--accent); border-color: var(--accent); background: rgba(124,106,247,0.08); }
+  .badge-green  { color: var(--accent2);  border-color: var(--accent2);  background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow); border-color: var(--yellow); background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(124,106,247,0.07), rgba(106,247,196,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '\26A0 '; color: var(--accent4); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '\1F4A1 '; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Nilton Correia da Silva</div>
+    <h1>Algoritmos de<br><span>Ordenação</span></h1>
+    <p class="subtitle">Selection Sort, Insertion Sort, Bubble Sort, QuickSort e Merge Sort com códigos, complexidades e rastreamento</p>
+    <div class="badge-row">
+      <span class="badge badge-purple">Selection Sort</span>
+      <span class="badge badge-green">Insertion Sort</span>
+      <span class="badge badge-orange">Bubble Sort</span>
+      <span class="badge badge-pink">QuickSort</span>
+      <span class="badge badge-purple">Merge Sort</span>
+      <span class="badge badge-yellow">Big O</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Ordenação — visão geral</a></li>
+      <li><a href="#sec2">Selection Sort — ordenação por seleção</a></li>
+      <li><a href="#sec3">Insertion Sort — ordenação por inserção</a></li>
+      <li><a href="#sec4">Bubble Sort — ordenação por bolha</a></li>
+      <li><a href="#sec5">QuickSort — ordenação rápida</a></li>
+      <li><a href="#sec6">Rastreamento do QuickSort</a></li>
+      <li><a href="#sec7">Merge Sort — ordenação por intercalação</a></li>
+      <li><a href="#sec8">Tabela comparativa</a></li>
+      <li><a href="#sec9">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Ordenação — <span style="color:var(--accent)">visão geral</span></h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Ordenar é como organizar cartas de baralho: você pode separar as cartas uma a uma (Selection), inseri-las na posição correta (Insertion), trocar adjacentes até tudo se acertar (Bubble), dividir o baralho ao meio recursivamente (Merge) ou escolher uma carta pivô e separar as menores das maiores (Quick).</p>
+    </div>
+
+    <p>Um conjunto <strong>ordenado</strong> reduz drasticamente o esforço computacional para encontrar um dado específico. Existem várias abordagens para ordenar, cada uma com vantagens e desvantagens em termos de <strong>complexidade de tempo</strong> e <strong>memória</strong>.</p>
+
+    <p>A aula aborda cinco métodos: <strong>Seleção</strong>, <strong>QuickSort</strong>, <strong>Inserção</strong>, <strong>Bolha</strong> e <strong>Intercalação (Merge Sort)</strong>.</p>
+
+    <div class="concept-card">
+      <p><strong>Estabilidade:</strong> um algoritmo de ordenação é <strong>estável</strong> se não altera a ordem relativa de elementos com chaves iguais.</p>
+      <p><strong>In-place:</strong> um algoritmo é dito <em>in-place</em> quando utiliza apenas uma quantidade constante de memória adicional (além do próprio vetor).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2><span style="color:var(--accent)">Selection Sort</span> — ordenação por seleção</h2>
+
+    <p>O Selection Sort funciona encontrando o <strong>menor elemento</strong> do vetor e trocando-o com o elemento da primeira posição. Depois, encontra o segundo menor e troca com a segunda posição, e assim sucessivamente.</p>
+
+    <div class="code-label">selection sort em C — smallerIndex e selectionSort</div>
+    <pre><code><span class="cmt">/* Encontra o índice do menor elemento a partir de ini */</span>
+<span class="kw">int</span> <span class="fn">smallerIndex</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam, <span class="kw">int</span> ini) {
+    <span class="kw">int</span> min = ini, j;
+    <span class="kw">for</span> (j = ini + <span class="num">1</span>; j &lt; tam; j++) {
+        <span class="kw">if</span> (vet[min] &gt; vet[j])
+            min = j;
+    }
+    <span class="kw">return</span> min;
+}
+
+<span class="kw">void</span> <span class="fn">selectionSort</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam) {
+    <span class="kw">int</span> i, min, aux;
+    <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; tam; i++) {
+        min = <span class="fn">smallerIndex</span>(vet, tam, i);
+        aux = vet[i];
+        vet[i] = vet[min];
+        vet[min] = aux;
+    }
+}</code></pre>
+
+    <div class="diagram">  Exemplo: [64, 25, 12, 22, 11]
+  Passo 1: menor = 11  → troca com 64 → [11, 25, 12, 22, 64]
+  Passo 2: menor = 12  → troca com 25 → [11, 12, 25, 22, 64]
+  Passo 3: menor = 22  → troca com 25 → [11, 12, 22, 25, 64]
+  Passo 4: menor = 25  → troca com 25 → [11, 12, 22, 25, 64]
+  Passo 5: menor = 64  → troca com 64 → [11, 12, 22, 25, 64]</div>
+
+    <div class="concept-card green">
+      <p><strong>Complexidade:</strong> Melhor caso O(n²) | Pior caso O(n²) | Estável: sim | In-place: sim</p>
+      <p>O Selection Sort sempre percorre todo o vetor restante para encontrar o menor elemento, independentemente de o vetor já estar ordenado. Por isso, seu melhor e pior caso são idênticos: O(n²).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2><span style="color:var(--accent)">Insertion Sort</span> — ordenação por inserção</h2>
+
+    <p>O Insertion Sort percorre o vetor da esquerda para a direita e, para cada elemento, <strong>desloca os maiores</strong> à sua direita para abrir espaço e insere o elemento em sua posição correta na parte já ordenada.</p>
+
+    <div class="code-label">insertion sort em C</div>
+    <pre><code><span class="kw">void</span> <span class="fn">insertionSort</span>(<span class="kw">int</span> list[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> i, j, next;
+    <span class="kw">for</span> (i = <span class="num">1</span>; i &lt; n; i++) {
+        next = list[i];
+        <span class="kw">for</span> (j = i - <span class="num">1</span>; j &gt;= <span class="num">0</span> &amp;&amp; next &lt; list[j]; j--)
+            list[j + <span class="num">1</span>] = list[j];
+        list[j + <span class="num">1</span>] = next;
+    }
+}</code></pre>
+
+    <div class="diagram">  Exemplo: [64, 25, 12, 22, 11]
+  i=1: next=25, desloca 64 → [25, 64, 12, 22, 11]
+  i=2: next=12, desloca 64, 25 → [12, 25, 64, 22, 11]
+  i=3: next=22, desloca 64 → [12, 22, 25, 64, 11]
+  i=4: next=11, desloca 64, 25, 22, 12 → [11, 12, 22, 25, 64]</div>
+
+    <div class="concept-card orange">
+      <p><strong>Complexidade:</strong> Melhor caso O(n) | Pior caso O(n²) | Estável: sim | In-place: sim</p>
+      <p>Quando o vetor já está ordenado, o Insertion Sort apenas percorre os elementos sem fazer deslocamentos — O(n). No pior caso (vetor invertido), cada elemento precisa ser deslocado até o início — O(n²).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2><span style="color:var(--accent)">Bubble Sort</span> — ordenação por bolha</h2>
+
+    <p>O Bubble Sort percorre o vetor várias vezes, trocando elementos adjacentes que estão fora de ordem. A cada passagem, o maior elemento "flutua" até sua posição final (como uma bolha).</p>
+
+    <div class="code-label">bubble sort em C</div>
+    <pre><code><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span> vet[], <span class="kw">int</span> tam) {
+    <span class="kw">int</span> i, j, temp;
+    <span class="kw">for</span> (i = tam - <span class="num">1</span>; i &gt; <span class="num">0</span>; i--) {
+        <span class="kw">for</span> (j = <span class="num">0</span>; j &lt; i; j++) {
+            <span class="kw">if</span> (vet[j] &gt; vet[j + <span class="num">1</span>]) {
+                temp = vet[j];
+                vet[j] = vet[j + <span class="num">1</span>];
+                vet[j + <span class="num">1</span>] = temp;
+            }
+        }
+    }
+}</code></pre>
+
+    <div class="diagram">  Exemplo: [64, 25, 12, 22, 11]
+  Passagem 1: 25 12 22 11 [64]
+  Passagem 2: 12 22 11 [25] 64
+  Passagem 3: 12 11 [22] 25 64
+  Passagem 4: 11 [12] 22 25 64</div>
+
+    <div class="concept-card pink">
+      <p><strong>Complexidade:</strong> Melhor caso O(n) | Pior caso O(n²) | Estável: sim | In-place: sim</p>
+      <p>Assim como o Insertion Sort, o Bubble Sort pode ser otimizado para parar quando nenhuma troca ocorre em uma passagem — o que dá O(n) no melhor caso.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2><span style="color:var(--accent)">QuickSort</span> — ordenação rápida</h2>
+
+    <p>O QuickSort é um algoritmo recursivo de <strong>divisão e conquista</strong>. Escolhe um <strong>pivô</strong> e rearranja o vetor de modo que os elementos menores que o pivô fiquem à esquerda e os maiores à direita (<strong>particionamento</strong>). Depois, ordena recursivamente cada parte.</p>
+
+    <div class="code-label">particionamento e quicksort em C</div>
+    <pre><code><span class="cmt">// Recebe vetor v[p..r] com p <= r. Rearranja
+// os elementos do vetor e devolve j em p..r
+// tal que v[p..j-1] <= v[j] < v[j+1..r].</span>
+<span class="kw">int</span> <span class="fn">separa</span> (<span class="kw">int</span> v[], <span class="kw">int</span> p, <span class="kw">int</span> r) {
+    <span class="kw">int</span> c = v[r]; <span class="cmt">// pivô (último elemento)</span>
+    <span class="kw">int</span> t, j = p;
+    <span class="kw">for</span> (<span class="kw">int</span> k = p; k &lt; r; ++k)
+        <span class="kw">if</span> (v[k] &lt;= c) {
+            t = v[j], v[j] = v[k], v[k] = t;
+            ++j;
+        }
+    t = v[j], v[j] = v[r], v[r] = t;
+    <span class="kw">return</span> j;
+}
+
+<span class="kw">void</span> <span class="fn">quicksort</span> (<span class="kw">int</span> v[], <span class="kw">int</span> p, <span class="kw">int</span> r) {
+    <span class="kw">if</span> (p &lt; r) {
+        <span class="kw">int</span> j = <span class="fn">separa</span> (v, p, r);
+        <span class="fn">quicksort</span> (v, p, j - <span class="num">1</span>);
+        <span class="fn">quicksort</span> (v, j + <span class="num">1</span>, r);
+    }
+}</code></pre>
+
+    <div class="concept-card green">
+      <p><strong>Complexidade:</strong> Melhor caso O(n log n) | Pior caso O(n²) | Estável: sim | In-place: sim | Recursivo: sim</p>
+      <p>O pior caso O(n²) ocorre quando o vetor já está ordenado e a escolha do pivô é sempre o extremo. A escolha do pivô impacta diretamente a eficiência.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Rastreamento do <span style="color:var(--accent)">QuickSort</span></h2>
+
+    <p>Rastreamento passo a passo do QuickSort no vetor <strong>[9, 8, 1, 4, 3]</strong> com pivô sendo o último elemento:</p>
+
+    <div class="diagram">  Chamada inicial: quicksort(v, 0, 4)  | vetor: [9, 8, 1, 4, 3]
+
+  separa(v, 0, 4): pivô c = 3, j = 0
+    k=0: 9 <= 3? F
+    k=1: 8 <= 3? F
+    k=2: 1 <= 3? V → troca v[0] c/ v[2]: [1, 8, 9, 4, 3], j=1
+    k=3: 4 <= 3? F
+    Final: troca v[1] c/ v[4]: [1, 3, 9, 4, 8]
+    Retorna j = 1
+
+  quicksort(v, 0, 0): não faz nada (p == r)
+  quicksort(v, 2, 4): vetor [9, 4, 8]
+
+    separa(v, 2, 4): pivô c = 8, j = 2
+      k=2: 9 <= 8? F
+      k=3: 4 <= 8? V → troca v[2] c/ v[3]: [4, 9, 8], j=3
+      Final: troca v[3] c/ v[4]: [4, 8, 9]
+      Retorna j = 3
+
+    quicksort(v, 2, 2): não faz nada
+    quicksort(v, 4, 4): não faz nada
+
+  Resultado: [1, 3, 4, 8, 9] ✓</div>
+
+    <div class="tip">O particionamento coloca o pivô em sua posição definitiva. A cada chamada de <code>separa</code>, pelo menos um elemento (o pivô) é colocado no lugar correto.</div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2><span style="color:var(--accent)">Merge Sort</span> — ordenação por intercalação</h2>
+
+    <p>O Merge Sort também é recursivo (divisão e conquista). Divide o vetor ao meio até ter subvetores de 1 elemento (trivialmente ordenados) e depois <strong>intercala</strong> as metades ordenadas, gerando um vetor ordenado maior. Usa um vetor temporário durante a intercalação.</p>
+
+    <div class="code-label">intercala e mergesort em C</div>
+    <pre><code><span class="cmt">// A função recebe vetores crescentes v[p..q-1] e v[q..r-1]
+// e rearranja v[p..r-1] em ordem crescente.</span>
+<span class="kw">void</span> <span class="fn">intercala</span> (<span class="kw">int</span> p, <span class="kw">int</span> q, <span class="kw">int</span> r, <span class="kw">int</span> v[]) {
+    <span class="kw">int</span> *w = <span class="fn">malloc</span>((r - p) * <span class="kw">sizeof</span>(<span class="kw">int</span>));
+    <span class="kw">int</span> i = p, j = q, k = <span class="num">0</span>;
+    <span class="kw">while</span> (i &lt; q &amp;&amp; j &lt; r) {
+        <span class="kw">if</span> (v[i] &lt;= v[j]) w[k++] = v[i++];
+        <span class="kw">else</span>              w[k++] = v[j++];
+    }
+    <span class="kw">while</span> (i &lt; q) w[k++] = v[i++];
+    <span class="kw">while</span> (j &lt; r) w[k++] = v[j++];
+    <span class="kw">for</span> (i = p; i &lt; r; ++i) v[i] = w[i - p];
+    <span class="fn">free</span>(w);
+}
+
+<span class="kw">void</span> <span class="fn">mergesort</span> (<span class="kw">int</span> p, <span class="kw">int</span> r, <span class="kw">int</span> v[]) {
+    <span class="kw">if</span> (p &lt; r - <span class="num">1</span>) {
+        <span class="kw">int</span> q = (p + r) / <span class="num">2</span>;
+        <span class="fn">mergesort</span> (p, q, v);
+        <span class="fn">mergesort</span> (q, r, v);
+        <span class="fn">intercala</span> (p, q, r, v);
+    }
+}</code></pre>
+
+    <div class="concept-card orange">
+      <p><strong>Complexidade:</strong> Melhor caso O(n log n) | Pior caso O(n log n) | Estável: sim | In-place: não (usa vetor auxiliar) | Recursivo: sim</p>
+      <p>O Merge Sort é o único algoritmo aqui que tem <strong>desempenho garantido</strong> O(n log n) em todos os casos. A desvantagem é o uso de memória extra O(n) para o vetor temporário.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">ordenação</span></h2>
+
+    <table>
+      <thead><tr><th>Algoritmo</th><th>Melhor caso</th><th>Pior caso</th><th>Estável</th><th>In-place</th><th>Recursivo</th></tr></thead>
+      <tbody>
+        <tr><td>Selection Sort</td><td>O(n²)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+        <tr><td>Insertion Sort</td><td>O(n)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+        <tr><td>Bubble Sort</td><td>O(n)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Não</td></tr>
+        <tr><td>QuickSort</td><td>O(n log n)</td><td>O(n²)</td><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+        <tr><td>Merge Sort</td><td>O(n log n)</td><td>O(n log n)</td><td>Sim</td><td>Não</td><td>Sim</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card yellow">
+      <p><strong>Resumo prático:</strong> Para vetores pequenos ou quase ordenados, Insertion Sort é eficiente (O(n) no melhor caso). Para vetores grandes, QuickSort é a escolha mais usada na prática (O(n log n) médio). Merge Sort é a opção segura com desempenho garantido, mas usa memória extra.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual a complexidade do Selection Sort no melhor caso?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) O(n log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) O(n²)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) O(log n)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent2)">✔ Correto! Selection Sort sempre percorre o vetor restante procurando o menor elemento. Melhor e pior caso são O(n²).</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent4)">✘ O Selection Sort SEMPRE faz n + (n-1) + ... + 1 comparações — O(n²).</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Qual algoritmo de ordenação NÃO é in-place?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) QuickSort</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) Merge Sort</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) Insertion Sort</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) Bubble Sort</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent2)">✔ Correto! Merge Sort usa um vetor auxiliar de tamanho O(n) durante a intercalação, portanto não é in-place.</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent4)">✘ Merge Sort precisa de memória extra O(n) para o vetor temporário da intercalação.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Em que situação o Insertion Sort é mais eficiente que o QuickSort?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Em vetores grandes e desordenados</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Em vetores pequenos ou quase ordenados</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Em vetores com muitos elementos repetidos</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Insertion Sort nunca é melhor que QuickSort</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent2)">✔ Exato! Insertion Sort tem melhor caso O(n) em vetor ordenado e constante pequena. É ideal para vetores pequenos ou quase ordenados.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent4)">✘ Insertion Sort é O(n) no melhor caso (vetor ordenado). Sua simplicidade e baixo overhead o tornam rápido para entradas pequenas ou quase ordenadas.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. O que causa o pior caso O(n²) no QuickSort?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) Vetor com muitos elementos duplicados</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) Vetor já ordenado com pivô no extremo</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Vetor muito pequeno</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) O QuickSort nunca é O(n²)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent2)">✔ Correto! Quando o vetor já está ordenado e o pivô é o último elemento, as partições ficam desbalanceadas, gerando O(n²).</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent4)">✘ O pior caso ocorre quando o pivô é sempre o menor ou maior elemento, o que acontece em vetores já ordenados com pivô extremo.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Algoritmos de Ordenação</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>
