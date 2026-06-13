@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Structs — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+  :root {
+    --bg: #0f0f13; --surface: #17171e; --surface2: #1e1e28; --border: #2a2a38;
+    --accent: #f76a9a; --accent2: #7c6af7; --accent3: #f7a26a; --accent4: #6af7c4;
+    --text: #e8e8f0; --text-muted: #7a7a9a; --code-bg: #12121a; --yellow: #f7e06a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+  header { background: linear-gradient(135deg, #150810 0%, #1f0a18 50%, #100609 100%); border-bottom: 1px solid var(--border); padding: 60px 40px 50px; position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,106,154,0.12) 0%, transparent 70%); }
+  header::after { content: '{}'; position: absolute; right: 40px; top: 10px; font-size: 200px; font-family: 'JetBrains Mono', monospace; color: rgba(247,106,154,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-purple { color: var(--accent2); border-color: var(--accent2); background: rgba(124,106,247,0.08); }
+  .badge-green  { color: var(--accent4); border-color: var(--accent4); background: rgba(106,247,196,0.08); }
+  .badge-pink   { color: var(--accent);  border-color: var(--accent);  background: rgba(247,106,154,0.08); }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.purple { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.green  { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+  .analogy { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '⚠ '; color: var(--accent); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '💡 '; }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .compare-header { padding: 10px 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .compare-header.orange { background: rgba(247,162,106,0.12); color: var(--accent3); }
+  .compare-header.purple { background: rgba(124,106,247,0.12); color: var(--accent2); }
+  .compare-header.green  { background: rgba(106,247,196,0.12); color: var(--accent4); }
+  .compare-header.pink   { background: rgba(247,106,154,0.12); color: var(--accent); }
+  .compare-card pre { margin: 0; border: none; border-radius: 0; padding: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent4); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* SIMULADOR */
+  #struct-demo { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; }
+  .s-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .s-btn { font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px 18px; border-radius: 8px; border: 1px solid var(--accent); background: rgba(247,106,154,0.08); color: var(--accent); cursor: pointer; transition: all .2s; }
+  .s-btn:hover { background: rgba(247,106,154,0.18); }
+  .s-btn.purple { border-color: var(--accent2); background: rgba(124,106,247,0.08); color: var(--accent2); }
+  .s-btn.purple:hover { background: rgba(124,106,247,0.18); }
+  .s-btn.green { border-color: var(--accent4); background: rgba(106,247,196,0.08); color: var(--accent4); }
+  .s-btn.green:hover { background: rgba(106,247,196,0.18); }
+  .s-btn.orange { border-color: var(--accent3); background: rgba(247,162,106,0.08); color: var(--accent3); }
+  .s-btn.orange:hover { background: rgba(247,162,106,0.18); }
+  .s-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .s-col-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
+  #s-visual { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; min-height: 220px; }
+  .s-box { border: 1px solid var(--accent); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .s-box.ptr { border-color: var(--accent2); }
+  .s-box-title { background: rgba(247,106,154,0.15); padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 700; }
+  .s-box.ptr .s-box-title { background: rgba(124,106,247,0.15); color: var(--accent2); }
+  .s-field { display: flex; justify-content: space-between; padding: 6px 14px; border-top: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 11px; transition: background .3s; }
+  .s-field-name { color: var(--text-muted); }
+  .s-field-val  { color: var(--yellow); }
+  .s-field.hl   { background: rgba(247,224,106,0.1); }
+  .s-field.hl .s-field-val { color: var(--yellow); font-weight: 700; }
+  .s-access { background: rgba(106,247,196,0.1); border: 1px solid rgba(106,247,196,.3); border-radius: 6px; padding: 6px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent4); margin-top: 8px; }
+  #s-log { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.9; min-height: 220px; max-height: 260px; overflow-y: auto; color: var(--text-muted); }
+  .sl-pink   { color: var(--accent); }
+  .sl-purple { color: var(--accent2); }
+  .sl-green  { color: var(--accent4); }
+  .sl-orange { color: var(--accent3); }
+  .sl-yellow { color: var(--yellow); }
+  .s-desc { font-size: .85rem; color: var(--text-muted); margin-top: 12px; padding: 10px 14px; background: var(--code-bg); border-radius: 8px; min-height: 40px; }
+
+  /* FILES */
+  .files-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(255px,1fr)); gap: 14px; margin: 20px 0; }
+  .file-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; transition: border-color .2s; }
+  .file-card:hover { border-color: var(--accent); }
+  .file-name { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); margin-bottom: 6px; }
+  .file-desc { font-size: .85rem; color: var(--text-muted); }
+
+  /* QUIZ */
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent4); color: var(--accent4); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent); color: var(--accent); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){
+    header { padding: 40px 20px; } header::after { display: none; }
+    .container { padding: 0 16px; } pre { padding: 14px; font-size: 12px; }
+    .compare-grid, .s-layout { grid-template-columns: 1fr; }
+    .toc, .quiz { padding: 20px; } .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Luana Almeida</div>
+    <h1>Structs<br>em <span>C</span></h1>
+    <p class="subtitle">Definição, campos, typedef, arrays de structs, structs aninhadas, funções e ponteiro para struct</p>
+    <div class="badge-row">
+      <span class="badge badge-pink">struct</span>
+      <span class="badge badge-purple">typedef</span>
+      <span class="badge badge-orange">campos</span>
+      <span class="badge badge-pink">arrays de struct</span>
+      <span class="badge badge-green">struct aninhada</span>
+      <span class="badge badge-purple">. vs -></span>
+      <span class="badge badge-orange">funções</span>
+      <span class="badge badge-green">ponteiro p/ struct</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que é uma struct?</a></li>
+      <li><a href="#sec2">Declaração e acesso — struct.c e struct1.c</a></li>
+      <li><a href="#sec3">typedef — simplificando o nome do tipo</a></li>
+      <li><a href="#sec4">Structs em funções — funcaoStruct.c e mediaNotas.c</a></li>
+      <li><a href="#sec5">Arrays de structs — arraysStruct.c, cadastro.c e cadastroPessoas.c</a></li>
+      <li><a href="#sec6">Structs aninhadas — structaninhada.c e areaRetangulo.c</a></li>
+      <li><a href="#sec7">Ponteiro para struct — operador seta (->) — structPonteiro.c</a></li>
+      <li><a href="#sec8">Simulador interativo — ponto vs seta</a></li>
+      <li><a href="#sec9">Arquivos desta pasta</a></li>
+      <li><a href="#sec10">Resumo — . vs -> e boas práticas</a></li>
+      <li><a href="#sec11">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <!-- 01 -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que é uma <span style="color:var(--accent)">struct</span>?</h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Uma struct é como uma <strong>ficha de cadastro</strong>. A ficha de um aluno tem campos: nome, matrícula, IRA, data de nascimento. Cada campo guarda um tipo diferente de informação. A struct em C faz exatamente isso — agrupa variáveis de tipos diferentes sob um único nome, formando um <strong>tipo composto que você mesmo define</strong>.</p>
+    </div>
+
+    <p>Até aqui você trabalhou com tipos primitivos: <code>int</code>, <code>float</code>, <code>char</code>. Com <code>struct</code>, você cria seus próprios tipos adaptados ao problema que está resolvendo — um <strong>Aluno</strong>, um <strong>Produto</strong>, um <strong>Ponto</strong> no plano.</p>
+
+    <div class="concept-card">
+      <p>📌 <strong>struct</strong> é um tipo de dado composto: agrupa campos de tipos potencialmente diferentes em uma única variável.</p>
+      <p>📌 Cada campo é acessado pelo <strong>operador ponto</strong> (<code style="color:var(--accent)">.</code>) na variável direta ou pelo <strong>operador seta</strong> (<code style="color:var(--accent)">-></code>) no ponteiro.</p>
+      <p>📌 Uma struct <em>não</em> é uma função — ela tem apenas dados, sem comportamento.</p>
+    </div>
+
+    <div class="concept-card purple">
+      <p>✔ Representar entidades reais: Aluno, Produto, Ponto, Data, Retângulo</p>
+      <p>✔ Organizar dados relacionados em uma única variável coerente</p>
+      <p>✔ Construir estruturas de dados: listas, árvores, filas e pilhas</p>
+      <p>✔ Passar grupos de dados relacionados para funções de forma limpa</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 02 -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Declaração e acesso — <span style="color:var(--accent)">struct.c</span> e <span style="color:var(--accent)">struct1.c</span></h2>
+
+    <p>A definição de uma struct usa a palavra-chave <code>struct</code> seguida de um nome (<em>tag</em>) e de um bloco <code>{ }</code> com os campos. Para criar uma variável desse tipo, escreve-se <code>struct NomeTag variavel;</code>.</p>
+
+    <div class="code-label">struct.c — declaração, atribuição e leitura de campos</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+
+<span class="cmt">/* Definição do tipo — fica fora das funções */</span>
+<span class="kw">struct</span> <span class="tp">Aluno</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="kw">int</span>   matricula;
+    <span class="kw">float</span> ira;
+};
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">struct</span> <span class="tp">Aluno</span> a1;              <span class="cmt">/* declara variável do tipo */</span>
+
+    <span class="fn">strcpy</span>(a1.nome, <span class="str">"Ana"</span>);       <span class="cmt">/* acessa campo com . (ponto) */</span>
+    a1.matricula = <span class="num">221001</span>;
+    a1.ira       = <span class="num">8.5f</span>;
+
+    <span class="fn">printf</span>(<span class="str">"Nome:      %s\n"</span>,  a1.nome);
+    <span class="fn">printf</span>(<span class="str">"Matricula: %d\n"</span>,  a1.matricula);
+    <span class="fn">printf</span>(<span class="str">"IRA:       %.1f\n"</span>, a1.ira);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="code-label">struct1.c — inicialização direta e cópia de struct</div>
+    <pre><code><span class="kw">struct</span> <span class="tp">Ponto</span> { <span class="kw">float</span> x; <span class="kw">float</span> y; };
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="cmt">/* inicialização por lista (na ordem dos campos) */</span>
+    <span class="kw">struct</span> <span class="tp">Ponto</span> p1 = {<span class="num">3.0f</span>, <span class="num">4.0f</span>};
+
+    <span class="cmt">/* cópia de struct — copia campo a campo (tipos primitivos) */</span>
+    <span class="kw">struct</span> <span class="tp">Ponto</span> p2 = p1;   <span class="cmt">/* p2 é cópia independente */</span>
+    p2.x = <span class="num">0.0f</span>;            <span class="cmt">/* não afeta p1 */</span>
+
+    <span class="fn">printf</span>(<span class="str">"p1: (%.1f, %.1f)\n"</span>, p1.x, p1.y);  <span class="cmt">/* 3.0, 4.0 */</span>
+    <span class="fn">printf</span>(<span class="str">"p2: (%.1f, %.1f)\n"</span>, p2.x, p2.y);  <span class="cmt">/* 0.0, 4.0 */</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="diagram">  struct Aluno a1 na memória (pilha):
+
+  ┌──────────────────────────────────────────────────┐
+  │  a1                                              │
+  │  ┌─────────────────┬─────────────┬───────────┐   │
+  │  │  nome[50]       │  matricula  │   ira     │   │
+  │  │  "Ana\0..."     │   221001    │   8.5     │   │
+  │  └─────────────────┴─────────────┴───────────┘   │
+  │    a1.nome           a1.matricula  a1.ira         │
+  └──────────────────────────────────────────────────┘</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 03 -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>typedef — simplificando o nome do tipo</h2>
+
+    <p>Escrever <code>struct Aluno</code> em todo lugar é verboso. O <code>typedef</code> cria um <strong>alias</strong> para o tipo, permitindo usar apenas <code>Aluno</code> no lugar de <code>struct Aluno</code>.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header orange">Sem typedef</div>
+        <pre><code><span class="kw">struct</span> <span class="tp">Aluno</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="kw">float</span> ira;
+};
+
+<span class="kw">struct</span> <span class="tp">Aluno</span> a1;
+<span class="kw">struct</span> <span class="tp">Aluno</span> turma[<span class="num">30</span>];
+<span class="kw">struct</span> <span class="tp">Aluno</span> *p;</code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header pink">Com typedef (idiomático em C)</div>
+        <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="kw">float</span> ira;
+} <span class="tp">Aluno</span>;
+
+<span class="tp">Aluno</span> a1;
+<span class="tp">Aluno</span> turma[<span class="num">30</span>];
+<span class="tp">Aluno</span> *p;</code></pre>
+      </div>
+    </div>
+
+    <div class="tip">Com <code>typedef struct { ... } NomeDoTipo;</code> o tipo passa a ser apenas <code>NomeDoTipo</code>. É a convenção mais usada em código C moderno e é o padrão adotado nos exercícios do curso.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 04 -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Structs em funções — <span style="color:var(--accent)">funcaoStruct.c</span> e <span style="color:var(--accent)">mediaNotas.c</span></h2>
+
+    <p>Structs podem ser passadas para funções <strong>por valor</strong> (cópia) ou <strong>por referência</strong> (via ponteiro). A diferença é fundamental tanto para a correção quanto para a eficiência.</p>
+
+    <div class="code-label">funcaoStruct.c — por valor vs. por referência</div>
+    <pre><code><span class="kw">typedef struct</span> { <span class="kw">char</span> nome[<span class="num">50</span>]; <span class="kw">float</span> ira; } <span class="tp">Aluno</span>;
+
+<span class="cmt">/* Por VALOR: recebe cópia — alterações NÃO afetam o original */</span>
+<span class="kw">void</span> <span class="fn">exibir</span>(<span class="tp">Aluno</span> a) {
+    <span class="fn">printf</span>(<span class="str">"%s — IRA: %.1f\n"</span>, a.nome, a.ira);
+}
+
+<span class="cmt">/* Por REFERÊNCIA: recebe endereço — alterações AFETAM o original */</span>
+<span class="kw">void</span> <span class="fn">aplicarBonus</span>(<span class="tp">Aluno</span> *a, <span class="kw">float</span> bonus) {
+    a->ira += bonus;
+    <span class="kw">if</span> (a->ira > <span class="num">10.0f</span>) a->ira = <span class="num">10.0f</span>;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Aluno</span> a1 = {<span class="str">"Carlos"</span>, <span class="num">7.5f</span>};
+    <span class="fn">exibir</span>(a1);                    <span class="cmt">/* Carlos — IRA: 7.5 */</span>
+    <span class="fn">aplicarBonus</span>(&amp;a1, <span class="num">1.0f</span>);
+    <span class="fn">exibir</span>(a1);                    <span class="cmt">/* Carlos — IRA: 8.5 */</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="code-label">mediaNotas.c — struct com vetor de notas</div>
+    <pre><code><span class="kw">typedef struct</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="kw">float</span> notas[<span class="num">4</span>];
+    <span class="kw">float</span> media;
+} <span class="tp">Aluno</span>;
+
+<span class="kw">void</span> <span class="fn">calcularMedia</span>(<span class="tp">Aluno</span> *a) {
+    <span class="kw">float</span> soma = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">4</span>; i++)
+        soma += a->notas[i];
+    a->media = soma / <span class="num">4.0f</span>;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Aluno</span> a1 = {<span class="str">"Maria"</span>, {<span class="num">8.0</span>, <span class="num">7.5</span>, <span class="num">9.0</span>, <span class="num">6.5</span>}, <span class="num">0</span>};
+    <span class="fn">calcularMedia</span>(&amp;a1);
+    <span class="fn">printf</span>(<span class="str">"%s: media = %.2f\n"</span>, a1.nome, a1.media); <span class="cmt">/* 7.75 */</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="concept-card orange">
+      <p>⚡ <strong>Eficiência:</strong> Passe structs por ponteiro sempre que possível. Por valor copia <em>todos</em> os bytes da struct a cada chamada. Use <code>const Aluno *a</code> para leitura sem risco de modificação acidental.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 05 -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Arrays de structs — <span style="color:var(--accent)">arraysStruct.c</span>, <span style="color:var(--accent)">cadastro.c</span> e <span style="color:var(--accent)">cadastroPessoas.c</span></h2>
+
+    <p>Vetores de structs representam <strong>coleções de entidades</strong>: uma turma de alunos, um estoque de produtos, uma lista de contatos.</p>
+
+    <div class="code-label">arraysStruct.c — vetor de structs e busca do maior IRA</div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+<span class="kw">typedef struct</span> { <span class="kw">char</span> nome[<span class="num">50</span>]; <span class="kw">int</span> idade; <span class="kw">float</span> ira; } <span class="tp">Aluno</span>;
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Aluno</span> turma[<span class="num">3</span>];
+
+    <span class="fn">strcpy</span>(turma[<span class="num">0</span>].nome, <span class="str">"Ana"</span>);    turma[<span class="num">0</span>].idade = <span class="num">20</span>; turma[<span class="num">0</span>].ira = <span class="num">8.5f</span>;
+    <span class="fn">strcpy</span>(turma[<span class="num">1</span>].nome, <span class="str">"Bruno"</span>);  turma[<span class="num">1</span>].idade = <span class="num">22</span>; turma[<span class="num">1</span>].ira = <span class="num">7.0f</span>;
+    <span class="fn">strcpy</span>(turma[<span class="num">2</span>].nome, <span class="str">"Carla"</span>);  turma[<span class="num">2</span>].idade = <span class="num">21</span>; turma[<span class="num">2</span>].ira = <span class="num">9.2f</span>;
+
+    <span class="kw">int</span> melhor = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; <span class="num">3</span>; i++)
+        <span class="kw">if</span> (turma[i].ira > turma[melhor].ira) melhor = i;
+
+    <span class="fn">printf</span>(<span class="str">"Melhor IRA: %s (%.1f)\n"</span>, turma[melhor].nome, turma[melhor].ira);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="code-label">cadastroPessoas.c — leitura interativa com scanf via ponteiro</div>
+    <pre><code><span class="kw">typedef struct</span> { <span class="kw">char</span> nome[<span class="num">50</span>]; <span class="kw">int</span> idade; <span class="kw">char</span> cpf[<span class="num">15</span>]; } <span class="tp">Pessoa</span>;
+
+<span class="kw">void</span> <span class="fn">lerPessoa</span>(<span class="tp">Pessoa</span> *p) {
+    <span class="fn">printf</span>(<span class="str">"Nome: "</span>);   <span class="fn">scanf</span>(<span class="str">"%49s"</span>, p->nome);
+    <span class="fn">printf</span>(<span class="str">"Idade: "</span>);  <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;p->idade);
+    <span class="fn">printf</span>(<span class="str">"CPF: "</span>);    <span class="fn">scanf</span>(<span class="str">"%14s"</span>, p->cpf);
+}
+
+<span class="kw">void</span> <span class="fn">exibir</span>(<span class="kw">const</span> <span class="tp">Pessoa</span> *p) {
+    <span class="fn">printf</span>(<span class="str">"[%s | %d anos | %s]\n"</span>, p->nome, p->idade, p->cpf);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Pessoa</span> pessoas[<span class="num">3</span>];
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++) { <span class="fn">printf</span>(<span class="str">"\n--- Pessoa %d ---\n"</span>,i+<span class="num">1</span>); <span class="fn">lerPessoa</span>(&amp;pessoas[i]); }
+    <span class="fn">printf</span>(<span class="str">"\n=== Cadastro ===\n"</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++) <span class="fn">exibir</span>(&amp;pessoas[i]);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="diagram">  Array turma[3] na memória:
+
+  turma[0]              turma[1]              turma[2]
+  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+  │ nome: "Ana"  │      │ nome:"Bruno" │      │ nome:"Carla" │
+  │ idade: 20    │      │ idade: 22    │      │ idade: 21    │
+  │ ira:  8.5    │      │ ira:  7.0    │      │ ira:  9.2    │
+  └──────────────┘      └──────────────┘      └──────────────┘
+
+  turma[0].nome    turma[1].ira    turma[2].idade   etc.</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 06 -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Structs aninhadas — <span style="color:var(--accent)">structaninhada.c</span> e <span style="color:var(--accent)">areaRetangulo.c</span></h2>
+
+    <p>Um campo de uma struct pode ser ele mesmo <strong>outra struct</strong>. Isso modela hierarquias de dados de forma natural.</p>
+
+    <div class="code-label">structaninhada.c — Data dentro de Aluno</div>
+    <pre><code><span class="kw">typedef struct</span> { <span class="kw">int</span> dia; <span class="kw">int</span> mes; <span class="kw">int</span> ano; } <span class="tp">Data</span>;
+
+<span class="kw">typedef struct</span> {
+    <span class="kw">char</span>  nome[<span class="num">50</span>];
+    <span class="tp">Data</span>  nascimento;   <span class="cmt">/* campo do tipo Data — struct aninhada */</span>
+    <span class="kw">float</span> ira;
+} <span class="tp">Aluno</span>;
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Aluno</span> a = {<span class="str">"Ana"</span>, {<span class="num">15</span>, <span class="num">3</span>, <span class="num">2003</span>}, <span class="num">8.5f</span>};
+
+    <span class="fn">printf</span>(<span class="str">"%s\n"</span>, a.nome);
+    <span class="fn">printf</span>(<span class="str">"%02d/%02d/%d\n"</span>,
+           a.nascimento.dia,   <span class="cmt">/* dois pontos encadeados */</span>
+           a.nascimento.mes,
+           a.nascimento.ano);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="code-label">areaRetangulo.c — Ponto dentro de Retangulo</div>
+    <pre><code><span class="kw">typedef struct</span> { <span class="kw">float</span> x, y; } <span class="tp">Ponto</span>;
+
+<span class="kw">typedef struct</span> { <span class="tp">Ponto</span> topEsq; <span class="tp">Ponto</span> botDir; } <span class="tp">Retangulo</span>;
+
+<span class="kw">float</span> <span class="fn">area</span>(<span class="tp">Retangulo</span> r) {
+    <span class="kw">return</span> (r.botDir.x - r.topEsq.x) * (r.botDir.y - r.topEsq.y);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Retangulo</span> rect = {{<span class="num">0</span>, <span class="num">0</span>}, {<span class="num">5</span>, <span class="num">4</span>}};
+    <span class="fn">printf</span>(<span class="str">"Area: %.1f\n"</span>, <span class="fn">area</span>(rect));  <span class="cmt">/* 20.0 */</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p>Para acessar campos aninhados, encadeie os pontos: <code>a.nascimento.dia</code>. Leia da esquerda para a direita: "o campo <em>nascimento</em> de <em>a</em>, e dentro dele o campo <em>dia</em>".</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 07 -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Ponteiro para struct — operador <span style="color:var(--accent)">-></span> — <span style="color:var(--accent)">structPonteiro.c</span></h2>
+
+    <p>Quando você tem um <strong>ponteiro para struct</strong>, o operador <strong>seta (->)</strong> é a forma compacta e idiomática de acessar campos.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-header orange">Forma longa (desreferência + ponto)</div>
+        <pre><code><span class="tp">Aluno</span> *p = &amp;a1;
+
+<span class="cmt">/* parênteses obrigatórios!
+   . tem precedência maior que *  */</span>
+(*p).ira  = <span class="num">9.0f</span>;
+(*p).nome[<span class="num">0</span>] = <span class="str">'B'</span>;</code></pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-header pink">Forma curta — seta (idiomático)</div>
+        <pre><code><span class="tp">Aluno</span> *p = &amp;a1;
+
+<span class="cmt">/* p->campo equivale a (*p).campo
+   mais limpo, mais legível        */</span>
+p->ira  = <span class="num">9.0f</span>;
+p->nome[<span class="num">0</span>] = <span class="str">'B'</span>;</code></pre>
+      </div>
+    </div>
+
+    <div class="concept-card">
+      <p>📌 <strong>Regra prática:</strong> Você tem <em>a struct direta</em>? Use <code style="color:var(--accent)">.</code> &nbsp;&nbsp; Você tem <em>um ponteiro</em> para a struct? Use <code style="color:var(--accent)">-></code></p>
+    </div>
+
+    <div class="diagram">  Aluno a1 = {"Ana", 221001, 8.5};
+  Aluno *p = &a1;            /* p guarda o endereço de a1 */
+
+  p ─────────────────────► a1
+  (endereço 0x3000)          ┌──────────────┐
+                             │ nome: "Ana"  │ ◄── p->nome   ou  (*p).nome
+                             │ matric:221001│ ◄── p->matricula
+                             │ ira:  8.5    │ ◄── p->ira
+                             └──────────────┘
+
+  p->ira = 9.5  →  modifica a1.ira diretamente (sem cópia)!</div>
+
+    <div class="code-label">structPonteiro.c — struct com campo ponteiro e uso de -></div>
+    <pre><code><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+
+<span class="kw">typedef struct</span> {
+    <span class="kw">char</span> *nome;       <span class="cmt">/* campo ponteiro — string no heap */</span>
+    <span class="kw">int</span>   matricula;
+} <span class="tp">Aluno</span>;
+
+<span class="tp">Aluno</span> <span class="fn">criaAluno</span>(<span class="kw">const char</span> *nome, <span class="kw">int</span> mat) {
+    <span class="tp">Aluno</span> a;
+    a.nome = (<span class="kw">char</span>*) <span class="fn">malloc</span>(<span class="fn">strlen</span>(nome) + <span class="num">1</span>);
+    <span class="fn">strcpy</span>(a.nome, nome);
+    a.matricula = mat;
+    <span class="kw">return</span> a;
+}
+
+<span class="kw">void</span> <span class="fn">liberaAluno</span>(<span class="tp">Aluno</span> *a) {
+    <span class="fn">free</span>(a->nome);   <span class="cmt">/* libera o campo ponteiro */</span>
+    a->nome = <span class="kw">NULL</span>;
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="tp">Aluno</span> a1 = <span class="fn">criaAluno</span>(<span class="str">"Italo Samuel"</span>, <span class="num">221032</span>);
+    <span class="fn">printf</span>(<span class="str">"%s — mat %d\n"</span>, a1.nome, a1.matricula);
+    <span class="fn">liberaAluno</span>(&amp;a1);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="warn">
+      Ao copiar uma struct com campo ponteiro (<code>a2 = a1</code>), ambas ficam apontando para o <strong>mesmo endereço</strong> de memória (cópia rasa). Liberar uma torna a outra inválida (dangling pointer). Implemente sempre uma função de cópia que faz <code>malloc</code> + <code>strcpy</code> para o campo ponteiro.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 08 SIMULADOR -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Simulador interativo — ponto (.) vs seta (->)</h2>
+
+    <p>Visualize ao vivo a diferença entre acessar campos via variável direta e via ponteiro.</p>
+
+    <div id="struct-demo">
+      <div class="s-controls">
+        <button class="s-btn" onclick="sdDeclare()">Criar Aluno a1</button>
+        <button class="s-btn purple" onclick="sdPointer()">Aluno *p = &amp;a1</button>
+        <button class="s-btn green" onclick="sdDot()">a1.ira  (ponto)</button>
+        <button class="s-btn orange" onclick="sdArrow()">p->ira  (seta)</button>
+        <button class="s-btn purple" onclick="sdModify()">p->ira = 9.5</button>
+        <button class="s-btn" style="border-color:var(--border);color:var(--text-muted)" onclick="sdReset()">&#8635; Reset</button>
+      </div>
+      <div class="s-layout">
+        <div>
+          <div class="s-col-title">// memória (simulada)</div>
+          <div id="s-visual"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);text-align:center;margin-top:70px;">[ clique em "Criar Aluno a1" ]</div></div>
+        </div>
+        <div>
+          <div class="s-col-title">// log de operações</div>
+          <div id="s-log"></div>
+        </div>
+      </div>
+      <div class="s-desc" id="s-desc">Clique em "Criar Aluno a1" para começar.</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 09 ARQUIVOS -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Arquivos desta pasta — <span style="color:var(--accent)">Struct/</span></h2>
+
+    <p>Cada arquivo explora um aspecto da struct em C, formando uma progressão do básico ao avançado.</p>
+
+    <div class="files-grid">
+      <div class="file-card">
+        <div class="file-name">📄 struct.c</div>
+        <div class="file-desc">Declaração básica com tag, criação de variável e acesso a campos com o operador ponto.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 struct1.c</div>
+        <div class="file-desc">Inicialização por lista na declaração, cópia de struct e múltiplos campos numéricos.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 areaRetangulo.c</div>
+        <div class="file-desc">Cálculo de área usando structs aninhadas — Ponto dentro de Retangulo, encadeamento de pontos.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 mediaNotas.c</div>
+        <div class="file-desc">Struct com vetor de notas. Calcula média via função que recebe ponteiro para struct.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 funcaoStruct.c</div>
+        <div class="file-desc">Passagem por valor versus por referência: qual modifica o original, qual trabalha só com cópia.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 arraysStruct.c</div>
+        <div class="file-desc">Vetor de structs: criação, preenchimento e busca do maior IRA em um array de Alunos.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 cadastro.c</div>
+        <div class="file-desc">Cadastro interativo via scanf, armazenando em struct e exibindo os dados ao final.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 cadastroPessoas.c</div>
+        <div class="file-desc">Múltiplas pessoas em loop, com funções lerPessoa e exibir recebendo ponteiros para struct.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 structaninhada.c</div>
+        <div class="file-desc">Struct aninhada: campo Data dentro de Aluno. Acesso com dois pontos encadeados.</div>
+      </div>
+      <div class="file-card">
+        <div class="file-name">📄 structPonteiro.c</div>
+        <div class="file-desc">Campo ponteiro dentro da struct. Operador ->, alocação dinâmica do campo e liberação segura.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 10 RESUMO -->
+  <section id="sec10">
+    <div class="section-number">// 10</div>
+    <h2>Resumo — . vs -> e boas práticas</h2>
+
+    <table>
+      <thead><tr><th>Situação</th><th>Operador</th><th>Exemplo</th></tr></thead>
+      <tbody>
+        <tr><td>Variável direta</td><td>. (ponto)</td><td><code>a1.nome</code>, <code>a1.ira</code></td></tr>
+        <tr><td>Ponteiro para struct</td><td>-> (seta)</td><td><code>p->nome</code>, <code>p->ira</code></td></tr>
+        <tr><td>Desreferência manual</td><td>(*ptr).campo</td><td><code>(*p).nome</code> — evitar, prefira -></td></tr>
+        <tr><td>Struct aninhada direta</td><td>. encadeado</td><td><code>a.nascimento.dia</code></td></tr>
+        <tr><td>Ponteiro p/ struct aninhada</td><td>-> e .</td><td><code>p->nascimento.dia</code></td></tr>
+        <tr><td>Campo ponteiro (lista)</td><td>Depende</td><td><code>no->prox</code>, <code>no->prox->valor</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Fluxo de boas práticas</h3>
+    <div class="diagram">  1. Definir a struct fora das funções (escopo global de tipo).
+  2. Usar typedef para evitar repetir "struct NomeTag".
+  3. Para structs grandes, passar SEMPRE por ponteiro.
+  4. Usar const Aluno *p quando a função só vai ler os dados.
+  5. Se a struct tem campo ponteiro:
+     - Crie função criaAluno()  → aloca o campo ponteiro (malloc + strcpy)
+     - Crie função copiaAluno() → deep copy (aloca nova memória)
+     - Crie função liberaAluno() → free do campo + atribui NULL
+  6. Inicializar com {0} para zerar todos os campos na declaração.</div>
+
+    <h3>Referência rápida de erros comuns</h3>
+    <table>
+      <thead><tr><th>Erro</th><th>O que fazer</th></tr></thead>
+      <tbody>
+        <tr><td>a1.nome = "texto"</td><td>Strings char[] não aceitam atribuição direta — use strcpy(a1.nome, "texto")</td></tr>
+        <tr><td>p.campo (com ponteiro)</td><td>Use seta: p->campo (ponto é só para variável direta)</td></tr>
+        <tr><td>a2 = a1 (campo ponteiro)</td><td>Cópia rasa — implemente deep copy com malloc+strcpy</td></tr>
+        <tr><td>(*p).campo sem parênteses</td><td>*p.campo é erro: ponto tem precedência maior que *. Use ->.</td></tr>
+        <tr><td>free(a) em struct com ptr</td><td>Libere o campo ponteiro ANTES de liberar a struct inteira</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 11 EXERCÍCIOS -->
+  <section id="sec11">
+    <div class="section-number">// 11</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Dada <code>Aluno *p = &amp;a1;</code>, qual é a forma correta de acessar o campo <code>ira</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) p.ira</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) p->ira (equivale a (*p).ira)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) *p.ira</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) &amp;p->ira</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent4)">✔ Correto! p é ponteiro → use p->ira. O ponto (p.ira) é só para variáveis diretas. A seta é um atalho para (*p).ira.</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent)">✘ Para ponteiro para struct use a seta: p->ira. O ponto (.) funciona apenas para variável direta. A seta equivale a (*p).ira.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. O que acontece ao fazer <code>Aluno a2 = a1;</code> quando <code>a1</code> tem campo <code>char *nome</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) Uma nova string é alocada automaticamente para a2.nome</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) a2.nome e a1.nome apontam para o mesmo endereço (cópia rasa)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) O compilador impede a cópia de structs com ponteiros</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) a2 é totalmente independente de a1</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent4)">✔ Exato! A cópia de struct é rasa (byte a byte), incluindo o valor do ponteiro. Ambas compartilham o mesmo endereço. Liberar uma deixa a outra com dangling pointer.</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent)">✘ A cópia copia apenas o endereço, não o conteúdo. É uma cópia rasa. Implemente deep copy com malloc + strcpy para copiar o conteúdo apontado independentemente.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Por que passar struct grande por ponteiro é mais eficiente do que por valor?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Structs não podem ser passadas por valor em C</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Por valor copia todos os bytes na pilha; por ponteiro passa apenas o endereço (4 ou 8 bytes)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Por valor altera o original; por ponteiro não</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Não há diferença de desempenho</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent4)">✔ Correto! Por valor, todos os bytes da struct são copiados na pilha a cada chamada. Para structs grandes, é custoso. Por ponteiro, apenas o endereço (4 ou 8 bytes) é passado.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent)">✘ Por valor copia todos os campos na pilha — ineficiente para structs com muitos dados. Use ponteiro: const Aluno *p para leitura, Aluno *p para modificação.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Como acessar o campo <code>dia</code> da struct aninhada <code>nascimento</code> em uma variável direta <code>a1</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) a1->nascimento.dia</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) a1.dia.nascimento</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) a1.nascimento.dia</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) nascimento(a1).dia</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent4)">✔ Correto! Encadeie pontos: a1.nascimento acessa o campo Data, e .dia acessa o campo dentro dele. A seta (->) só é usada quando a1 é um ponteiro.</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent)">✘ Para variável direta use ponto encadeado: a1.nascimento.dia. Leia da esquerda: campo nascimento de a1, depois campo dia. Seta é para ponteiros.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p>5. Qual expressão é equivalente a <code>p->ira</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) *p.ira</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) (*p).ira</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) &amp;p.ira</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) p[0]->ira</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q5" style="color:var(--accent4)">✔ Correto! p->ira é um atalho para (*p).ira. Os parênteses são obrigatórios pois o ponto (.) tem precedência maior que o asterisco (*).</div>
+        <div class="quiz-feedback" id="fb_wrong_q5" style="color:var(--accent)">✘ p->ira equivale a (*p).ira. Os parênteses são necessários: sem eles *p.ira seria *(p.ira), que tentaria acessar campo ira de p — mas p é ponteiro, não struct.</div>
+      </div>
+    </div>
+
+    <h3>Desafios para programar</h3>
+    <div class="concept-card yellow">
+      <p><strong>Desafio 1 — Sistema de Alunos</strong><br>
+      Crie struct <code>Aluno</code> com nome, matrícula e vetor de 3 notas. Leia N alunos, calcule a média de cada um com função que recebe ponteiro para struct. Imprima aprovados (média ≥ 5.0) e reprovados ao final.</p>
+    </div>
+    <div class="concept-card orange">
+      <p><strong>Desafio 2 — Catálogo de Produtos</strong><br>
+      Crie struct <code>Produto</code> com nome, código, preço e quantidade. Implemente funções <code>lerProduto</code>, <code>exibirProduto</code> e <code>valorTotal</code> (preço × quantidade). Leia 5 produtos e exiba o valor total do estoque.</p>
+    </div>
+    <div class="concept-card purple">
+      <p><strong>Desafio 3 — Agenda com struct aninhada</strong><br>
+      Crie structs <code>Data</code> e <code>Contato</code> (nome, telefone, Data aniversario). Implemente função que recebe vetor de contatos e exibe quem faz aniversário em determinado mês.</p>
+    </div>
+    <div class="concept-card green">
+      <p><strong>Desafio 4 — Nó de lista encadeada</strong><br>
+      Crie struct <code>No</code> com campo <code>int valor</code> e <code>struct No *prox</code>. Implemente <code>inserirInicio</code>, <code>exibirLista</code> e <code>liberarLista</code>. Insira 5 valores e exiba a lista do início ao fim.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Structs em C</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+
+const sd = { a1: null, p: null, hl: null };
+
+function sLog(msg, cls) {
+  const el = document.getElementById('s-log');
+  el.innerHTML += `<div class="${cls}">${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderSD() {
+  const v = document.getElementById('s-visual');
+  if (!sd.a1) {
+    v.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-muted);text-align:center;margin-top:70px;">[ clique em "Criar Aluno a1" ]</div>';
+    return;
+  }
+  const iraHl = sd.hl ? 's-field hl' : 's-field';
+  v.innerHTML = `
+    <div class="s-box">
+      <div class="s-box-title">Aluno a1  @ 0x2000</div>
+      <div class="s-field"><span class="s-field-name">char nome[50]</span><span class="s-field-val">"${sd.a1.nome}"</span></div>
+      <div class="s-field"><span class="s-field-name">int  matricula</span><span class="s-field-val">${sd.a1.mat}</span></div>
+      <div class="${iraHl}"><span class="s-field-name">float ira</span><span class="s-field-val">${sd.a1.ira.toFixed(1)}</span></div>
+    </div>`;
+  if (sd.p) {
+    v.innerHTML += `
+      <div class="s-box ptr">
+        <div class="s-box-title">Aluno *p  @ 0x3000</div>
+        <div class="s-field"><span class="s-field-name">valor</span><span class="s-field-val" style="color:var(--accent2)">0x2000 → a1</span></div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent2);text-align:center;margin-top:4px">p aponta para a1 ↑</div>`;
+  }
+  if (sd.hl) {
+    const expr = sd.hl === 'dot' ? `a1.ira = ${sd.a1.ira.toFixed(1)}` : `p->ira = ${sd.a1.ira.toFixed(1)}`;
+    v.innerHTML += `<div class="s-access" style="margin-top:10px">${expr}</div>`;
+  }
+}
+
+function sdDeclare() {
+  sd.a1 = { nome: 'Ana', mat: 221001, ira: 8.5 }; sd.p = null; sd.hl = null;
+  renderSD();
+  sLog('Aluno a1 = {"Ana", 221001, 8.5f};', 'sl-pink');
+  sLog('a1 criada na pilha — endereço: 0x2000', 'sl-pink');
+  document.getElementById('s-desc').textContent = 'a1 é uma variável struct Aluno direta. Acesse seus campos com ponto: a1.nome, a1.matricula, a1.ira.';
+}
+
+function sdPointer() {
+  if (!sd.a1) { sLog('Aviso: crie a1 primeiro!', 'sl-yellow'); return; }
+  sd.p = '0x2000'; sd.hl = null; renderSD();
+  sLog('Aluno *p = &a1; → p = 0x2000', 'sl-purple');
+  sLog('p guarda o endereço de a1 — use p->campo', 'sl-purple');
+  document.getElementById('s-desc').textContent = 'p é um ponteiro que guarda 0x2000 (endereço de a1). Para acessar campos via p, use a seta: p->nome, p->ira.';
+}
+
+function sdDot() {
+  if (!sd.a1) { sLog('Aviso: crie a1 primeiro!', 'sl-yellow'); return; }
+  sd.hl = 'dot'; renderSD();
+  sLog('a1.ira → ' + sd.a1.ira.toFixed(1) + '  [ponto: variável direta]', 'sl-green');
+  document.getElementById('s-desc').textContent = 'a1.ira usa o ponto porque a1 É a struct diretamente. O operador . acessa o campo dentro da variável.';
+}
+
+function sdArrow() {
+  if (!sd.p) { sLog('Aviso: crie o ponteiro p primeiro!', 'sl-yellow'); return; }
+  sd.hl = 'arrow'; renderSD();
+  sLog('p->ira → ' + sd.a1.ira.toFixed(1) + '  [seta: ponteiro para struct]', 'sl-orange');
+  sLog('Equivale a (*p).ira — vai até 0x2000 e lê ira', 'sl-purple');
+  document.getElementById('s-desc').textContent = 'p->ira usa a seta porque p é um PONTEIRO. Equivale a (*p).ira — desreferencia p e acessa ira em um único passo.';
+}
+
+function sdModify() {
+  if (!sd.p) { sLog('Aviso: crie o ponteiro p primeiro!', 'sl-yellow'); return; }
+  const old = sd.a1.ira; sd.a1.ira = 9.5; sd.hl = 'arrow'; renderSD();
+  sLog('p->ira = 9.5; → a1.ira: ' + old.toFixed(1) + ' → 9.5', 'sl-orange');
+  sLog('Modificação via ponteiro altera o ORIGINAL em 0x2000', 'sl-green');
+  document.getElementById('s-desc').textContent = 'p->ira = 9.5 modificou a1.ira diretamente! Como p aponta para a1, qualquer escrita via p altera o dado original — sem cópia intermediária.';
+}
+
+function sdReset() {
+  sd.a1 = null; sd.p = null; sd.hl = null; renderSD();
+  document.getElementById('s-log').innerHTML = '';
+  document.getElementById('s-desc').textContent = 'Clique em "Criar Aluno a1" para começar.';
+}
+
+renderSD();
+</script>
+</body>
+</html>
