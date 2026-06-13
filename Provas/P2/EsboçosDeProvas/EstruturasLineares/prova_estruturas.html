@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova Esboço 04 — Estruturas Lineares · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f76a9a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f7a26a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1f0812 0%, #2a0a1a 50%, #1a0810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,106,154,0.13) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(247,106,154,0.05); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .aluno-box { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .aluno-box span { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-muted); }
+  .aluno-box b { color: var(--accent); font-weight: 600; }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .instrucoes { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 10px; padding: 22px 26px; margin: 36px 0; }
+  .instrucoes-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .instrucoes ul { margin-left: 20px; color: #c8c8e0; }
+  .instrucoes li { margin: 4px 0; }
+
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent2); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .param-box { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.3); border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: .92rem; }
+  .param-box .pb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .param-box ul { margin-left: 20px; margin-bottom: 0; color: #c8c8e0; }
+
+  .quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 30px 0; }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .quiz-q > p.enunciado { font-weight: 500; color: var(--text); margin-bottom: 10px; font-size: 1.02rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .quiz-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; cursor: pointer; font-size: .92rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent); color: var(--accent); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 14px; font-size: .88rem; padding: 14px 18px; border-radius: 8px; display: none; line-height: 1.7; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: #9ef7d4; border: 1px solid rgba(106,247,196,0.25); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: #f7a3bd; border: 1px solid rgba(247,106,154,0.3); }
+
+  .placar { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px 30px; margin: 40px 0; text-align: center; }
+  .placar h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 8px; }
+  .placar p { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px 40px;} pre{padding:14px;font-size:12px;} .quiz-q{padding:20px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">FCTE/UnB · EDA · Esboço de Prova 2 — Simulado 04</div>
+    <h1>Prova — <span>Estruturas Lineares</span></h1>
+    <p class="subtitle">Lista sequencial, encadeada, dupla, circular, pilha e fila — todas operando sobre os dígitos da sua matrícula. Desenhe os ponteiros a cada linha.</p>
+    <div class="aluno-box">
+      <span>Nome: <b>italo alves sampaio de oliveira</b></span>
+      <span>Matrícula: <b>232037937</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="instrucoes">
+    <div class="instrucoes-title">// instruções — dados base</div>
+    <ul>
+      <li>Dígitos da matrícula: <code>[2,3,2,0,3,7,9,3,7]</code>. As questões usam fatias deles (5 primeiros = <code>[2,3,2,0,3]</code>, etc.).</li>
+      <li>As funções <code>inserir</code>, <code>remover</code>, <code>inserirInicio</code>, <code>inserirFim</code> e <code>percorrer</code> são as mesmas da teoria (teoria_estruturas_prova.html).</li>
+      <li>Listas encadeadas: DESENHE os nós como caixas <code>[info|→]</code> e atualize as setas a cada operação.</li>
+      <li>Pilha = LIFO (último entra, primeiro sai). Fila = FIFO (primeiro entra, primeiro sai).</li>
+    </ul>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">// questão 01 — lista sequencial: inserção</div>
+    <p class="enunciado">A lista sequencial contém os <strong>5 primeiros dígitos da sua matrícula</strong>: v=[2,3,2,0,3], n=5, MAX=10. Após <code>inserir(&amp;l, 9, 2)</code> (inserir o dígito 9 — 7º da matrícula — na posição 2), qual o estado?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">inserir</span>(<span class="tp">Lista</span> *l, <span class="kw">int</span> x, <span class="kw">int</span> p) {
+    <span class="kw">if</span> (l-&gt;n == MAX || p &lt; <span class="num">0</span> || p &gt; l-&gt;n) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = l-&gt;n; i &gt; p; i--)
+        l-&gt;v[i] = l-&gt;v[i - <span class="num">1</span>];
+    l-&gt;v[p] = x;
+    l-&gt;n++;
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) [2,9,3,2,0,3], n=6</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) [2,3,9,2,0,3], n=6</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) [2,3,2,9,0,3], n=6</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) [2,3,2,0,3,9], n=6</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q1">✔ CORRETO — [2,3,9,2,0,3], n=6
+
+Deslocamento de TRÁS pra FRENTE (i de n até p+1):
+
+[2,3,2,0,3,?] n=5, inserindo 9 na posição 2
+i=5: v[5]=v[4]=3 → [2,3,2,0,3,3]
+i=4: v[4]=v[3]=0 → [2,3,2,0,0,3]
+i=3: v[3]=v[2]=2 → [2,3,2,2,0,3]
+i=2: 2&gt;2? FALSO → para
+v[2]=9            → [2,3,9,2,0,3]
+n++ → 6
+
+Posição 2 = TERCEIRA casa (índices começam em 0).
+Os elementos das posições 2,3,4 andaram uma casa
+pra direita; posições 0 e 1 ficaram paradas.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q1">✘ ERRADO — resposta certa: b) [2,3,9,2,0,3], n=6
+
+"Posição 2" é o ÍNDICE 2 — a terceira casa, não a
+segunda! O que estava em v[2..4] ([2,0,3]) anda uma
+casa pra direita, abrindo o buraco:
+
+[2,3,2,0,3] → desloca → [2,3,_,2,0,3] → v[2]=9
+→ [2,3,9,2,0,3], n=6.
+
+Trace do for (de trás pra frente): v[5]←v[4],
+v[4]←v[3], v[3]←v[2], para quando i==p. Se deslocasse
+de frente pra trás, sobrescreveria o 0 e o 3.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">// questão 02 — lista sequencial: remoção</div>
+    <p class="enunciado">Na lista v=[2,3,2,0,3], n=5, executa-se <code>remover(&amp;l, 3)</code> — remover a <strong>posição</strong> 3 (não o valor 3!). Qual o estado final?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">Lista</span> *l, <span class="kw">int</span> p) {
+    <span class="kw">if</span> (p &lt; <span class="num">0</span> || p &gt;= l-&gt;n) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = p; i &lt; l-&gt;n - <span class="num">1</span>; i++)
+        l-&gt;v[i] = l-&gt;v[i + <span class="num">1</span>];
+    l-&gt;n--;
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) [2,2,0,3], n=4 — removeu o valor 3</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) [2,3,2,3], n=4 — removeu o 0 da posição 3</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) [2,3,2,0], n=4 — removeu o último</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) [2,3,0,3], n=4</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q2">✔ CORRETO — [2,3,2,3], n=4
+
+PEGADINHA clássica: o parâmetro é a POSIÇÃO (índice),
+não o valor! v[3] = 0 → é o 0 que sai.
+
+Trace (desloca de frente pra trás, de p até n-2):
+i=3: v[3]=v[4]=3 → [2,3,2,3,3]
+i=4: 4 &lt; 4? FALSO → para
+n-- → n=4
+
+Parte válida: [2,3,2,3]. O v[4]=3 ainda existe na
+memória, mas está FORA da lista (n=4 ignora ele).
+Sempre leia o enunciado: remover posição ≠ remover valor.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q2">✘ ERRADO — resposta certa: b) [2,3,2,3], n=4
+
+O parâmetro 3 é POSIÇÃO (índice do vetor), não valor!
+v = [2,3,2,0,3]
+     0 1 2 3 4   ← v[3] = 0 → o 0 é removido.
+
+Deslocamento: v[3] ← v[4]=3, e n cai pra 4.
+Resultado: [2,3,2,3].
+
+Remover por VALOR seria outra função (com busca antes).
+A prova alterna entre as duas pra pegar desatento —
+sublinhe no enunciado qual é o caso.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">// questão 03 — encadeada: inserirInicio</div>
+    <p class="enunciado">Os <strong>4 primeiros dígitos da sua matrícula</strong> (2, 3, 2, 0 — nessa ordem) são inseridos com <code>inserirInicio</code>. Qual a saída de <code>percorrer(inicio)</code>?</p>
+    <pre><code><span class="tp">No</span> *inicio = <span class="kw">NULL</span>;
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">2</span>);
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">3</span>);
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">2</span>);
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">0</span>);
+<span class="fn">percorrer</span>(inicio);</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 2 3 2 0 — ordem de inserção</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) 0 2 3 2 — ordem invertida</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 0 2 2 3 — invertida e agrupada</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 2 2 3 0</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q3">✔ CORRETO — saída: 0 2 3 2
+
+inserirInicio empurra a lista pra trás a cada chamada:
+
+insere 2 → [2]
+insere 3 → [3, 2]
+insere 2 → [2, 3, 2]
+insere 0 → [0, 2, 3, 2]
+
+percorrer imprime do início ao fim: 0 2 3 2.
+
+Regra: inserirInicio N vezes = ordem INVERTIDA da
+inserção. O último inserido (0) vira o primeiro.
+Cuidado com os dígitos repetidos (2 aparece 2x) —
+não "agrupam", cada um fica onde a inversão mandar.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q3">✘ ERRADO — resposta certa: b) 0 2 3 2
+
+Cada inserirInicio coloca o novo nó NA FRENTE:
+
+[2] → [3,2] → [2,3,2] → [0,2,3,2]
+
+A ordem de saída é a INVERSA da ordem de inserção:
+inseriu 2,3,2,0 → imprime 0,2,3,2.
+
+Não existe "agrupamento" de valores iguais — lista
+preserva posição, não ordena. Refaça desenhando a
+lista após CADA inserção.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">// questão 04 — encadeada: misto início/fim</div>
+    <p class="enunciado">Agora misturando <code>inserirFim</code> (F) e <code>inserirInicio</code> (I) com os 4 primeiros dígitos. Qual a saída de <code>percorrer(inicio)</code>?</p>
+    <pre><code><span class="tp">No</span> *inicio = <span class="kw">NULL</span>;
+<span class="fn">inserirFim</span>(&amp;inicio, <span class="num">2</span>);      <span class="cmt">// F</span>
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">3</span>);   <span class="cmt">// I</span>
+<span class="fn">inserirFim</span>(&amp;inicio, <span class="num">2</span>);      <span class="cmt">// F</span>
+<span class="fn">inserirInicio</span>(&amp;inicio, <span class="num">0</span>);   <span class="cmt">// I</span>
+<span class="fn">percorrer</span>(inicio);</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 2 3 2 0</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) 0 2 3 2</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) 0 3 2 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) 3 0 2 2</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q4">✔ CORRETO — saída: 0 3 2 2
+
+Trace operação por operação:
+
+F(2): lista vazia → [2]
+I(3): 3 entra na frente → [3, 2]
+F(2): 2 entra no fim → [3, 2, 2]
+I(0): 0 entra na frente → [0, 3, 2, 2]
+
+percorrer: 0 3 2 2.
+
+Quando mistura I e F, não dá pra usar a regra de
+"inverte tudo" — tem que simular UMA POR UMA. F põe
+no fim (caminha até o último), I põe na frente (O(1)).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q4">✘ ERRADO — resposta certa: c) 0 3 2 2
+
+Com I e F misturados, simule na ordem exata:
+
+F(2) → [2]          (fim de lista vazia = único nó)
+I(3) → [3,2]        (3 na frente)
+F(2) → [3,2,2]      (2 no fim)
+I(0) → [0,3,2,2]    (0 na frente)
+
+Erros comuns: aplicar "inversão total" (só vale se
+TODAS forem inserirInicio) ou esquecer que F em lista
+vazia também funciona (vira o primeiro nó).</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">// questão 05 — encadeada: remoção por valor</div>
+    <p class="enunciado">A lista contém os 5 primeiros dígitos na ordem natural: [2]→[3]→[2]→[0]→[3]→NULL. Após <code>remover(&amp;inicio, 3)</code> (remover por <strong>valor</strong>), qual a saída de <code>percorrer</code>?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *ant = <span class="kw">NULL</span>, *atu = *l;
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor) {
+        ant = atu;
+        atu = atu-&gt;prox;
+    }
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">if</span> (ant == <span class="kw">NULL</span>) *l = atu-&gt;prox;
+    <span class="kw">else</span> ant-&gt;prox = atu-&gt;prox;
+    <span class="fn">free</span>(atu);
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'correct','q5')">a) 2 2 0 3 — remove só a primeira ocorrência</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) 2 2 0 — remove todas as ocorrências de 3</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) 2 3 2 3 — remove o 0</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) 3 2 0 3 — remove o primeiro nó</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q5">✔ CORRETO — saída: 2 2 0 3
+
+O while para na PRIMEIRA ocorrência (atu->info != valor
+falha) e a função retorna depois de UM free — não há
+loop de remoção múltipla.
+
+Trace: [2]→[3]→[2]→[0]→[3]
+it1: atu=[2], 2≠3 → ant=[2], atu=[3]
+it2: atu=[3], 3==3 → PARA
+
+ant=[2] (≠NULL) → ant->prox = atu->prox
+→ o nó [2] inicial aponta direto pro [2] seguinte
+free([3])
+
+Lista: [2]→[2]→[0]→[3] → saída 2 2 0 3.
+O SEGUNDO 3 (último nó) fica intacto!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q5">✘ ERRADO — resposta certa: a) 2 2 0 3
+
+Olhe a estrutura: a função tem UM return 1 após UM
+free — ela remove apenas a PRIMEIRA ocorrência e sai.
+Para remover todas, precisaria de outro loop.
+
+Busca: para no primeiro 3 (segundo nó).
+ant = nó [2] inicial → ant->prox pula o [3]:
+[2]→[2]→[0]→[3].
+
+O 3 do final continua lá. Remover por valor ≠ remover
+posição (Q2!) ≠ remover todas — identifique qual é
+ANTES de tracejar.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">// questão 06 — pilha (LIFO)</div>
+    <p class="enunciado">Os <strong>5 primeiros dígitos da matrícula</strong> entram numa pilha (push 2, 3, 2, 0, 3). Depois executa-se a sequência abaixo. O que é impresso, e qual o topo final?</p>
+    <pre><code><span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">pop</span>(&amp;p));
+<span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">pop</span>(&amp;p));
+<span class="fn">push</span>(&amp;p, <span class="num">7</span>);
+<span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">pop</span>(&amp;p));</code></pre>
+    <div class="param-box"><div class="pb-title">estado inicial</div><ul><li>pilha (fundo → topo): 2, 3, 2, 0, 3</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) imprime 2 3 7 · topo final = 0</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) imprime 3 0 7 · topo final = 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) imprime 3 0 2 · topo final = 7</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) imprime 2 3 2 · topo final = 7</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q6">✔ CORRETO — imprime 3 0 7, topo final = 2
+
+Pilha é LIFO: pop tira do TOPO (último que entrou).
+
+Estado (fundo→topo): 2 3 2 0 3
+pop → sai 3 (topo)   → 2 3 2 0
+pop → sai 0          → 2 3 2
+push(7)              → 2 3 2 7
+pop → sai 7          → 2 3 2
+topo final = 2.
+
+O 7 entrou e saiu IMEDIATAMENTE — quem entra por
+último sai primeiro. Os dígitos do fundo (2,3) nunca
+foram tocados.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q6">✘ ERRADO — resposta certa: b) 3 0 7, topo = 2
+
+LIFO: o pop SEMPRE tira o último que entrou (o topo),
+nunca o primeiro. Push 2,3,2,0,3 deixa o 3 no topo.
+
+pop→3, pop→0 (pilha: 2,3,2)
+push 7 (pilha: 2,3,2,7)
+pop→7 (o 7 acabou de entrar — sai primeiro!)
+Pilha final: 2,3,2 → topo = 2.
+
+"2 3 ..." seria FILA (FIFO). Não confunda: pilha tira
+de cima, fila tira da frente.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-q" id="q7">
+    <div class="q-num">// questão 07 — fila (FIFO)</div>
+    <p class="enunciado">Agora os <strong>4 primeiros dígitos</strong> entram numa fila (enqueue 2, 3, 2, 0). Executa-se a sequência abaixo. O que é impresso, e quem fica na frente da fila?</p>
+    <pre><code><span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">dequeue</span>(&amp;f));
+<span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">dequeue</span>(&amp;f));
+<span class="fn">enqueue</span>(&amp;f, <span class="num">7</span>);
+<span class="fn">printf</span>(<span class="str">"%d "</span>, <span class="fn">dequeue</span>(&amp;f));</code></pre>
+    <div class="param-box"><div class="pb-title">estado inicial</div><ul><li>fila (frente → trás): 2, 3, 2, 0</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'correct','q7')">a) imprime 2 3 2 · frente final = 0</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) imprime 0 2 7 · frente final = 3</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) imprime 2 3 7 · frente final = 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) imprime 0 2 3 · frente final = 7</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q7">✔ CORRETO — imprime 2 3 2, frente final = 0
+
+Fila é FIFO: dequeue tira da FRENTE (primeiro que
+entrou). enqueue põe no FIM.
+
+Fila (frente→trás): 2 3 2 0
+deq → sai 2          → 3 2 0
+deq → sai 3          → 2 0
+enq(7) entra ATRÁS   → 2 0 7
+deq → sai 2          → 0 7
+Frente final = 0.
+
+O 7 NÃO sai — ele entrou por último, está no fim da
+fila. Compare com a Q6: na pilha o 7 saiu na hora.
+Essa dupla pilha/fila com mesma sequência é pegadinha
+recorrente.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q7">✘ ERRADO — resposta certa: a) 2 3 2, frente = 0
+
+FIFO: sai sempre o MAIS ANTIGO (a frente da fila), e
+quem chega (enqueue) entra no FIM.
+
+deq→2 (primeiro que entrou), deq→3, enq(7) vai pro
+fim [2,0,7], deq→2. Sobra [0,7], frente = 0.
+
+Se você pensou "0 2 7" ou "...7", aplicou lógica de
+PILHA. Fila: pense em fila de banco — o 7 que acabou
+de chegar espera atrás de todo mundo.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-q" id="q8">
+    <div class="q-num">// questão 08 — lista circular</div>
+    <p class="enunciado">Lista circular com os 3 primeiros dígitos: [2]→[3]→[2]→(volta ao primeiro). O percorrimento abaixo começa em <code>inicio-&gt;prox</code> (não em <code>inicio</code>!). O que é impresso?</p>
+    <pre><code><span class="tp">No</span> *atu = inicio-&gt;prox;          <span class="cmt">// começa no SEGUNDO nó!</span>
+<span class="kw">do</span> {
+    <span class="fn">printf</span>(<span class="str">"%d "</span>, atu-&gt;info);
+    atu = atu-&gt;prox;
+} <span class="kw">while</span> (atu != inicio-&gt;prox);   <span class="cmt">// para ao voltar ao ponto de partida</span></code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) 2 3 2 — começa do inicio normalmente</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) 3 2 2 — começa do segundo nó e dá a volta</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) 3 2 — para antes de completar a volta</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) nada — loop não executa</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q8">✔ CORRETO — saída: 3 2 2
+
+O ponto de partida mudou: atu = inicio->prox = nó [3].
+Numa circular, dá pra começar de QUALQUER nó e
+visitar todos — a condição de parada é "voltei ao
+ponto de partida".
+
+Nós: A[2] → B[3] → C[2] → A (circular)
+atu = B
+imprime 3, atu = C
+C ≠ B → continua: imprime 2, atu = A
+A ≠ B → continua: imprime 2, atu = B
+B == B → PARA
+
+Saída: 3 2 2 — os mesmos 3 elementos, começando do 2º.
+O do-while garante a 1ª impressão antes do teste.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q8">✘ ERRADO — resposta certa: b) 3 2 2
+
+Leia a primeira linha: atu = inicio->PROX → o
+percorrimento começa no SEGUNDO nó (valor 3), não no
+inicio!
+
+A condição de parada também compara com inicio->prox
+(o ponto de partida), então a volta é completa:
+B[3] → C[2] → A[2] → volta a B → para.
+Imprime 3 2 2 (3 elementos, ordem rotacionada).
+
+"nada" seria com WHILE simples começando igual ao
+alvo — aqui é DO-while, sempre roda ao menos 1 vez.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-q" id="q9">
+    <div class="q-num">// questão 09 — ponteiro para ponteiro</div>
+    <p class="enunciado">A lista contém [3]→[7]→NULL (dois últimos dígitos pares de posição da matrícula). Chama-se <code>inserirErrado(inicio, 9)</code> e depois <code>percorrer(inicio)</code>. O que é impresso?</p>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirErrado</span>(<span class="tp">No</span> *l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = l;
+    l = novo;            <span class="cmt">// ← modifica só a cópia local!</span>
+}
+
+<span class="cmt">// na main:</span>
+<span class="fn">inserirErrado</span>(inicio, <span class="num">9</span>);
+<span class="fn">percorrer</span>(inicio);</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) 9 3 7 — o 9 entra no início</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) 3 7 — a lista não muda; o nó 9 vira lixo (vazamento)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) 3 7 9 — o 9 entra no fim</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) erro de compilação — No* não pode receber novo</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q9">✔ CORRETO — saída: 3 7
+
+A função recebe No *l — uma CÓPIA do ponteiro inicio.
+
+Dentro da função:
+  novo->prox = l   → o nó [9] aponta pra [3] ✓
+  l = novo         → muda a CÓPIA local, não o inicio!
+
+Quando a função retorna, a cópia morre. O inicio da
+main continua apontando pra [3]→[7].
+
+Consequências:
+1) percorrer imprime 3 7 (lista intacta)
+2) o nó [9] ficou alocado SEM ninguém apontando pra
+   ele = MEMORY LEAK (nó órfão).
+
+Pra funcionar: No **l na assinatura, *l = novo no
+corpo, e &amp;inicio na chamada. É A pegadinha de **l.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q9">✘ ERRADO — resposta certa: b) 3 7
+
+Parâmetros em C são passados POR VALOR — No *l é uma
+cópia do ponteiro. l = novo troca o valor da cópia;
+a variável inicio da main nem fica sabendo.
+
+Compila normalmente (atribuição válida), o 9 NÃO entra
+na lista (nem no início nem no fim), e o malloc do nó
+[9] vira vazamento de memória.
+
+Versão correta: void inserir(No **l, ...) com *l=novo
+e chamada inserir(&amp;inicio, 9). Compare Q9 com a sua
+inserirInicio — a diferença é exatamente o **.</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-q" id="q10">
+    <div class="q-num">// questão 10 — lista duplamente encadeada</div>
+    <p class="enunciado">Lista dupla: NULL←[2]⇄[3]⇄[7]→NULL. Após <code>remover(&amp;inicio, 3)</code> (remoção por valor, com atualização de <code>ant</code> e <code>prox</code>), qual o valor de <code>inicio-&gt;prox-&gt;ant-&gt;info</code>?</p>
+    <pre><code><span class="cmt">// após a busca, atu aponta para o nó [3]:</span>
+<span class="kw">if</span> (atu-&gt;ant != <span class="kw">NULL</span>)
+    atu-&gt;ant-&gt;prox = atu-&gt;prox;
+<span class="kw">else</span>
+    *l = atu-&gt;prox;
+<span class="kw">if</span> (atu-&gt;prox != <span class="kw">NULL</span>)
+    atu-&gt;prox-&gt;ant = atu-&gt;ant;
+<span class="fn">free</span>(atu);</code></pre>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'correct','q10')">a) 2 — o nó [7] agora aponta ant para [2]</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) 3 — o ant ainda aponta para o nó removido</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) 7 — aponta para si mesmo</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) NULL — o ant foi zerado</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q10">✔ CORRETO — resposta: 2
+
+Estado antes: NULL←[2]⇄[3]⇄[7]→NULL, atu = [3].
+
+Linha 1: atu->ant = [2] ≠ NULL →
+  [2]->prox = atu->prox = [7]   (2 pula o 3)
+Linha 2: atu->prox = [7] ≠ NULL →
+  [7]->ant = atu->ant = [2]     (7 aponta de volta pro 2)
+free([3])
+
+Estado final: NULL←[2]⇄[7]→NULL
+
+Decompondo a expressão:
+inicio          = [2]
+inicio->prox    = [7]
+inicio->prox->ant = [2]
+inicio->prox->ant->info = 2 ✓
+
+Os DOIS lados foram religados — é o par de ifs que
+mantém a consistência da lista dupla.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q10">✘ ERRADO — resposta certa: a) 2
+
+A remoção na lista dupla atualiza DOIS ponteiros:
+• [2]->prox passa a apontar pra [7] (pula o 3)
+• [7]->ant passa a apontar pra [2] (linha
+  atu->prox->ant = atu->ant)
+
+Se a 2ª atualização não existisse, aí sim [7]->ant
+apontaria pro nó liberado (ponteiro pendurado — bug
+da pegadinha #5 da teoria). Mas o código FAZ a
+atualização.
+
+Caminho: inicio=[2] → prox=[7] → ant=[2] → info=2.
+Resolva expressões encadeadas um -&gt; por vez, da
+esquerda pra direita.</div>
+  </div>
+
+  <div class="placar" id="placar">
+    <h3>Resultado</h3>
+    <p id="placar-texto">Responda as 10 questões para ver seu placar.</p>
+  </div>
+
+</div>
+
+<footer>
+  Universidade de Brasília — FCTE &nbsp;·&nbsp; EDA &nbsp;·&nbsp;
+  <strong>Esboço de Prova — Estruturas Lineares</strong> &nbsp;·&nbsp;
+  Gabarito verificado por execução (gabarito_verificacao.c)
+</footer>
+
+<script>
+let acertos = 0, respondidas = 0;
+const TOTAL = 10;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  respondidas++;
+  if (result === 'correct') {
+    acertos++;
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+  const t = document.getElementById('placar-texto');
+  t.textContent = `Acertos: ${acertos}/${respondidas} respondidas (total ${TOTAL})`;
+  if (respondidas === TOTAL) {
+    const pct = Math.round(100 * acertos / TOTAL);
+    t.textContent = `Placar final: ${acertos}/${TOTAL} (${pct}%)` +
+      (pct >= 80 ? ' — Pronto pra prova! ✔' : pct >= 60 ? ' — Quase lá. Revise as erradas.' : ' — Refaça a teoria e tente de novo.');
+  }
+}
+</script>
+</body>
+</html>

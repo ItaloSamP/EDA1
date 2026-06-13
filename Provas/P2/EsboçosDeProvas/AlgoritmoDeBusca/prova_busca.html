@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova Esboço 02 — Algoritmos de Busca · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #f7a26a;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2a1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .aluno-box { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .aluno-box span { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-muted); }
+  .aluno-box b { color: var(--accent); font-weight: 600; }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .instrucoes { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 10px; padding: 22px 26px; margin: 36px 0; }
+  .instrucoes-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .instrucoes ul { margin-left: 20px; color: #c8c8e0; }
+  .instrucoes li { margin: 4px 0; }
+  .ruler { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; white-space: pre; overflow-x: auto; color: #9898c0; margin: 10px 0; }
+
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .param-box { background: rgba(247,162,106,0.06); border: 1px solid rgba(247,162,106,0.3); border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: .92rem; }
+  .param-box .pb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .param-box ul { margin-left: 20px; margin-bottom: 0; color: #c8c8e0; }
+
+  .quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 30px 0; }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .quiz-q > p.enunciado { font-weight: 500; color: var(--text); margin-bottom: 10px; font-size: 1.02rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .quiz-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; cursor: pointer; font-size: .92rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent); color: var(--accent); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 14px; font-size: .88rem; padding: 14px 18px; border-radius: 8px; display: none; line-height: 1.7; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: #9ef7d4; border: 1px solid rgba(106,247,196,0.25); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: #f7a3bd; border: 1px solid rgba(247,106,154,0.3); }
+
+  .placar { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px 30px; margin: 40px 0; text-align: center; }
+  .placar h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 8px; }
+  .placar p { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px 40px;} pre{padding:14px;font-size:12px;} .quiz-q{padding:20px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">FCTE/UnB · EDA · Esboço de Prova 2 — Simulado 02</div>
+    <h1>Prova — <span>Algoritmos de Busca</span></h1>
+    <p class="subtitle">Busca linear e binária com seus parâmetros pessoais — incluindo o estilo exato das questões Q2 e Q3 da prova 24.1. Faça o trace no papel.</p>
+    <div class="aluno-box">
+      <span>Nome: <b>italo alves sampaio de oliveira</b></span>
+      <span>Matrícula: <b>232037937</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="instrucoes">
+    <div class="instrucoes-title">// instruções — dados que você vai usar o tempo todo</div>
+    <ul>
+      <li>Régua de índices do seu nome (decore como achar posições rápido):</li>
+    </ul>
+    <div class="ruler">índice: 0         1         2         3
+        0123456789012345678901234567890
+nome:   "italo alves sampaio de oliveira"   (31 chars)</div>
+    <ul>
+      <li>Nome <strong>ordenado</strong> (espaços vão pro início, igual à prova 24.1): <code>"    aaaaadeeeiiiilllmoooprsstvv"</code></li>
+      <li>Dígitos da matrícula em ordem natural: <code>[2,3,2,0,3,7,9,3,7]</code> · ordenados: <code>[0,2,2,3,3,3,7,7,9]</code></li>
+      <li><code>matricula % 10 = 7</code> · <code>matricula % 100 = 37</code></li>
+      <li>Na busca binária, escreva <code>inicio</code>, <code>fim</code> e <code>meio</code> de CADA iteração — é onde todo mundo erra.</li>
+    </ul>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">// questão 01</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q1</code>? A chave é <code>nome[matricula % 10]</code>, ou seja, o caractere do seu nome na posição dada pelo <strong>último dígito da sua matrícula</strong>.</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q1</span>(<span class="kw">char</span> *s, <span class="kw">char</span> chave) {
+    <span class="kw">int</span> p = <span class="num">0</span>;
+    <span class="kw">while</span> (s[p] != <span class="str">'\0'</span>) {
+        <span class="kw">if</span> (s[p] == chave) <span class="kw">return</span> p;
+        p++;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>s</code> = "italo alves sampaio de oliveira"</li><li><code>chave</code> = <code>s[232037937 % 10]</code> = <code>s[7]</code></li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 7</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) 3</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) 24</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) -1</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q1">✔ CORRETO — resposta: 3
+
+Passo 1 — descobrir a chave:
+  232037937 % 10 = 7 → chave = nome[7].
+  i(0) t(1) a(2) l(3) o(4) ' '(5) a(6) l(7) → chave = 'l'
+
+Passo 2 — busca linear com return DENTRO do loop:
+  retorna a PRIMEIRA ocorrência.
+  'l' aparece nas posições 3, 7 e 24.
+  A primeira é a do "ita**l**o" → retorna 3.
+
+Pegadinha: a chave veio da posição 7, mas a resposta é
+onde 'l' aparece PRIMEIRO (posição 3), não 7!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q1">✘ ERRADO — resposta certa: b) 3
+
+Duas etapas separadas:
+1) chave = nome[7] = 'l' (conte: i0 t1 a2 l3 o4 ␣5 a6 l7)
+2) o return p está DENTRO do while → para na PRIMEIRA
+   ocorrência de 'l', que é a posição 3 ("ita**l**o").
+
+7 confunde "posição de onde a chave veio" com "posição
+encontrada". 24 seria a ÚLTIMA ocorrência (isso é a Q2!).
+-1 só se a letra não existisse no nome.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">// questão 02 — estilo exato da prova 24.1</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q2</code> passando seu <strong>nome completo</strong> e sua <strong>matrícula</strong> como parâmetros?</p>
+    <pre><code><span class="kw">char</span> <span class="fn">letra</span>(<span class="kw">int</span> P) {
+    P = P % <span class="num">26</span>;
+    <span class="kw">return</span> <span class="str">'a'</span> + P;
+}
+
+<span class="kw">int</span> <span class="fn">Q2</span>(<span class="kw">char</span> *nc, <span class="kw">int</span> matricula) {
+    <span class="kw">int</span> p = <span class="num">0</span>, posic = -<span class="num">1</span>;
+    <span class="kw">char</span> chave = <span class="fn">letra</span>(matricula % <span class="num">100</span>);
+    <span class="kw">while</span> (nc[p] != <span class="str">'\0'</span>) {
+        <span class="kw">if</span> (chave == nc[p])
+            posic = p;
+        p++;
+    }
+    <span class="kw">return</span> posic;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>nc</code> = "italo alves sampaio de oliveira"</li><li><code>matricula</code> = 232037937</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 3 — primeira ocorrência</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 7</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q2')">c) 24 — última ocorrência</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 11</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q2">✔ CORRETO — resposta: 24
+
+Passo 1 — calcular a chave:
+  matricula % 100 = 37
+  letra(37): 37 % 26 = 11 → 'a' + 11 = 'l'
+  (a=0, b=1, ..., k=10, l=11)
+
+Passo 2 — entender o loop:
+  NÃO há break/return dentro do while! posic é
+  SOBRESCRITO a cada ocorrência → guarda a ÚLTIMA.
+
+Passo 3 — ocorrências de 'l': 3, 7 e 24.
+  "...de o**l**iveira" → última = 24.
+
+Essa é a diferença Q1 vs Q2: return dentro do loop =
+primeira; atribuição sem break = última. Caiu na 24.1!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q2">✘ ERRADO — resposta certa: c) 24
+
+Chave: 232037937 % 100 = 37 → letra(37) → 37%26 = 11
+→ 'a'+11 = 'l' (conte no alfabeto: a0 b1 c2 d3 e4 f5 g6
+h7 i8 j9 k10 l11).
+
+O detalhe que decide a questão: dentro do while NÃO tem
+break. posic = p executa TODA vez que acha 'l' →
+no final guarda a ÚLTIMA ocorrência.
+
+'l' está em 3 ("italo"), 7 ("alves") e 24 ("oliveira").
+Resposta: 24. (11 é o resultado de 37%26, não posição!)</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">// questão 03</div>
+    <p class="enunciado">Quantas <strong>comparações</strong> a função <code>Q3</code> retorna ao buscar a letra <code>'p'</code> (primeira letra de "sampaio" depois do m) no seu nome completo?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q3</span>(<span class="kw">char</span> *s, <span class="kw">char</span> chave) {
+    <span class="kw">int</span> p = <span class="num">0</span>, c = <span class="num">0</span>;
+    <span class="kw">while</span> (s[p] != <span class="str">'\0'</span>) {
+        c++;
+        <span class="kw">if</span> (s[p] == chave) <span class="kw">break</span>;
+        p++;
+    }
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>s</code> = "italo alves sampaio de oliveira"</li><li><code>chave</code> = 'p'</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 15</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) 16</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 17</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 31</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q3">✔ CORRETO — resposta: 16
+
+Posição do 'p': "italo alves sam**p**aio..."
+i0 t1 a2 l3 o4 ␣5 a6 l7 v8 e9 s10 ␣11 s12 a13 m14 p15
+→ 'p' está no índice 15.
+
+O contador c++ executa ANTES do if, inclusive na
+iteração que encontra. Para achar o índice 15, o loop
+visita os índices 0..15 → 16 iterações → c = 16.
+
+Regra: achou no índice k → comparações = k + 1
+(índice começa em 0, contagem começa em 1).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q3">✘ ERRADO — resposta certa: b) 16
+
+'p' fica no índice 15 (conte: i0 t1 a2 l3 o4 ␣5 a6 l7
+v8 e9 s10 ␣11 s12 a13 m14 p15).
+
+MAS a pergunta é o nº de COMPARAÇÕES, não o índice!
+c++ roda a cada iteração, incluindo a que dá match.
+Índices visitados: 0,1,2,...,15 → 16 visitas → c=16.
+
+Erro clássico de ±1: índice k ⇒ k+1 comparações.
+31 seria varrer o nome inteiro (chave inexistente).</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">// questão 04 — estilo exato da Q3 da prova 24.1</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q4</code> (número de iterações da busca binária)? O vetor é seu <strong>nome ordenado alfabeticamente com os espaços no início</strong>, e a chave é <code>nome[matricula % 10]</code> tirada do nome <strong>ordenado</strong>.</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q4</span>(<span class="kw">char</span> *nome, <span class="kw">int</span> tamanho, <span class="kw">int</span> matricula) {
+    <span class="kw">int</span> inicio = <span class="num">0</span>, meio, fim = tamanho - <span class="num">1</span>, pcont = <span class="num">0</span>;
+    <span class="kw">char</span> chave = nome[matricula % <span class="num">10</span>];
+    <span class="kw">while</span> (inicio &lt;= fim) {
+        pcont++;
+        meio = (inicio + fim) / <span class="num">2</span>;
+        <span class="kw">if</span> (chave == nome[meio]) <span class="kw">break</span>;
+        <span class="kw">else</span> <span class="kw">if</span> (chave &lt; nome[meio]) fim = meio - <span class="num">1</span>;
+        <span class="kw">else</span> inicio = meio + <span class="num">1</span>;
+    }
+    <span class="kw">return</span> pcont;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>nome</code> = "&nbsp;&nbsp;&nbsp;&nbsp;aaaaadeeeiiiilllmoooprsstvv" (seu nome ordenado, 31 chars)</li><li><code>tamanho</code> = 31</li><li><code>matricula</code> = 232037937 → chave = nomeOrdenado[7]</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 1</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) 4</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) 5</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q4">✔ CORRETO — resposta: 2
+
+Passo 1 — a chave:
+  232037937 % 10 = 7 → chave = nomeOrdenado[7]
+  "    aaaaadeee..." → ␣␣␣␣(0-3) a(4) a(5) a(6) a(7)
+  → chave = 'a'
+
+Passo 2 — trace da busca binária (tamanho=31):
+  it1: inicio=0 fim=30 → meio=15 → nome[15]='i'
+       'a' &lt; 'i' → fim = 14
+  it2: inicio=0 fim=14 → meio=7  → nome[7]='a'
+       'a' == 'a' → BREAK!
+
+pcont = 2. A chave caiu exatamente num meio da 2ª
+iteração — coincidência boa de prova. Sempre faça o
+trace, não chute pelo "tamanho do vetor".</div>
+    <div class="quiz-feedback err" id="fb_wrong_q4">✘ ERRADO — resposta certa: b) 2
+
+Trace obrigatório (escreva inicio/fim/meio!):
+
+chave: nomeOrdenado[7] = 'a'
+(ordenado = "␣␣␣␣aaaaadeeeiiiilllmoooprsstvv";
+posições 0-3 são espaços, 4-8 são 'a')
+
+it1: inicio=0, fim=30 → meio=(0+30)/2=15 → 'i'
+     'a' &lt; 'i' → busca à esquerda: fim=14
+it2: inicio=0, fim=14 → meio=7 → nome[7]='a' = chave
+     → break. pcont=2.
+
+5 seria o PIOR caso (⌈log₂ 32⌉). A questão pede o caso
+REAL com a sua chave — tem que tracejar.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">// questão 05</div>
+    <p class="enunciado">Busca binária no vetor com os <strong>dígitos da sua matrícula ordenados</strong>, procurando a chave <code>9</code>. Qual posição é retornada e em quantas iterações?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q5</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> chave) {
+    <span class="kw">int</span> inicio = <span class="num">0</span>, fim = n - <span class="num">1</span>, meio;
+    <span class="kw">while</span> (inicio &lt;= fim) {
+        meio = (inicio + fim) / <span class="num">2</span>;
+        <span class="kw">if</span> (v[meio] == chave) <span class="kw">return</span> meio;
+        <span class="kw">else</span> <span class="kw">if</span> (chave &lt; v[meio]) fim = meio - <span class="num">1</span>;
+        <span class="kw">else</span> inicio = meio + <span class="num">1</span>;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [0,2,2,3,3,3,7,7,9] (dígitos de 232037937 ordenados)</li><li><code>n</code> = 9, <code>chave</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) posição 8, em 2 iterações</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) posição 8, em 3 iterações</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) posição 8, em 4 iterações</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) posição -1 — não encontra</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q5">✔ CORRETO — posição 8, 4 iterações
+
+v = [0,2,2,3,3,3,7,7,9]   (índices 0..8)
+
+it1: inicio=0 fim=8 → meio=4 → v[4]=3
+     9 &gt; 3 → inicio=5
+it2: inicio=5 fim=8 → meio=6 → v[6]=7
+     9 &gt; 7 → inicio=7
+it3: inicio=7 fim=8 → meio=7 → v[7]=7
+     9 &gt; 7 → inicio=8
+it4: inicio=8 fim=8 → meio=8 → v[8]=9 ✔ → return 8
+
+Buscar o MAIOR elemento força a binária a ir sempre
+pra direita — quase pior caso. Note it3: meio=(7+8)/2=7
+(divisão inteira arredonda pra baixo!).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q5">✘ ERRADO — resposta certa: c) posição 8, 4 iterações
+
+O 9 é o último elemento → a busca desce sempre pela
+direita. Trace completo:
+
+it1: meio=(0+8)/2=4, v[4]=3, 9&gt;3 → inicio=5
+it2: meio=(5+8)/2=6, v[6]=7, 9&gt;7 → inicio=7
+it3: meio=(7+8)/2=7, v[7]=7, 9&gt;7 → inicio=8
+it4: meio=(8+8)/2=8, v[8]=9 → achou! return 8
+
+Atenção na it3: (7+8)/2 = 7 em divisão INTEIRA (não 7.5).
+É exatamente aí que se perde uma iteração na conta.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">// questão 06</div>
+    <p class="enunciado">A função abaixo busca <code>'z'</code> no seu nome completo e grava em <code>*comp</code> o número de comparações. O que ela retorna, e qual o valor final de <code>comp</code>?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q6</span>(<span class="kw">char</span> *s, <span class="kw">char</span> chave, <span class="kw">int</span> *comp) {
+    <span class="kw">int</span> p = <span class="num">0</span>;
+    *comp = <span class="num">0</span>;
+    <span class="kw">while</span> (s[p] != <span class="str">'\0'</span>) {
+        (*comp)++;
+        <span class="kw">if</span> (s[p] == chave) <span class="kw">return</span> p;
+        p++;
+    }
+    <span class="kw">return</span> -<span class="num">1</span>;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>s</code> = "italo alves sampaio de oliveira" (31 chars)</li><li><code>chave</code> = 'z' (não existe no seu nome)</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) retorna 0, comp = 31</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) retorna -1, comp = 31</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) retorna -1, comp = 30</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) retorna -1, comp = 32</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q6">✔ CORRETO — retorna -1, comp = 31
+
+'z' não aparece em "italo alves sampaio de oliveira"
+(tem v, mas não z!). O while varre TODAS as posições
+0..30, incrementando comp em cada uma → comp = 31
+(strlen do nome). Sai do loop quando s[31]='\0' e
+retorna -1 (código de "não encontrado").
+
+Pior caso da busca linear = n comparações = O(n).
+O '\0' NÃO conta como comparação de chave — o teste
+s[p]!='\0' é a condição do loop, não o if da chave.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q6">✘ ERRADO — resposta certa: b) retorna -1, comp = 31
+
+Sem 'z' no nome → o if nunca dispara → o while roda até
+s[p]=='\0', visitando os 31 caracteres (índices 0..30).
+(*comp)++ executa 31 vezes → comp = 31.
+Depois do loop: return -1.
+
+30 = esqueceu que o índice 30 ('a' final) também é
+comparado. 32 = contou o '\0' (a condição do while
+barra ANTES de incrementar). 0 = confundiu retorno
+com posição 0.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-q" id="q7">
+    <div class="q-num">// questão 07</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q7</code> buscando o dígito <code>3</code> no vetor dos <strong>dígitos da sua matrícula</strong> (ordem natural)?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q7</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n, <span class="kw">int</span> chave) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">if</span> (v[i] == chave)
+            c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [2,3,2,0,3,7,9,3,7] · <code>n</code> = 9 · <code>chave</code> = 3</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 1 — posição da primeira ocorrência</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) 2</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q7')">c) 3 — total de ocorrências</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 7 — última posição com 3</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q7">✔ CORRETO — resposta: 3
+
+Sem break, sem return dentro do loop, e c++ só quando
+acha → a função CONTA OCORRÊNCIAS.
+
+2 3 2 0 3 7 9 3 7
+  ↑     ↑     ↑     → o dígito 3 aparece 3 vezes
+ (i=1) (i=4) (i=7)
+
+Os 3 sabores de busca linear que a prova mistura:
+• return p no if         → PRIMEIRA ocorrência
+• posic = p (sem break)  → ÚLTIMA ocorrência
+• c++ (sem break)        → CONTAGEM
+Identifique qual é ANTES de tracejar.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q7">✘ ERRADO — resposta certa: c) 3
+
+Olhe a estrutura: c++ dentro do if, sem break/return.
+Isso é CONTADOR de ocorrências, não posição!
+
+Matrícula 232037937 → [2,3,2,0,3,7,9,3,7]
+O dígito 3 está nos índices 1, 4 e 7 → 3 ocorrências.
+
+1 seria o índice da primeira; 7 o da última. A função
+não retorna índice nenhum — retorna o CONTADOR c.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-q" id="q8">
+    <div class="q-num">// questão 08</div>
+    <p class="enunciado">A busca binária <strong>recursiva</strong> abaixo procura a chave <code>2</code> nos dígitos ordenados da sua matrícula. Quantas <strong>chamadas</strong> da função acontecem (incluindo a primeira), e o que ela retorna?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q8</span>(<span class="kw">int</span> v[], <span class="kw">int</span> inicio, <span class="kw">int</span> fim, <span class="kw">int</span> chave) {
+    <span class="kw">if</span> (inicio &gt; fim) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="kw">int</span> meio = (inicio + fim) / <span class="num">2</span>;
+    <span class="kw">if</span> (v[meio] == chave) <span class="kw">return</span> meio;
+    <span class="kw">if</span> (chave &lt; v[meio])
+        <span class="kw">return</span> <span class="fn">Q8</span>(v, inicio, meio - <span class="num">1</span>, chave);
+    <span class="kw">return</span> <span class="fn">Q8</span>(v, meio + <span class="num">1</span>, fim, chave);
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [0,2,2,3,3,3,7,7,9] · chamada: <code>Q8(v, 0, 8, 2)</code></li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'correct','q8')">a) 2 chamadas, retorna 1</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) 2 chamadas, retorna 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) 3 chamadas, retorna 1</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) 4 chamadas, retorna 2</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q8">✔ CORRETO — 2 chamadas, retorna 1
+
+v = [0,2,2,3,3,3,7,7,9]
+
+Chamada 1: Q8(v, 0, 8, 2)
+  meio=(0+8)/2=4 → v[4]=3
+  2 &lt; 3 → Q8(v, 0, 3, 2)
+Chamada 2: Q8(v, 0, 3, 2)
+  meio=(0+3)/2=1 → v[1]=2 ✔ → return 1
+
+Detalhes que decidem: (0+3)/2 = 1 (divisão inteira!) e
+o 2 aparece nos índices 1 E 2 — a binária encontra o
+do índice 1 porque foi o meio calculado. Ela NÃO
+garante achar a primeira ocorrência de duplicados!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q8">✘ ERRADO — resposta certa: a) 2 chamadas, retorna 1
+
+Trace:
+Chamada 1: inicio=0 fim=8 → meio=4 → v[4]=3; 2&lt;3 →
+           recursão à esquerda Q8(v,0,3,2)
+Chamada 2: inicio=0 fim=3 → meio=(0+3)/2=1 (inteira,
+           não 1.5!) → v[1]=2 = chave → return 1
+
+Dois pontos de erro:
+• (0+3)/2 = 1, não 2 — divisão inteira trunca.
+• v tem 2 nos índices 1 e 2; a binária retorna o que
+  cair no meio (1), não necessariamente o primeiro.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-q" id="q9">
+    <div class="q-num">// questão 09</div>
+    <p class="enunciado">No <strong>pior caso</strong>, quantas iterações a busca binária faz num vetor com <strong>31 elementos</strong> (o tamanho do seu nome)? E a busca linear?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) binária: 4 · linear: 31</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) binária: 5 · linear: 31</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) binária: 15 · linear: 31</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) binária: 5 · linear: 16</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q9">✔ CORRETO — binária: 5, linear: 31
+
+Binária: a cada iteração o espaço de busca cai pela
+metade. Com n=31:
+31 → 15 → 7 → 3 → 1 → 0
+São 5 "cortes" até esgotar → no pior caso 5 iterações.
+Fórmula: ⌈log₂(n+1)⌉ = ⌈log₂ 32⌉ = 5. (2⁵ = 32 ≥ 31)
+
+Linear (pior caso = elemento ausente ou no fim):
+visita os 31 elementos → 31 comparações.
+
+5 vs 31 — essa razão explode com n: pra n = 1.000.000,
+binária faz ~20, linear faz 1.000.000.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q9">✘ ERRADO — resposta certa: b) binária: 5, linear: 31
+
+Binária pior caso: quantas vezes 31 cai pela metade
+até virar 0?
+31 → 15 → 7 → 3 → 1 → 0  = 5 cortes → 5 iterações.
+Atalho: menor k com 2^k ≥ n+1 → 2⁵=32 → k=5.
+
+Linear pior caso: varre tudo → 31.
+(16 seria o caso MÉDIO da linear ≈ n/2; 15 é n/2 da
+binária — não é assim que ela funciona.)</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-q" id="q10">
+    <div class="q-num">// questão 10</div>
+    <p class="enunciado">Sobre a <strong>condição necessária</strong> para usar busca binária, marque a alternativa correta:</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) O vetor precisa ter tamanho par, para o meio ser exato</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) O vetor precisa estar ordenado; se não estiver, o resultado é imprevisível</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) O vetor não pode ter elementos repetidos</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) Basta o vetor estar em memória contígua; ordem não importa</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q10">✔ CORRETO
+
+A busca binária DEPENDE da ordenação: ao comparar
+chave &lt; v[meio], ela DESCARTA metade do vetor assumindo
+que tudo à esquerda é menor e tudo à direita é maior.
+Vetor desordenado → o descarte joga fora a metade que
+continha a chave → pode retornar -1 com a chave presente.
+
+Por isso a prova sempre manda ordenar o nome ANTES
+(ex.: "    aaaaadeee...").
+
+Repetidos são permitidos (Q8 desta prova!) — só não há
+garantia de QUAL índice das repetições é retornado.
+Tamanho par/ímpar é irrelevante: divisão inteira resolve.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q10">✘ ERRADO — resposta certa: b)
+
+Pré-requisito ÚNICO e obrigatório: vetor ORDENADO.
+O descarte de metade só é válido se a ordem garante
+"esquerda ≤ meio ≤ direita". Sem ordem, a chave pode
+estar na metade descartada → resultado imprevisível.
+
+Repetidos: permitidos (apenas não se sabe qual índice
+volta). Tamanho ímpar: ok, divisão inteira trunca.
+Memória contígua: vetores em C já são contíguos — isso
+não é a condição da binária.</div>
+  </div>
+
+  <div class="placar" id="placar">
+    <h3>Resultado</h3>
+    <p id="placar-texto">Responda as 10 questões para ver seu placar.</p>
+  </div>
+
+</div>
+
+<footer>
+  Universidade de Brasília — FCTE &nbsp;·&nbsp; EDA &nbsp;·&nbsp;
+  <strong>Esboço de Prova — Algoritmos de Busca</strong> &nbsp;·&nbsp;
+  Gabarito verificado por execução (gabarito_verificacao.c)
+</footer>
+
+<script>
+let acertos = 0, respondidas = 0;
+const TOTAL = 10;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  respondidas++;
+  if (result === 'correct') {
+    acertos++;
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+  const t = document.getElementById('placar-texto');
+  t.textContent = `Acertos: ${acertos}/${respondidas} respondidas (total ${TOTAL})`;
+  if (respondidas === TOTAL) {
+    const pct = Math.round(100 * acertos / TOTAL);
+    t.textContent = `Placar final: ${acertos}/${TOTAL} (${pct}%)` +
+      (pct >= 80 ? ' — Pronto pra prova! ✔' : pct >= 60 ? ' — Quase lá. Revise as erradas.' : ' — Refaça a teoria e tente de novo.');
+  }
+}
+</script>
+</body>
+</html>

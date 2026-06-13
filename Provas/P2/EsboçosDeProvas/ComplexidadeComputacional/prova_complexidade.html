@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova Esboço 01 — Complexidade Computacional · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent2: #f7a26a;
+    --accent3: #6af7c4;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #14101f 0%, #1d1530 50%, #120e1c 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(124,106,247,0.14) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(124,106,247,0.05); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .aluno-box { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .aluno-box span { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-muted); }
+  .aluno-box b { color: var(--accent); font-weight: 600; }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .instrucoes { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 10px; padding: 22px 26px; margin: 36px 0; }
+  .instrucoes-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .instrucoes ul { margin-left: 20px; color: #c8c8e0; }
+  .instrucoes li { margin: 4px 0; }
+
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent3); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .param-box { background: rgba(247,162,106,0.06); border: 1px solid rgba(247,162,106,0.3); border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: .92rem; }
+  .param-box .pb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .param-box ul { margin-left: 20px; margin-bottom: 0; color: #c8c8e0; }
+
+  .quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 30px 0; }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .quiz-q > p.enunciado { font-weight: 500; color: var(--text); margin-bottom: 10px; font-size: 1.02rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .quiz-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; cursor: pointer; font-size: .92rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent3); color: var(--accent3); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 14px; font-size: .88rem; padding: 14px 18px; border-radius: 8px; display: none; line-height: 1.7; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: #9ef7d4; border: 1px solid rgba(106,247,196,0.25); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: #f7a3bd; border: 1px solid rgba(247,106,154,0.3); }
+
+  .placar { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px 30px; margin: 40px 0; text-align: center; }
+  .placar h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 8px; }
+  .placar p { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px 40px;} pre{padding:14px;font-size:12px;} .quiz-q{padding:20px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">FCTE/UnB · EDA · Esboço de Prova 2 — Simulado 01</div>
+    <h1>Prova — <span>Complexidade Computacional</span></h1>
+    <p class="subtitle">10 questões no estilo da prova real: análise de código com seus parâmetros pessoais. Calcule no papel antes de clicar — na prova não tem computador.</p>
+    <div class="aluno-box">
+      <span>Nome: <b>italo alves sampaio de oliveira</b></span>
+      <span>Matrícula: <b>232037937</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="instrucoes">
+    <div class="instrucoes-title">// instruções — leia antes de começar</div>
+    <ul>
+      <li>Sua matrícula é <code>232037937</code> → dígitos <code>[2,3,2,0,3,7,9,3,7]</code> → <strong>9 dígitos</strong>.</li>
+      <li>Últimos dois dígitos: <code>37</code>. Último dígito: <code>7</code>. Penúltimo: <code>3</code>.</li>
+      <li>Seu nome completo tem <strong>31 caracteres</strong> (contando os 4 espaços).</li>
+      <li>Faça o trace no papel, conte iterações linha por linha, só depois clique na alternativa.</li>
+      <li>Errou? Leia a explicação inteira antes de ir para a próxima.</li>
+    </ul>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">// questão 01</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q1</code> ao invocá-la passando o número da sua <strong>matrícula</strong> como parâmetro de entrada?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q1</span>(<span class="kw">int</span> m) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">while</span> (m &gt; <span class="num">0</span>) {
+        c++;
+        m /= <span class="num">10</span>;
+    }
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>m</code> = 232037937 (sua matrícula)</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 8</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) 9</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) 10</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 23</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q1">✔ CORRETO — resposta: 9
+
+O que o código faz: m /= 10 corta o último dígito a cada volta.
+Logo, c conta QUANTOS DÍGITOS m tem.
+
+Trace: 232037937 → 23203793 → 2320379 → 232037 → 23203
+       → 2320 → 232 → 23 → 2 → 0 (para)
+São 9 divisões até zerar → c = 9.
+
+Padrão pra prova: while(m>0){ m/=10; } = "conta dígitos".
+Complexidade: O(log n) — o tamanho do problema cai pela
+metade (na base 10) a cada iteração.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q1">✘ ERRADO — resposta certa: b) 9
+
+m /= 10 remove o último dígito por iteração e c++ conta
+cada remoção. 232037937 tem 9 dígitos → 9 iterações → c=9.
+
+Não confunda: o loop NÃO soma dígitos nem retorna a
+matrícula — só conta quantas vezes dá pra dividir por 10.
+Decore: while(m>0){ c++; m/=10; } retorna nº de dígitos.
+Complexidade O(log n).</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">// questão 02</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q2</code> ao invocá-la passando a <strong>quantidade de dígitos da sua matrícula</strong> como parâmetro?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q2</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++)
+            c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 9 (quantidade de dígitos de 232037937)</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 18</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 72</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q2')">c) 81</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 36</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q2">✔ CORRETO — resposta: 81
+
+Loop duplo COMPLETO: para cada um dos n valores de i,
+o j roda n vezes inteiras (j sempre recomeça de 0).
+
+Total de incrementos = n × n = 9 × 9 = 81.
+
+Esse é o padrão O(n²) clássico. Diferencie do loop
+triangular (j = i+1), que dá n(n-1)/2 — cai na Q4.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q2">✘ ERRADO — resposta certa: c) 81
+
+j começa SEMPRE em 0 (não em i+1!). Então o loop interno
+executa n vezes completas para CADA i.
+
+Total = n × n = 9 × 9 = 81.
+
+18 seria 2n (dois loops sequenciais). 36 seria n(n-1)/2
+(loop triangular com j=i+1). 72 seria n(n-1). Olhe sempre
+ONDE o j começa — é isso que muda a contagem.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">// questão 03</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q3</code> ao invocá-la passando sua <strong>matrícula</strong> como parâmetro?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q3</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; n; i *= <span class="num">2</span>)
+        c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 232037937 (sua matrícula)</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 9</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) 27</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q3')">c) 28</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 29</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q3">✔ CORRETO — resposta: 28
+
+i dobra a cada volta: 1, 2, 4, 8, ..., 2^k.
+O loop conta enquanto i &lt; 232.037.937.
+
+2^27 = 134.217.728  → ainda &lt; 232.037.937 → conta (28ª volta)
+2^28 = 268.435.456  → ≥ 232.037.937 → PARA
+
+i assume os valores 2^0 até 2^27 → são 28 valores → c = 28.
+
+Padrão: loop que dobra = O(log₂ n). A resposta é
+⌈log₂(n)⌉ — pra prova, vá listando potências de 2 até
+passar do número.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q3">✘ ERRADO — resposta certa: c) 28
+
+Loop dobra i: 1,2,4,8,... → executa enquanto 2^k &lt; n.
+
+Liste as potências: 2^27 = 134.217.728 (&lt; matrícula, conta);
+2^28 = 268.435.456 (≥ matrícula, para).
+i percorre 2^0 ... 2^27 → 28 iterações.
+
+9 seria contar dígitos (loop /=10). Erro clássico de ±1:
+confira se a ÚLTIMA potência ainda entra no loop
+(2^27 entra; 2^28 não). Complexidade: O(log n).</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">// questão 04</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q4</code> com <code>n</code> igual à <strong>quantidade de dígitos da sua matrícula</strong>?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q4</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = i + <span class="num">1</span>; j &lt; n; j++)
+            c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 81</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) 45</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) 36</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) 72</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q4">✔ CORRETO — resposta: 36
+
+j começa em i+1 → loop TRIANGULAR. Contagem por i:
+i=0 → j de 1 a 8 → 8 voltas
+i=1 → 7 | i=2 → 6 | i=3 → 5 | i=4 → 4
+i=5 → 3 | i=6 → 2 | i=7 → 1 | i=8 → 0
+
+Soma: 8+7+6+5+4+3+2+1 = 36 = n(n-1)/2 = 9·8/2.
+
+Esse padrão é o nº de comparações do bubble/selection
+sort — guarda a fórmula n(n-1)/2. Continua O(n²).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q4">✘ ERRADO — resposta certa: c) 36
+
+A diferença está em j = i+1 (não j = 0!).
+O loop interno encolhe a cada i:
+i=0→8 voltas, i=1→7, ..., i=8→0.
+Soma = 8+7+...+1 = n(n-1)/2 = 9·8/2 = 36.
+
+81 seria o loop completo (j=0). 45 é n(n+1)/2 (soma de
+1 a 9 — cuidado, aqui é de 1 a 8!). Memorize:
+j=i+1 → n(n-1)/2 pares.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">// questão 05</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q5</code> ao invocá-la passando os <strong>dois últimos dígitos da sua matrícula</strong> como parâmetro?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q5</span>(<span class="kw">int</span> n) {
+    <span class="kw">if</span> (n &lt;= <span class="num">1</span>) <span class="kw">return</span> <span class="num">1</span>;
+    <span class="kw">return</span> <span class="num">1</span> + <span class="fn">Q5</span>(n / <span class="num">2</span>);
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 37 (dois últimos dígitos de 2320379<strong>37</strong>)</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) 5</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) 6</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) 7</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) 37</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q5">✔ CORRETO — resposta: 6
+
+Recursão que divide por 2 (divisão INTEIRA) e soma 1
+por chamada. Trace da pilha:
+
+Q5(37) = 1 + Q5(18)
+Q5(18) = 1 + Q5(9)
+Q5(9)  = 1 + Q5(4)
+Q5(4)  = 1 + Q5(2)
+Q5(2)  = 1 + Q5(1)
+Q5(1)  = 1            ← caso base
+
+Voltando: 1+1+1+1+1+1 = 6.
+
+É o "loop que divide por 2" em versão recursiva →
+O(log n), e o retorno ≈ ⌊log₂ n⌋ + 1.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q5">✘ ERRADO — resposta certa: b) 6
+
+Monte a pilha de chamadas com divisão INTEIRA (37/2=18,
+não 18.5):
+
+37 → 18 → 9 → 4 → 2 → 1(base)
+
+São 5 chamadas recursivas + 1 do caso base = 6 níveis,
+cada um somando 1 → retorno 6.
+
+Erro comum: esquecer que o caso base TAMBÉM retorna 1,
+ou errar 9/2=4 (inteira!). Sempre escreva a pilha inteira.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">// questão 06</div>
+    <p class="enunciado">Qual o valor retornado pela função <code>Q6</code> ao invocá-la passando seu <strong>nome completo em minúsculas</strong> como parâmetro?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q6</span>(<span class="kw">char</span> *s) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; s[i] != <span class="str">'\0'</span>; i++)
+        <span class="kw">if</span> (s[i]==<span class="str">'a'</span>||s[i]==<span class="str">'e'</span>||s[i]==<span class="str">'i'</span>||s[i]==<span class="str">'o'</span>||s[i]==<span class="str">'u'</span>)
+            c += <span class="num">2</span>;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>s</code> = "italo alves sampaio de oliveira"</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 15</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) 31</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q6')">c) 30</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) 62</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q6">✔ CORRETO — resposta: 30
+
+O loop conta vogais, somando 2 POR VOGAL (c += 2).
+
+Vogais palavra por palavra:
+italo    → i, a, o       = 3
+alves    → a, e          = 2
+sampaio  → a, a, i, o    = 4
+de       → e             = 1
+oliveira → o, i, e, i, a = 5
+TOTAL = 15 vogais
+
+Retorno = 15 × 2 = 30.
+
+Na prova: separe por palavra, conte com calma e NÃO
+esqueça do multiplicador (c += 2, não c++).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q6">✘ ERRADO — resposta certa: c) 30
+
+Duas etapas: (1) contar vogais, (2) aplicar o c += 2.
+
+Vogais: italo=3, alves=2, sampaio=4, de=1, oliveira=5
+→ 15 vogais. Como cada vogal soma 2: 15 × 2 = 30.
+
+15 = esqueceu o ×2. 31 = strlen do nome (não é isso que
+o código faz). 62 = strlen × 2 (só vogais contam!).
+Leia o incremento com atenção: c += 2 ≠ c++.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-q" id="q7">
+    <div class="q-num">// questão 07</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q7</code> com <code>n</code> = quantidade de dígitos da sua matrícula? E qual a complexidade da função?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q7</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; n; j++)
+            <span class="kw">for</span> (<span class="kw">int</span> k = <span class="num">0</span>; k &lt; <span class="num">10</span>; k++)
+                c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 729, O(n³)</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 810, O(n²)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 810, O(n³)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 90, O(n²)</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q7">✔ CORRETO — resposta: 810, O(n²)
+
+Valor: n × n × 10 = 9 × 9 × 10 = 810.
+
+Complexidade: o loop de k vai até 10 — uma CONSTANTE,
+não depende de n. Constante multiplicativa é descartada
+no Big-O: O(10·n²) = O(n²).
+
+Pegadinha clássica: 3 fors aninhados ≠ O(n³) automático.
+Só vira n³ se TODOS os limites dependem de n.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q7">✘ ERRADO — resposta certa: b) 810, O(n²)
+
+Valor: i roda 9×, j roda 9× por i, k roda 10× por j
+→ 9 × 9 × 10 = 810. (729 seria 9³ — mas k vai até 10,
+não até n!)
+
+Complexidade: k ≤ 10 é constante → some no Big-O.
+O(n · n · 10) = O(n²).
+
+Regra: conte só os loops cujo limite DEPENDE de n.
+Loop com limite fixo é fator constante → descartado.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-q" id="q8">
+    <div class="q-num">// questão 08</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q8</code> com <code>n</code> = quantidade de dígitos da sua matrícula? E a complexidade?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q8</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n; i++)
+        c++;
+    <span class="kw">for</span> (<span class="kw">int</span> j = <span class="num">0</span>; j &lt; <span class="num">2</span> * n; j++)
+        c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) 18, O(n²)</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) 27, O(n)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) 27, O(n²)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) 81, O(n)</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q8">✔ CORRETO — resposta: 27, O(n)
+
+Os loops são SEQUENCIAIS (um depois do outro), não
+aninhados. Custos SOMAM, não multiplicam:
+
+1º loop: n = 9 voltas
+2º loop: 2n = 18 voltas
+Total: 9 + 18 = 27.
+
+Big-O: O(n + 2n) = O(3n) = O(n) — constante 3 descartada.
+
+Aninhado → multiplica. Sequencial → soma. Esse é O
+critério número 1 de análise de loops.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q8">✘ ERRADO — resposta certa: b) 27, O(n)
+
+Repare na indentação/chaves: o 2º for NÃO está dentro
+do 1º. São dois loops em sequência:
+n + 2n = 9 + 18 = 27.
+
+Sequencial = SOMA (O(n)+O(n)=O(n)).
+Aninhado = MULTIPLICA (O(n)·O(n)=O(n²)).
+81 seria se fossem aninhados 9×9. Sempre confira as
+chaves antes de classificar.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-q" id="q9">
+    <div class="q-num">// questão 09</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q9</code> ao invocá-la com os <strong>dois últimos dígitos da sua matrícula</strong>?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q9</span>(<span class="kw">int</span> n) {
+    <span class="kw">int</span> c = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">1</span>; i &lt; n; i *= <span class="num">3</span>)
+        c++;
+    <span class="kw">return</span> c;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>n</code> = 37</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) 3</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) 4</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) 5</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) 12</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q9">✔ CORRETO — resposta: 4
+
+i TRIPLICA: assume 1, 3, 9, 27 — todos &lt; 37 → 4 voltas.
+Próximo seria 81 ≥ 37 → para.
+
+Generalização: i *= k → O(log_k n) iterações.
+i *= 2 → log₂ | i *= 3 → log₃ | i *= 10 → log₁₀
+(que é o mesmo padrão de contar dígitos da Q1!).
+
+No Big-O a base do log não importa: O(log₃ n) = O(log n).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q9">✘ ERRADO — resposta certa: b) 4
+
+Liste os valores de i: 1, 3, 9, 27 → quatro valores
+abaixo de 37. Em 81 o loop para (81 ≥ 37).
+
+Erro comum: esquecer que i COMEÇA em 1 (1 também conta
+como iteração!) ou parar em 27 achando que são 3.
+Liste TODOS os valores no papel: 1✓ 3✓ 9✓ 27✓ 81✗ = 4.</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-q" id="q10">
+    <div class="q-num">// questão 10</div>
+    <p class="enunciado">Considere as complexidades das questões anteriores. Qual alternativa ordena corretamente do <strong>mais lento crescimento</strong> (melhor) para o <strong>mais rápido crescimento</strong> (pior)?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) O(n) &lt; O(log n) &lt; O(n²) &lt; O(n log n) &lt; O(2ⁿ)</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) O(1) &lt; O(n) &lt; O(log n) &lt; O(n²) &lt; O(n log n) &lt; O(2ⁿ)</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) O(log n) &lt; O(1) &lt; O(n) &lt; O(n²) &lt; O(n log n) &lt; O(2ⁿ)</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q10">✔ CORRETO
+
+Hierarquia que TEM que estar decorada:
+O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(n³) &lt; O(2ⁿ)
+
+Ancore nos exemplos da prova:
+O(1)      → acesso v[i]
+O(log n)  → busca binária / loop que dobra (Q3, Q9)
+O(n)      → busca linear / loop simples (Q8)
+O(n log n)→ merge sort
+O(n²)     → bubble/selection/insertion, loop duplo (Q2, Q4)
+O(2ⁿ)     → fibonacci recursivo ingênuo</div>
+    <div class="quiz-feedback err" id="fb_wrong_q10">✘ ERRADO — resposta certa: b)
+
+Ordem fixa (decore!):
+O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ)
+
+Pontos onde mais se erra:
+• log n cresce MAIS DEVAGAR que n (log₂ de 1.000.000 ≈ 20!)
+• n log n fica ENTRE n e n² (não depois de n²)
+• O(1) é sempre o menor — constante não cresce.
+
+Teste mental com n=1024: log n=10, n=1024,
+n log n≈10.240, n²≈1.000.000. A ordem fica óbvia.</div>
+  </div>
+
+  <div class="placar" id="placar">
+    <h3>Resultado</h3>
+    <p id="placar-texto">Responda as 10 questões para ver seu placar.</p>
+  </div>
+
+</div>
+
+<footer>
+  Universidade de Brasília — FCTE &nbsp;·&nbsp; EDA &nbsp;·&nbsp;
+  <strong>Esboço de Prova — Complexidade Computacional</strong> &nbsp;·&nbsp;
+  Gabarito verificado por execução (gabarito_verificacao.c)
+</footer>
+
+<script>
+let acertos = 0, respondidas = 0;
+const TOTAL = 10;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  respondidas++;
+  if (result === 'correct') {
+    acertos++;
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+  const t = document.getElementById('placar-texto');
+  t.textContent = `Acertos: ${acertos}/${respondidas} respondidas (total ${TOTAL})`;
+  if (respondidas === TOTAL) {
+    const pct = Math.round(100 * acertos / TOTAL);
+    t.textContent = `Placar final: ${acertos}/${TOTAL} (${pct}%)` +
+      (pct >= 80 ? ' — Pronto pra prova! ✔' : pct >= 60 ? ' — Quase lá. Revise as erradas.' : ' — Refaça a teoria e tente de novo.');
+  }
+}
+</script>
+</body>
+</html>

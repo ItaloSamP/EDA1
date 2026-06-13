@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova Esboço 03 — Algoritmos de Ordenação · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1f1408 0%, #2a1c0a 50%, #1a1208 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.13) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(247,162,106,0.05); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .aluno-box { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .aluno-box span { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-muted); }
+  .aluno-box b { color: var(--accent); font-weight: 600; }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .instrucoes { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 10px; padding: 22px 26px; margin: 36px 0; }
+  .instrucoes-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .instrucoes ul { margin-left: 20px; color: #c8c8e0; }
+  .instrucoes li { margin: 4px 0; }
+
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(247,162,106,0.08); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .param-box { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.3); border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: .92rem; }
+  .param-box .pb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .param-box ul { margin-left: 20px; margin-bottom: 0; color: #c8c8e0; }
+
+  .quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 30px 0; }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .quiz-q > p.enunciado { font-weight: 500; color: var(--text); margin-bottom: 10px; font-size: 1.02rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .quiz-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; cursor: pointer; font-size: .92rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 14px; font-size: .88rem; padding: 14px 18px; border-radius: 8px; display: none; line-height: 1.7; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: #9ef7d4; border: 1px solid rgba(106,247,196,0.25); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: #f7a3bd; border: 1px solid rgba(247,106,154,0.3); }
+
+  .placar { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px 30px; margin: 40px 0; text-align: center; }
+  .placar h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 8px; }
+  .placar p { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin: 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px 40px;} pre{padding:14px;font-size:12px;} .quiz-q{padding:20px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">FCTE/UnB · EDA · Esboço de Prova 2 — Simulado 03</div>
+    <h1>Prova — <span>Algoritmos de Ordenação</span></h1>
+    <p class="subtitle">Bubble, insertion e selection sort sobre o seu nome e matrícula — réplica direta do estilo das Q4 e Q5 da prova 24.1. Faça os traces letra por letra.</p>
+    <div class="aluno-box">
+      <span>Nome: <b>italo alves sampaio de oliveira</b></span>
+      <span>Matrícula: <b>232037937</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="instrucoes">
+    <div class="instrucoes-title">// instruções — dados base</div>
+    <ul>
+      <li>Primeiro nome: <code>"italo"</code> (5 letras). Último nome: <code>"oliveira"</code> (8 letras). Sobrenome do meio: <code>"sampaio"</code> (7 letras).</li>
+      <li>Dígitos da matrícula: <code>[2,3,2,0,3,7,9,3,7]</code>.</li>
+      <li>Ordem alfabética: <code>a &lt; e &lt; i &lt; l &lt; m &lt; o &lt; p &lt; r &lt; s &lt; t &lt; v</code> (chars comparam pelo código ASCII).</li>
+      <li>Nas questões de contagem de trocas, escreva o vetor a CADA troca — uma troca esquecida muda a resposta.</li>
+      <li>Atenção redobrada quando <code>tamanho</code> for menor que a string — pegadinha que já caiu (24.1 usou "santos" com 5!).</li>
+    </ul>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">// questão 01 — estilo exato da Q4 da prova 24.1</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q1</code> passando seu <strong>primeiro nome</strong> e a quantidade de letras dele?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q1</span>(<span class="kw">char</span> *vet, <span class="kw">int</span> count) {
+    <span class="kw">int</span> pcont = <span class="num">0</span>;
+    <span class="kw">char</span> aux;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; count; i++)
+        <span class="kw">for</span> (<span class="kw">int</span> j = i+<span class="num">1</span>; j &lt; count; j++)
+            <span class="kw">if</span> (vet[i] &lt; vet[j]) {
+                aux = vet[i]; vet[i] = vet[j]; vet[j] = aux;
+                pcont++;
+            }
+    <span class="kw">return</span> pcont;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>vet</code> = "italo" · <code>count</code> = 5</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 4</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) 5</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) 6</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 10</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q1">✔ CORRETO — resposta: 6
+
+vet[i] &lt; vet[j] + swap → ordena DECRESCENTE.
+Trace completo de "italo":
+
+i=0: j=1 'i'&lt;'t'? SIM → troca → "tialo"  (1)
+     j=2 't'&lt;'a'? não | j=3 't'&lt;'l'? não | j=4 't'&lt;'o'? não
+i=1: j=2 'i'&lt;'a'? não
+     j=3 'i'&lt;'l'? SIM → troca → "tlaio"  (2)
+     j=4 'l'&lt;'o'? SIM → troca → "toail"  (3)
+i=2: j=3 'a'&lt;'i'? SIM → troca → "toial"  (4)
+     j=4 'i'&lt;'l'? SIM → troca → "tolai"  (5)
+i=3: j=4 'a'&lt;'i'? SIM → troca → "tolia"  (6)
+
+pcont = 6. CUIDADO: depois de cada troca, vet[i] MUDA —
+as próximas comparações usam o valor novo!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q1">✘ ERRADO — resposta certa: c) 6
+
+Erro mais comum: esquecer que após a troca, vet[i] tem
+um valor NOVO, e as comparações seguintes do mesmo i
+usam esse valor novo.
+
+Trace: "italo" → tialo(1) → tlaio(2) → toail(3)
+→ toial(4) → tolai(5) → tolia(6).
+
+10 = nº de comparações n(n-1)/2, não de trocas.
+Refaça o trace escrevendo a string após CADA troca.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">// questão 02</div>
+    <p class="enunciado">No código da Q1, qual o <strong>conteúdo final</strong> da string <code>vet</code> após a execução? (Era essa a segunda pergunta da Q4 da 24.1: "qual o valor de nome?")</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) "ailot" — ordem crescente</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) "tolia" — ordem decrescente</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) "italo" — vetor não muda, é cópia</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) "tloia"</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q2">✔ CORRETO — resposta: "tolia"
+
+A condição é vet[i] &lt; vet[j] → troca quando o da
+ESQUERDA é MENOR → os maiores migram pro início →
+ordem DECRESCENTE.
+
+Letras de "italo": a, i, l, o, t
+Decrescente: t &gt; o &gt; l &gt; i &gt; a → "tolia".
+
+E sim, o vetor original MUDA: vet é um ponteiro — a
+função recebe o ENDEREÇO do array da main e mexe nele
+direto (array nunca é copiado em chamada de função em C).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q2">✘ ERRADO — resposta certa: b) "tolia"
+
+Dois pontos:
+1) Sinal da comparação: vet[i] &lt; vet[j] troca quando o
+   maior está à direita → maiores vêm pra frente →
+   DECRESCENTE: "tolia" (t&gt;o&gt;l&gt;i&gt;a).
+   "ailot" seria com vet[i] &gt; vet[j] (crescente).
+2) O array original MUDA — em C, passar array = passar
+   ponteiro. A main vê "tolia" depois da chamada.
+   (Foi pergunta literal da 24.1: "qual o valor de nome?")</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">// questão 03</div>
+    <p class="enunciado">Ainda sobre o código da Q1: qual o <strong>tipo de ordenação</strong> e o <strong>sentido</strong>? (Terceira pergunta da Q4 da 24.1: "qual tipo de ordenação da função?")</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Bubble sort clássico, crescente — compara vizinhos adjacentes</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Ordenação por troca (variação do selection sort), decrescente — compara vet[i] com todos os j&gt;i</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Insertion sort, decrescente — insere cada elemento na posição certa</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Merge sort, crescente — divide e conquista</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q3">✔ CORRETO
+
+Como identificar cada um na prova (assinaturas):
+
+TROCA/SELECTION: for i + for j=i+1 + if(v[i] ? v[j]) swap
+  → compara a posição i com TODAS as seguintes.
+  (selection sort otimizado só troca 1x por i, com min/max;
+   este troca toda hora = "troca direta" / exchange sort)
+
+BUBBLE: if (v[j] &gt; v[j+1]) — compara VIZINHOS adjacentes.
+
+INSERTION: chave = v[i]; while (j&gt;=0 &amp;&amp; v[j] &gt; chave)
+  → desloca e insere.
+
+Sentido: v[i] &lt; v[j] + swap → DECRESCENTE.
+v[i] &gt; v[j] + swap → crescente.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q3">✘ ERRADO — resposta certa: b)
+
+Identifique pela ASSINATURA do código:
+• Bubble compara VIZINHOS: v[j] vs v[j+1]. Aqui não —
+  compara v[i] com v[j] para todo j&gt;i.
+• Insertion tem "chave" + while deslocando. Não tem.
+• Merge é recursivo com divisão. Não é.
+• O código compara a posição i com todas as posteriores
+  e troca → ordenação por TROCA (selection variante).
+
+Sentido: v[i] &lt; v[j] → traz os MAIORES pra frente →
+DECRESCENTE. Decore: o sinal da comparação dita o sentido.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">// questão 04 — estilo exato da Q5 da prova 24.1</div>
+    <p class="enunciado">Qual o valor retornado por <code>Q4</code> passando seu <strong>último nome</strong> ("oliveira") e <code>tamanho</code> = 8?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q4</span>(<span class="kw">char</span> vetor[], <span class="kw">int</span> tamanho) {
+    <span class="kw">int</span> trocas = <span class="num">0</span>, j, i;
+    <span class="kw">char</span> chave;
+    <span class="kw">for</span> (i = <span class="num">1</span>; i &lt; tamanho; i++) {
+        chave = vetor[i];
+        j = i-<span class="num">1</span>;
+        <span class="kw">while</span> (j &gt;= <span class="num">0</span> &amp;&amp; vetor[j] &gt; chave) {
+            vetor[j+<span class="num">1</span>] = vetor[j];
+            j--; trocas++;
+        }
+        vetor[j+<span class="num">1</span>] = chave;
+    }
+    <span class="kw">return</span> trocas;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>vetor</code> = "oliveira" · <code>tamanho</code> = 8</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 14</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) 16</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) 18</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) 28</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q4">✔ CORRETO — resposta: 18
+
+INSERTION SORT: trocas conta DESLOCAMENTOS (cada
+vetor[j+1]=vetor[j]). Trace de "oliveira":
+
+i=1 chave='l': 'o'&gt;'l' desloca(1)        → "loiveira"
+i=2 chave='i': 'o'(2),'l'(3) deslocam     → "iloveira"
+i=3 chave='v': 'o'&gt;'v'? não → 0 desloc.  → "iloveira"
+i=4 chave='e': 'v','o','l','i' (4)=7      → "eilovira"
+i=5 chave='i': 'v','o','l' (3)=10         → "eiilovra"
+i=6 chave='r': 'v' (1)=11                 → "eiilorva"
+i=7 chave='a': TODOS: v,r,o,l,i,i,e (7)=18→ "aeiilorv"
+
+Total: 1+2+0+4+3+1+7 = 18.
+O 'a' no final é o pior elemento possível: atravessa
+a string inteira (7 deslocamentos).</div>
+    <div class="quiz-feedback err" id="fb_wrong_q4">✘ ERRADO — resposta certa: c) 18
+
+Conte os deslocamentos por iteração (i = 1 a 7):
+
+chave 'l'→1 | 'i'→2 | 'v'→0 | 'e'→4 | 'i'→3 | 'r'→1
+| 'a'→7 (o 'a' final passa por cima de TUDO)
+
+1+2+0+4+3+1+7 = 18. String final: "aeiilorv".
+
+Erros típicos: esquecer que 'v' não desloca nada (já
+está no lugar), ou subcontar o 'a' final — ele desloca
+as 7 letras anteriores. Faça o trace completo, i por i.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">// questão 05 — pegadinha que caiu na 24.1</div>
+    <p class="enunciado">Mesmo código da Q4, agora com <code>vetor</code> = "sampaio" e <code>tamanho</code> = <strong>6</strong> (menor que o nº de letras — igual à 24.1, que passou "santos" com 5!). Quantas trocas, e qual a string final?</p>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>vetor</code> = "sampaio" (7 letras!) · <code>tamanho</code> = 6</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) 11 trocas, "aaimops" — ordena tudo</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) 9 trocas, "aaimpso" — o 'o' final fica fora</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) 9 trocas, "aaimops"</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) 6 trocas, "aamspio"</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q5">✔ CORRETO — 9 trocas, "aaimpso"
+
+A PEGADINHA: tamanho=6 → o for vai de i=1 a i=5 →
+só ordena os índices 0..5 = "sampai". O 'o' (índice 6)
+NUNCA é tocado!
+
+Trace de "sampai" dentro de "sampaio":
+i=1 chave='a': 's' desloca (1)      → "asmpaio"
+i=2 chave='m': 's' desloca (2)      → "amspaio"
+i=3 chave='p': 's' desloca (3)      → "ampsaio"
+i=4 chave='a': s,p,m deslocam (6)   → "aampsio"
+i=5 chave='i': s,p,m deslocam (9)   → "aaimpso"
+
+Resultado: "aaimps" ordenado + 'o' intocado = "aaimpso".
+SEMPRE confira se tamanho == strlen — a prova adora
+passar tamanho menor.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q5">✘ ERRADO — resposta certa: b) 9 trocas, "aaimpso"
+
+Releia os parâmetros: "sampaio" tem 7 letras, mas
+tamanho = 6! O loop for(i=1; i&lt;6; i++) só processa os
+índices 0..5 ("sampai"). O 'o' do índice 6 fica
+EXATAMENTE onde estava.
+
+Ordenando "sampai": a,a,i,m,p,s → "aaimps".
+Com o 'o' parado no fim: "aaimpso". Deslocamentos:
+1+1+1+3+3 = 9.
+
+Na 24.1 foi idêntico: "santos" com tamanho 5 — o 's'
+final ficou de fora. Confira tamanho vs string SEMPRE.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">// questão 06</div>
+    <p class="enunciado">O bubble sort abaixo (com flag) recebe os <strong>dígitos da sua matrícula já ordenados</strong>: [0,2,2,3,3,3,7,7,9]. Quantas <strong>passadas</strong> (voltas do while) ele executa?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q6</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> passes = <span class="num">0</span>, trocou = <span class="num">1</span>, aux;
+    <span class="kw">while</span> (trocou) {
+        trocou = <span class="num">0</span>;
+        passes++;
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n-<span class="num">1</span>; i++)
+            <span class="kw">if</span> (v[i] &gt; v[i+<span class="num">1</span>]) {
+                aux = v[i]; v[i] = v[i+<span class="num">1</span>]; v[i+<span class="num">1</span>] = aux;
+                trocou = <span class="num">1</span>;
+            }
+    }
+    <span class="kw">return</span> passes;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [0,2,2,3,3,3,7,7,9] (já ordenado!) · <code>n</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 0 — não precisa ordenar</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) 1 — uma passada de verificação</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) 8 — sempre n-1 passadas</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) 9 — uma por elemento</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q6">✔ CORRETO — resposta: 1
+
+O while só roda enquanto trocou==1. Na 1ª passada:
+v já está ordenado → nenhum v[i] &gt; v[i+1] → nenhuma
+troca → trocou permanece 0 → while encerra.
+
+passes = 1. O algoritmo PRECISA dessa passada para
+DESCOBRIR que está ordenado — não existe "0 passadas".
+
+É isso que faz o melhor caso do bubble com flag ser
+O(n): uma única varredura. Sem a flag, seria O(n²)
+mesmo com tudo ordenado.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q6">✘ ERRADO — resposta certa: b) 1
+
+0 é impossível: trocou inicia em 1, então o while
+SEMPRE executa ao menos uma vez. Nessa primeira
+passada o vetor já está ordenado → zero trocas →
+trocou fica 0 → para. Total: 1 passada.
+
+n-1 passadas é o PIOR caso (vetor invertido), não o
+melhor. A flag "trocou" é justamente a otimização que
+detecta vetor pronto em UMA passada → melhor caso O(n).</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-q" id="q7">
+    <div class="q-num">// questão 07</div>
+    <p class="enunciado">O selection sort abaixo (troca só quando necessário) ordena os <strong>dígitos da sua matrícula</strong> [2,3,2,0,3,7,9,3,7]. Quantas <strong>trocas efetivas</strong> ele faz?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q7</span>(<span class="kw">int</span> v[], <span class="kw">int</span> n) {
+    <span class="kw">int</span> trocas = <span class="num">0</span>, min, aux;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n-<span class="num">1</span>; i++) {
+        min = i;
+        <span class="kw">for</span> (<span class="kw">int</span> j = i+<span class="num">1</span>; j &lt; n; j++)
+            <span class="kw">if</span> (v[j] &lt; v[min]) min = j;
+        <span class="kw">if</span> (min != i) {
+            aux = v[i]; v[i] = v[min]; v[min] = aux;
+            trocas++;
+        }
+    }
+    <span class="kw">return</span> trocas;
+}</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [2,3,2,0,3,7,9,3,7] · <code>n</code> = 9</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 8 — sempre n-1 trocas</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 6</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 9</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 36</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q7">✔ CORRETO — resposta: 6
+
+Selection: acha o MENOR do trecho [i..n-1] e troca com
+v[i] — no máximo 1 troca por i. O if(min!=i) PULA a
+troca quando o menor já está no lugar.
+
+Trace ([2,3,2,0,3,7,9,3,7]):
+i=0: menor=0 (idx 3) ≠ 0 → troca → [0,3,2,2,3,7,9,3,7] (1)
+i=1: menor=2 (idx 2) ≠ 1 → troca → [0,2,3,2,3,7,9,3,7] (2)
+i=2: menor=2 (idx 3) ≠ 2 → troca → [0,2,2,3,3,7,9,3,7] (3)
+i=3: menor=3 (idx 3) = i → NÃO troca
+i=4: menor=3 (idx 4) = i → NÃO troca
+i=5: menor=3 (idx 7) ≠ 5 → troca → [0,2,2,3,3,3,9,7,7] (4)
+i=6: menor=7 (idx 7) ≠ 6 → troca → [0,2,2,3,3,3,7,9,7] (5)
+i=7: menor=7 (idx 8) ≠ 7 → troca → [0,2,2,3,3,3,7,7,9] (6)
+
+6 trocas. Selection faz POUCAS trocas (≤ n-1), mas
+SEMPRE n(n-1)/2 = 36 comparações.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q7">✘ ERRADO — resposta certa: b) 6
+
+O if(min != i) evita trocas desnecessárias: quando o
+menor do trecho já está na posição i, não conta troca.
+Isso acontece 2 vezes (i=3 e i=4, onde o 3 já estava
+no lugar) → 8 possíveis − 2 puladas = 6 trocas.
+
+36 é o nº de COMPARAÇÕES (n(n-1)/2) — o enunciado pede
+TROCAS. Diferencie sempre: selection = muitas
+comparações, poucas trocas.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-q" id="q8">
+    <div class="q-num">// questão 08</div>
+    <p class="enunciado">Após <strong>UMA passada completa</strong> do bubble sort (crescente, comparando vizinhos) nos dígitos da sua matrícula [2,3,2,0,3,7,9,3,7], qual o estado do vetor?</p>
+    <pre><code><span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; n-<span class="num">1</span>; i++)
+    <span class="kw">if</span> (v[i] &gt; v[i+<span class="num">1</span>]) {
+        aux = v[i]; v[i] = v[i+<span class="num">1</span>]; v[i+<span class="num">1</span>] = aux;
+    }</code></pre>
+    <div class="param-box"><div class="pb-title">parâmetros</div><ul><li><code>v</code> = [2,3,2,0,3,7,9,3,7] · <code>n</code> = 9 · apenas 1 passada</li></ul></div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) [0,2,2,3,3,3,7,7,9] — já ordena tudo</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) [2,2,0,3,3,7,3,7,9] — o 9 chega ao fim</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) [2,3,2,0,3,7,3,7,9]</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) [0,2,3,2,3,7,9,3,7] — o 0 vai pro início</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q8">✔ CORRETO — [2,2,0,3,3,7,3,7,9]
+
+Trace da passada (compara pares vizinhos, esq→dir):
+[2,3,2,0,3,7,9,3,7]
+i=0: 2&gt;3? não
+i=1: 3&gt;2? SIM → [2,2,3,0,3,7,9,3,7]
+i=2: 3&gt;0? SIM → [2,2,0,3,3,7,9,3,7]
+i=3: 3&gt;3? não
+i=4: 3&gt;7? não
+i=5: 7&gt;9? não
+i=6: 9&gt;3? SIM → [2,2,0,3,3,7,3,9,7]
+i=7: 9&gt;7? SIM → [2,2,0,3,3,7,3,7,9]
+
+Propriedade do bubble: a cada passada, o MAIOR
+elemento do trecho "borbulha" até o FIM (o 9 chegou).
+O menor (0) anda só 1 casa por passada para a esquerda.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q8">✘ ERRADO — resposta certa: b) [2,2,0,3,3,7,3,7,9]
+
+Uma passada do bubble NÃO ordena tudo — ela garante
+apenas que o MAIOR elemento chega ao fim (o 9
+"borbulha" sendo trocado em sequência).
+
+O 0 NÃO vai pro início em uma passada: ele se move no
+máximo 1 posição à esquerda por passada (quando o
+vizinho da esquerda é maior).
+
+Trace par a par: 2-3 ok | 3-2 troca | 3-0 troca |
+3-3 ok | 3-7 ok | 7-9 ok | 9-3 troca | 9-7 troca
+→ [2,2,0,3,3,7,3,7,9].</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz-q" id="q9">
+    <div class="q-num">// questão 09</div>
+    <p class="enunciado">Sobre as complexidades dos algoritmos de ordenação, marque a alternativa <strong>correta</strong>:</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) Bubble, insertion e selection são O(n log n) no pior caso</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) Merge sort é O(n log n) em todos os casos; bubble/insertion/selection são O(n²) no pior caso</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) Selection sort melhora para O(n) quando o vetor já está ordenado</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) Insertion sort é O(n²) inclusive no melhor caso</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q9">✔ CORRETO
+
+Tabela que cai SEMPRE:
+
+            melhor      médio       pior
+bubble*     O(n)        O(n²)       O(n²)
+insertion   O(n)        O(n²)       O(n²)
+selection   O(n²)       O(n²)       O(n²)
+merge       O(n log n)  O(n log n)  O(n log n)
+* bubble com flag
+
+Pontos finos:
+• SELECTION é O(n²) ATÉ NO MELHOR CASO — ele sempre
+  varre tudo procurando o mínimo (Q7: 36 comparações).
+• INSERTION no melhor caso (ordenado) é O(n): só
+  compara cada chave com o vizinho e não desloca.
+• MERGE é o único garantido O(n log n) sempre.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q9">✘ ERRADO — resposta certa: b)
+
+Memorize:
+• Quadráticos no pior caso: bubble, insertion,
+  selection → O(n²).
+• Merge sort: O(n log n) SEMPRE (melhor, médio, pior).
+
+Detalhes que derrubam:
+• Selection NÃO melhora com vetor ordenado — as
+  n(n-1)/2 comparações acontecem de qualquer jeito
+  → O(n²) até no melhor caso (letra c é falsa).
+• Insertion TEM melhor caso O(n) (vetor ordenado:
+  nenhum deslocamento) → letra d é falsa.</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz-q" id="q10">
+    <div class="q-num">// questão 10</div>
+    <p class="enunciado">O insertion sort da Q4 recebe um vetor <strong>já ordenado</strong> de tamanho n. Quantos <strong>deslocamentos</strong> (trocas) ele faz, e quantas <strong>comparações</strong> <code>vetor[j] &gt; chave</code>?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) n−1 deslocamentos e n−1 comparações</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) 0 deslocamentos e n−1 comparações</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) 0 deslocamentos e 0 comparações</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) n(n−1)/2 deslocamentos e n(n−1)/2 comparações</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q10">✔ CORRETO — 0 deslocamentos, n−1 comparações
+
+Vetor ordenado: para cada i (de 1 a n−1), a chave já é
+≥ vetor[i−1]. O while testa vetor[j] &gt; chave UMA vez,
+dá falso, e nem entra no corpo:
+
+• comparações: 1 por i → n−1 no total
+• deslocamentos: 0
+
+Por isso o melhor caso do insertion é O(n) — ele é o
+algoritmo ideal pra vetor "quase ordenado". É também o
+motivo de trocas=0 não significar "não rodou": ele
+PERCORREU o vetor todo verificando.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q10">✘ ERRADO — resposta certa: b)
+
+Com vetor ordenado, a condição vetor[j] &gt; chave é
+FALSA logo na primeira verificação de cada i → o while
+não executa o corpo → 0 deslocamentos.
+
+Mas a COMPARAÇÃO acontece: uma por iteração do for
+(n−1 vezes). Não é 0 comparações — o algoritmo precisa
+checar pra saber que não desloca.
+
+n(n−1)/2 seria o PIOR caso (vetor invertido), onde
+cada chave atravessa todo o trecho ordenado.</div>
+  </div>
+
+  <div class="placar" id="placar">
+    <h3>Resultado</h3>
+    <p id="placar-texto">Responda as 10 questões para ver seu placar.</p>
+  </div>
+
+</div>
+
+<footer>
+  Universidade de Brasília — FCTE &nbsp;·&nbsp; EDA &nbsp;·&nbsp;
+  <strong>Esboço de Prova — Algoritmos de Ordenação</strong> &nbsp;·&nbsp;
+  Gabarito verificado por execução (gabarito_verificacao.c)
+</footer>
+
+<script>
+let acertos = 0, respondidas = 0;
+const TOTAL = 10;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  respondidas++;
+  if (result === 'correct') {
+    acertos++;
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+  const t = document.getElementById('placar-texto');
+  t.textContent = `Acertos: ${acertos}/${respondidas} respondidas (total ${TOTAL})`;
+  if (respondidas === TOTAL) {
+    const pct = Math.round(100 * acertos / TOTAL);
+    t.textContent = `Placar final: ${acertos}/${TOTAL} (${pct}%)` +
+      (pct >= 80 ? ' — Pronto pra prova! ✔' : pct >= 60 ? ' — Quase lá. Revise as erradas.' : ' — Refaça a teoria e tente de novo.');
+  }
+}
+</script>
+</body>
+</html>
