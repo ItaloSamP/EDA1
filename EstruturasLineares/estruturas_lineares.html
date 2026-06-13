@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estruturas Lineares — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --accent5: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2a1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'Nó*'; position: absolute; right: 50px; top: 10px;
+    font-size: 200px; font-family: 'Fraunces', serif;
+    color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 620px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-green  { color: var(--accent); border-color: var(--accent); background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-purple { color: #7c6af7; border-color: #7c6af7; background: rgba(124,106,247,0.08); }
+  .badge-yellow { color: var(--yellow); border-color: var(--yellow); background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent3); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.purple { border-left-color: #7c6af7; }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(106,247,196,0.07), rgba(247,162,106,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '\26A0 '; color: var(--accent4); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '\1F4A1 '; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent3); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Nilton Correia da Silva</div>
+    <h1>Estruturas <span>Lineares</span></h1>
+    <p class="subtitle">Lista sequencial, lista simplesmente encadeada, lista duplamente encadeada e lista circular — conceitos, TADs e operações</p>
+    <div class="badge-row">
+      <span class="badge badge-green">Lista Sequencial</span>
+      <span class="badge badge-orange">S. Encadeada</span>
+      <span class="badge badge-pink">D. Encadeada</span>
+      <span class="badge badge-purple">Circular</span>
+      <span class="badge badge-yellow">TAD</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Listas lineares — visão geral</a></li>
+      <li><a href="#sec2">Lista sequencial (estática)</a></li>
+      <li><a href="#sec3">Lista simplesmente encadeada</a></li>
+      <li><a href="#sec4">Lista duplamente encadeada</a></li>
+      <li><a href="#sec5">Lista circular</a></li>
+      <li><a href="#sec6">Tabela comparativa</a></li>
+      <li><a href="#sec7">Exercícios de fixação</a></li>
+    </ol>
+  </nav>
+
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Listas lineares — <span style="color:var(--accent)">visão geral</span></h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Uma lista linear é como um vagão de trem: cada elemento tem um antecessor (exceto o primeiro) e um sucessor (exceto o último). A diferença entre os tipos de lista está em <strong>como</strong> a relação entre elementos é mantida na memória — contiguamente (vetor) ou através de ponteiros (nós).</p>
+    </div>
+
+    <p>Uma <strong>lista linear</strong> é uma sequência finita de elementos onde a ordem é determinada pela posição. As operações fundamentais de qualquer lista incluem:</p>
+    <ul style="color:#c8c8e0; margin-left:20px; margin-bottom:14px;">
+      <li><strong>Inserção</strong> — em qualquer posição</li>
+      <li><strong>Remoção</strong> — por valor ou por posição</li>
+      <li><strong>Busca</strong> — localizar um elemento</li>
+      <li><strong>Percorrimento</strong> — visitar todos os elementos</li>
+    </ul>
+
+    <p>Quatro formas de implementar listas lineares são estudadas: <strong>sequencial (estática)</strong>, <strong>simplesmente encadeada</strong>, <strong>duplamente encadeada</strong> e <strong>circular</strong>.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Lista sequencial <span style="color:var(--accent)">(estática)</span></h2>
+
+    <p>Elementos armazenados em <strong>posições consecutivas de memória</strong> (vetor). O acesso é direto via índice — O(1). A desvantagem é o tamanho fixo (alocação estática).</p>
+
+    <div class="concept-card green">
+      <p><strong>TAD — Tipo Abstrato de Dados:</strong> Uma lista sequencial é definida por um vetor de tamanho máximo <code>MAX</code> e um inteiro <code>n</code> que controla quantos elementos estão efetivamente armazenados.</p>
+    </div>
+
+    <div class="code-label">estrutura da lista sequencial — C</div>
+    <pre><code><span class="cmt">// Estruturas de dados: definições das listas</span>
+<span class="kw">#define</span> MAX <span class="num">100</span>
+
+<span class="kw">struct</span> <span class="tp">lista</span> {
+    <span class="kw">int</span> v[MAX];   <span class="cmt">// vetor com os elementos</span>
+    <span class="kw">int</span> n;         <span class="cmt">// número de elementos armazenados</span>
+};
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">lista</span> <span class="tp">Lista</span>;</code></pre>
+
+    <p><strong>Operações principais:</strong></p>
+    <ul style="color:#c8c8e0; margin-left:20px; margin-bottom:14px;">
+      <li><code>criar()</code> — aloca a lista e inicializa <code>n = 0</code></li>
+      <li><code>inserir(x, p)</code> — insere o elemento <code>x</code> na posição <code>p</code>, deslocando os seguintes</li>
+      <li><code>remover(p)</code> — remove o elemento na posição <code>p</code>, deslocando os seguintes</li>
+      <li><code>buscar(valor)</code> — percorre o vetor procurando o valor</li>
+    </ul>
+
+    <div class="code-label">inserção na lista sequencial — C</div>
+    <pre><code><span class="kw">int</span> <span class="fn">inserir</span>(<span class="tp">Lista</span> *l, <span class="kw">int</span> x, <span class="kw">int</span> p) {
+    <span class="kw">if</span> (l-&gt;n == MAX || p &lt; <span class="num">0</span> || p &gt; l-&gt;n)
+        <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// falha</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = l-&gt;n; i &gt; p; i--)
+        l-&gt;v[i] = l-&gt;v[i - <span class="num">1</span>];
+    l-&gt;v[p] = x;
+    l-&gt;n++;
+    <span class="kw">return</span> <span class="num">1</span>; <span class="cmt">// sucesso</span>
+}</code></pre>
+
+    <div class="diagram">  Lista: [10, 20, 30, 40, 50], n=5, MAX=10
+  Inserir 25 na posição 3:
+    Desloca: 50→[4], 40→[3]
+    Insere: [10, 20, 30, 25, 40, 50], n=6</div>
+
+    <div class="concept-card orange">
+      <p><strong>Complexidade:</strong> Acesso O(1) | Inserção/remoção no início O(n) | Inserção/remoção no fim O(1) | Busca O(n)</p>
+      <p>O deslocamento de elementos é o custo principal. Inserir no início exige deslocar todos os n elementos. Inserir no fim é O(1) se houver espaço.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Lista simplesmente <span style="color:var(--accent)">encadeada</span></h2>
+
+    <p>Os elementos (nós) são <strong>alocados dinamicamente</strong> e ligados por ponteiros. Cada nó contém o dado e um ponteiro para o <strong>próximo</strong> nó. A lista é referenciada pelo ponteiro para o primeiro nó (<code>inicio</code> ou <code>head</code>).</p>
+
+    <div class="concept-card pink">
+      <p><strong>Vantagem:</strong> Tamanho dinâmico — cresce e diminui conforme necessário. Inserção e remoção não exigem deslocamento de elementos.</p>
+      <p><strong>Desvantagem:</strong> Acesso sequencial — para chegar ao nó na posição p, é preciso percorrer desde o início.</p>
+    </div>
+
+    <div class="code-label">estrutura do nó — C</div>
+    <pre><code><span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>           info;    <span class="cmt">// dado armazenado</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;     <span class="cmt">// ponteiro para o próximo nó</span>
+};
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> <span class="tp">No</span>;</code></pre>
+
+    <div class="code-label">inserção no início — C</div>
+    <pre><code><span class="cmt">/* Insere 'valor' no início da lista apontada por *l */</span>
+<span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = *l;   <span class="cmt">// aponta para o antigo primeiro</span>
+    *l = novo;           <span class="cmt">// atualiza o início</span>
+}</code></pre>
+
+    <div class="diagram">  Representação gráfica:
+  [info | prox] → [info | prox] → [info | prox] → NULL
+       ↑
+     inicio
+
+  Inserir 5 no início:
+  [5 | *] → [10 | *] → [20 | *] → [30 | NULL]
+       ↑
+     inicio</div>
+
+    <div class="code-label">remoção de um valor — C</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *ant = <span class="kw">NULL</span>, *atu = *l;
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor) {
+        ant = atu;
+        atu = atu-&gt;prox;
+    }
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>; <span class="cmt">// não encontrado</span>
+    <span class="kw">if</span> (ant == <span class="kw">NULL</span>)         <span class="cmt">// remoção do primeiro</span>
+        *l = atu-&gt;prox;
+    <span class="kw">else</span>                      <span class="cmt">// remoção do meio/fim</span>
+        ant-&gt;prox = atu-&gt;prox;
+    <span class="fn">free</span>(atu);
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Complexidade:</strong> Acesso O(n) | Inserção/remoção no início O(1) | Inserção/remoção no fim O(n) | Busca O(n)</p>
+      <p>A grande vantagem da lista encadeada é a inserção e remoção no início serem O(1), sem necessidade de realocar ou deslocar dados.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Lista duplamente <span style="color:var(--accent)">encadeada</span></h2>
+
+    <p>Cada nó possui <strong>dois ponteiros</strong>: <code>ant</code> (para o nó anterior) e <code>prox</code> (para o próximo). Isso permite percorrer a lista nos dois sentidos e simplifica operações como remoção de um nó conhecido.</p>
+
+    <div class="code-label">estrutura do nó — C</div>
+    <pre><code><span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>           info;
+    <span class="kw">struct</span> <span class="tp">no</span> *ant;  <span class="cmt">// ponteiro para o anterior</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;  <span class="cmt">// ponteiro para o próximo</span>
+};
+
+<span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> <span class="tp">No</span>;</code></pre>
+
+    <div class="diagram">  Representação:
+  NULL ← [ant|info|prox] ↔ [ant|info|prox] ↔ [ant|info|prox] → NULL
+               ↑
+             inicio</div>
+
+    <div class="code-label">inserção no início — C</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;ant  = <span class="kw">NULL</span>;
+    novo-&gt;prox = *l;
+    <span class="kw">if</span> (*l != <span class="kw">NULL</span>)
+        (*l)-&gt;ant = novo;
+    *l = novo;
+}</code></pre>
+
+    <div class="code-label">remoção de um valor — C</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *atu = *l;
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor)
+        atu = atu-&gt;prox;
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;
+
+    <span class="kw">if</span> (atu-&gt;ant != <span class="kw">NULL</span>)
+        atu-&gt;ant-&gt;prox = atu-&gt;prox;
+    <span class="kw">else</span>
+        *l = atu-&gt;prox;    <span class="cmt">// remove o primeiro</span>
+
+    <span class="kw">if</span> (atu-&gt;prox != <span class="kw">NULL</span>)
+        atu-&gt;prox-&gt;ant = atu-&gt;ant;
+
+    <span class="fn">free</span>(atu);
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Complexidade:</strong> Acesso O(n) | Inserção/remoção no início O(1) | Inserção/remoção no fim O(1) (com ponteiro para o fim) | Busca O(n)</p>
+      <p>A dupla ligação permite remover um nó sem precisar do nó anterior, e mantendo o ponteiro para o fim, a inserção no final também é O(1).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Lista <span style="color:var(--accent)">circular</span></h2>
+
+    <p>Em uma lista circular, o <strong>último nó aponta de volta para o primeiro</strong>, formando um ciclo. Pode ser implementada tanto sobre uma lista simplesmente encadeada quanto sobre uma duplamente encadeada.</p>
+
+    <div class="diagram">  Circular simplesmente encadeada:
+  [info|prox] → [info|prox] → [info|prox] ←┐
+  └──────────────────────────────────────────┘
+
+  Circular duplamente encadeada:
+  ┌──────────────────────────────────────────────┐
+  ↓ ant                                          │ prox
+  [ant|info|prox] ↔ [ant|info|prox] ↔ [ant|info|prox]
+  ↑ prox                                          │ ant
+  └──────────────────────────────────────────────┘</div>
+
+    <div class="concept-card yellow">
+      <p><strong>Características:</strong></p>
+      <ul style="color:#c8c8e0; margin-left:20px; margin-bottom:0;">
+        <li>Não há <code>NULL</code> nos ponteiros — o último <code>prox</code> aponta para o primeiro</li>
+        <li>A partir de qualquer nó, é possível percorrer a lista inteira</li>
+        <li>O percorrimento deve tomar cuidado para não entrar em loop infinito — é necessário um critério de parada</li>
+        <li>Útil para aplicações como escalonamento circular (round-robin), buffers circulares, jogos de turnos</li>
+      </ul>
+    </div>
+
+    <div class="code-label">percorrimento de lista circular — C</div>
+    <pre><code><span class="cmt">/* Percorre uma lista circular, parando quando
+ * retorna ao nó inicial */</span>
+<span class="kw">void</span> <span class="fn">percorrer</span>(<span class="tp">No</span> *inicio) {
+    <span class="kw">if</span> (inicio == <span class="kw">NULL</span>) <span class="kw">return</span>;
+    <span class="tp">No</span> *atu = inicio;
+    <span class="kw">do</span> {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, atu-&gt;info);
+        atu = atu-&gt;prox;
+    } <span class="kw">while</span> (atu != inicio);
+}</code></pre>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">listas lineares</span></h2>
+
+    <table>
+      <thead><tr><th>Critério</th><th>Sequencial</th><th>S. Encadeada</th><th>D. Encadeada</th><th>Circular</th></tr></thead>
+      <tbody>
+        <tr><td>Acesso</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Inserção início</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Inserção fim</td><td>O(1)*</td><td>O(n)</td><td>O(1)**</td><td>O(1)</td></tr>
+        <tr><td>Remoção início</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Remoção fim</td><td>O(1)</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Busca</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Tamanho</td><td>Fixo</td><td>Dinâmico</td><td>Dinâmico</td><td>Dinâmico</td></tr>
+        <tr><td>Memória extra</td><td>Nenhuma</td><td>1 ponteiro/nó</td><td>2 ponteiros/nó</td><td>1 ou 2 ptr/nó</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size:0.85rem; color:var(--text-muted);">* O(1) apenas se houver espaço no vetor. ** O(1) com ponteiro para o último nó.</p>
+
+    <div class="concept-card green">
+      <p><strong>Resumo prático:</strong> Use lista sequencial quando o tamanho for conhecido e o acesso aleatório for frequente. Use lista encadeada quando houver muitas inserções/remoções e o tamanho for imprevisível. A dupla ligação é útil quando é necessário percorrer nos dois sentidos. A lista circular é ideal para aplicações que precisam de iteração contínua.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Exercícios de fixação</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Quiz rápido</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual a complexidade de inserir um elemento no início da lista sequencial?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) O(n²)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent2)">✔ Correto! Inserir no início exige deslocar todos os n elementos uma posição à direita — O(n).</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent4)">✘ Na lista sequencial, inserir no início exige deslocar todos os elementos — O(n).</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Qual a principal vantagem de uma lista duplamente encadeada sobre uma simplesmente encadeada?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) Usa menos memória</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) Permite percorrer nos dois sentidos e remover um nó conhecido sem o anterior</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) Acesso aleatório O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) Não precisa de ponteiros</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent2)">✔ Exato! O ponteiro <code>ant</code> permite navegação bidirecional e remoção direta de um nó.</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent4)">✘ A dupla ligação permite percorrer nos dois sentidos e remover um nó conhecido sem precisar do nó anterior.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Em uma lista circular, como identificar que todos os nós foram percorridos?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Quando o ponteiro for NULL</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Quando o nó atual aponta de volta para o primeiro nó</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Quando o nó atual não tem sucessor</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Não é possível — a lista é infinita</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent2)">✔ Correto! Na lista circular, o último nó aponta para o primeiro. O percorrimento usa um <code>do-while</code> comparando com o nó inicial.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent4)">✘ Em uma lista circular, não há NULL. O percorrimento é feito até retornar ao nó de partida.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Qual estrutura é mais adequada para uma aplicação com muitas inserções e remoções no início e tamanho imprevisível?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) Lista sequencial</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) Lista simplesmente encadeada</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Não há diferença significativa</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Nenhuma das anteriores</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent2)">✔ Sim! A lista encadeada tem inserção/remoção no início O(1) e tamanho dinâmico — ideal para este cenário.</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent4)">✘ Lista sequencial exige deslocamento O(n) no início e tem tamanho fixo. Lista encadeada é a melhor escolha.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Estruturas Lineares</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>

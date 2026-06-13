@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria — Estruturas Lineares para a Prova · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #f7a26a;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2a1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-green  { color: var(--accent);  border-color: var(--accent);  background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent2); border-color: var(--accent2); background: rgba(247,162,106,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  h4 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; color: var(--accent); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  ul, ol { color: #c8c8e0; margin-left: 22px; margin-bottom: 14px; }
+  li { margin: 5px 0; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.orange { border-left-color: var(--accent2); }
+  .concept-card.purple { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.35); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pegadinha-box { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.05)); border: 1px solid rgba(247,106,154,0.3); border-radius: 12px; padding: 24px 28px; margin: 28px 0; }
+  .pegadinha-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .trace-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+  .trace-header { background: rgba(106,247,196,0.08); padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+  .trace-body { padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent); color: var(--accent); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 6px; display: none; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px;} pre{padding:14px;font-size:12px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Preparação para Prova 2</div>
+    <h1>Teoria de <span>Estruturas Lineares</span></h1>
+    <p class="subtitle">Como listas, pilhas, filas e listas encadeadas funcionam por dentro — com traces de operações, lógica dos ponteiros e todas as pegadinhas da prova.</p>
+    <div class="badge-row">
+      <span class="badge badge-green">Lista Sequencial</span>
+      <span class="badge badge-orange">S. Encadeada</span>
+      <span class="badge badge-purple">D. Encadeada</span>
+      <span class="badge badge-pink">Circular</span>
+      <span class="badge badge-yellow">Pegadinhas</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que a prova testa em estruturas lineares</a></li>
+      <li><a href="#sec2">Lista sequencial — inserção e remoção com deslocamento</a></li>
+      <li><a href="#sec3">Lista simplesmente encadeada — ponteiros linha a linha</a></li>
+      <li><a href="#sec4">Lista duplamente encadeada — dois ponteiros</a></li>
+      <li><a href="#sec5">Lista circular — sem NULL, com do-while</a></li>
+      <li><a href="#sec6">Ponteiro para ponteiro — **l na prova</a></li>
+      <li><a href="#sec7">Pegadinhas da prova — estruturas lineares</a></li>
+      <li><a href="#sec8">Tabela comparativa</a></li>
+      <li><a href="#sec9">Questões no estilo da prova</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== SEC 1 ===== -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que a prova testa em <span style="color:var(--accent)">estruturas lineares</span></h2>
+
+    <p>As questões de estruturas lineares geralmente caem em três categorias:</p>
+
+    <div class="concept-card">
+      <ol>
+        <li><strong>Trace de operações:</strong> dado código que insere/remove elementos de uma lista, qual o estado final? Qual a saída de um percorrimento?</li>
+        <li><strong>Ponteiros:</strong> dado código que manipula ponteiros de nós, o que acontece? Qual nó fica "órfão"? O que `*l` aponta?</li>
+        <li><strong>Complexidade:</strong> qual a complexidade de inserir no início/meio/fim de cada tipo de lista?</li>
+      </ol>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Cuidado especial com ponteiros</div>
+      <p>A prova adora questões onde um ponteiro deixa de ser atualizado na ordem certa, causando perda de referência. Sempre rastreie o estado de <em>todos</em> os ponteiros após cada linha de atribuição. Um ponteiro "perdido" é um nó que não pode mais ser acessado.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 2 ===== -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Lista sequencial — <span style="color:var(--accent)">inserção e remoção com deslocamento</span></h2>
+
+    <p>Armazena elementos em um vetor. O acesso é O(1) por índice, mas inserção e remoção no meio exigem deslocar elementos.</p>
+
+    <div class="code-label">estrutura</div>
+    <pre><code><span class="kw">#define</span> MAX <span class="num">100</span>          <span class="cmt">// capacidade máxima fixa do vetor (constante)</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> {              <span class="cmt">// define um novo tipo composto chamado Lista</span>
+    <span class="kw">int</span> v[MAX];               <span class="cmt">// vetor que guarda os elementos (sempre tem MAX posições)</span>
+    <span class="kw">int</span> n;       <span class="cmt">// número de elementos atualmente na lista (0 a MAX)</span>
+} <span class="tp">Lista</span>;                    <span class="cmt">// agora "Lista" pode ser usado como tipo</span></code></pre>
+
+    <div class="concept-card">
+      <p><strong>n é o número de elementos, não o tamanho do vetor.</strong> O vetor tem MAX posições, mas apenas as posições 0 a n-1 estão ocupadas. Inserir no final: coloca em <code>v[n]</code> e incrementa n. Remover do final: decrementa n.</p>
+    </div>
+
+    <h3>Inserção na posição p — como o deslocamento funciona</h3>
+
+    <div class="code-label">inserção na posição p</div>
+    <pre><code><span class="kw">int</span> <span class="fn">inserir</span>(<span class="tp">Lista</span> *l, <span class="kw">int</span> x, <span class="kw">int</span> p) {   <span class="cmt">// l=ponteiro p/ lista, x=valor, p=posição</span>
+    <span class="kw">if</span> (l-&gt;n == MAX || p &lt; <span class="num">0</span> || p &gt; l-&gt;n) <span class="kw">return</span> <span class="num">0</span>;   <span class="cmt">// cheia OU posição inválida → falha (retorna 0)</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = l-&gt;n; i &gt; p; i--)    <span class="cmt">// começa no fim (i=n) e desce até p+1: desloca de trás p/ frente</span>
+        l-&gt;v[i] = l-&gt;v[i - <span class="num">1</span>];      <span class="cmt">// copia cada elemento uma casa p/ a direita, abrindo espaço</span>
+    l-&gt;v[p] = x;                    <span class="cmt">// coloca o novo valor no buraco aberto na posição p</span>
+    l-&gt;n++;                         <span class="cmt">// agora há um elemento a mais</span>
+    <span class="kw">return</span> <span class="num">1</span>;                    <span class="cmt">// sucesso</span>
+}</code></pre>
+
+    <div class="concept-card orange">
+      <p><strong>Por que deslocar de trás para frente (i começa em n, vai até p)?</strong> Se deslocasse de frente para trás, o elemento em p+1 seria sobrescrito pelo elemento em p antes de ser salvo. Deslocando de trás: salva o maior índice primeiro, liberando espaço para o próximo deslocamento.</p>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">inserir(l, 25, 2) em [10, 20, 30, 40], n=4</div>
+      <div class="trace-body">Antes: [10, 20, 30, 40, ?, ?], n=4, inserindo 25 na posição 2
+
+i=4: v[4] = v[3] = 40  → [10, 20, 30, 40, 40, ?]
+i=3: v[3] = v[2] = 30  → [10, 20, 30, 30, 40, ?]
+i=2: i > p(2)? Não, para.
+
+Espera! i > p é condição do loop. i=2, p=2: 2 > 2? Falso → para.
+v[2] = 25  → [10, 20, 25, 30, 40, ?]
+n++ → n=5
+
+Após: [10, 20, 25, 30, 40], n=5 ✓</div>
+    </div>
+
+    <h3>Remoção na posição p</h3>
+
+    <div class="code-label">remoção na posição p</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">Lista</span> *l, <span class="kw">int</span> p) {        <span class="cmt">// remove o elemento que está na posição p</span>
+    <span class="kw">if</span> (p &lt; <span class="num">0</span> || p &gt;= l-&gt;n) <span class="kw">return</span> <span class="num">0</span>;   <span class="cmt">// posição inválida (não existe) → falha</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = p; i &lt; l-&gt;n - <span class="num">1</span>; i++)   <span class="cmt">// começa em p e vai até o penúltimo: desloca de frente p/ trás</span>
+        l-&gt;v[i] = l-&gt;v[i + <span class="num">1</span>];      <span class="cmt">// puxa cada elemento uma casa p/ a esquerda, cobrindo o removido</span>
+    l-&gt;n--;                         <span class="cmt">// agora há um elemento a menos</span>
+    <span class="kw">return</span> <span class="num">1</span>;                    <span class="cmt">// sucesso</span>
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Remoção: deslocamento de frente para trás.</strong> Para remover posição p: copia v[p+1] para v[p], v[p+2] para v[p+1], etc. O loop vai de p até n-2 (não n-1, pois i+1 chegaria a n-1, o último elemento válido).</p>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">remover(l, 1) em [10, 20, 30, 40], n=4</div>
+      <div class="trace-body">Removendo posição 1 (valor 20):
+
+i=1: v[1] = v[2] = 30  → [10, 30, 30, 40]
+i=2: v[2] = v[3] = 40  → [10, 30, 40, 40]
+i=3: i < n-1 = 3? Não → para
+
+n-- → n=3
+Resultado: [10, 30, 40], n=3 ✓</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 3 ===== -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Lista simplesmente encadeada — <span style="color:var(--accent)">ponteiros linha a linha</span></h2>
+
+    <p>Nós alocados dinamicamente, cada um com um campo <code>info</code> (dado) e um campo <code>prox</code> (ponteiro para o próximo nó). A lista é referenciada por um ponteiro para o primeiro nó (<code>inicio</code>). O último nó tem <code>prox = NULL</code>.</p>
+
+    <div class="code-label">estrutura do nó</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {        <span class="cmt">// "struct no" precisa de nome p/ poder se referenciar</span>
+    <span class="kw">int</span>          info;        <span class="cmt">// o dado guardado no nó</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;        <span class="cmt">// ponteiro p/ o próximo nó (NULL se for o último)</span>
+} <span class="tp">No</span>;                       <span class="cmt">// apelido curto: "No" em vez de "struct no"</span></code></pre>
+
+    <div class="diagram">Representação visual:
+inicio → [10|→] → [20|→] → [30|→] → [40|NULL]
+
+Cada nó: [info | prox]
+O último nó sempre tem prox = NULL.</div>
+
+    <h3>Inserção no início — trace de ponteiros</h3>
+
+    <div class="code-label">inserirInicio</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// **l: ponteiro p/ o ponteiro "inicio" (permite alterá-lo)</span>
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));   <span class="cmt">// reserva memória p/ 1 nó; (No*) converte o tipo</span>
+    novo-&gt;info = valor;  <span class="cmt">// grava o dado no nó recém-criado</span>
+    novo-&gt;prox = *l;    <span class="cmt">// novo aponta para o primeiro atual (*l = inicio)</span>
+    *l = novo;           <span class="cmt">// atualiza o início para o novo (escreve na variável da main)</span>
+}</code></pre>
+
+    <div class="trace-box">
+      <div class="trace-header">inserirInicio(&amp;inicio, 5) — lista: [10]→[20]→NULL</div>
+      <div class="trace-body">Estado inicial: inicio → [10|→] → [20|NULL]
+
+1. novo = malloc(...)    → cria nó [?|?]
+2. novo->info = 5        → nó fica [5|?]
+3. novo->prox = *l       → *l é inicio, que aponta para [10|...]
+                            novo fica [5|→[10|→[20|NULL]]]
+4. *l = novo             → inicio agora aponta para o novo nó
+
+Estado final: inicio → [5|→] → [10|→] → [20|NULL] ✓
+
+ORDEM IMPORTA: se fizéssemos '*l = novo' ANTES de 'novo->prox = *l',
+perderíamos a referência para a lista antiga!</div>
+    </div>
+
+    <h3>Inserção no final</h3>
+
+    <div class="code-label">inserirFim — percorre até o último nó</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirFim</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// insere no final da lista</span>
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));   <span class="cmt">// cria o novo nó</span>
+    novo-&gt;info = valor;         <span class="cmt">// grava o dado</span>
+    novo-&gt;prox = <span class="kw">NULL</span>;          <span class="cmt">// será o último, então aponta p/ NULL</span>
+    <span class="kw">if</span> (*l == <span class="kw">NULL</span>) {         <span class="cmt">// lista vazia: não há para onde caminhar</span>
+        *l = novo;              <span class="cmt">// o novo nó vira o próprio início</span>
+        <span class="kw">return</span>;                 <span class="cmt">// encerra a função aqui</span>
+    }
+    <span class="tp">No</span> *atu = *l;               <span class="cmt">// "atu" (atual) começa no primeiro nó</span>
+    <span class="kw">while</span> (atu-&gt;prox != <span class="kw">NULL</span>)  <span class="cmt">// enquanto houver próximo, ainda não é o último</span>
+        atu = atu-&gt;prox;        <span class="cmt">// avança um nó por vez até chegar no último</span>
+    atu-&gt;prox = novo;           <span class="cmt">// conecta o último (atu) ao novo nó</span>
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Complexidade da inserção no final:</strong> O(n) porque precisa percorrer toda a lista para encontrar o último nó. Inserção no início é O(1).</p>
+    </div>
+
+    <h3>Remoção — lógica do ponteiro anterior</h3>
+
+    <div class="code-label">remover por valor</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// remove o primeiro nó cujo info == valor</span>
+    <span class="tp">No</span> *ant = <span class="kw">NULL</span>, *atu = *l;   <span class="cmt">// ant=nó anterior (ainda nenhum), atu=nó atual (começa no início)</span>
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor) {   <span class="cmt">// anda enquanto não chegou ao fim E não achou o valor</span>
+        ant = atu;              <span class="cmt">// guarda o nó atual como "anterior" antes de avançar</span>
+        atu = atu-&gt;prox;        <span class="cmt">// avança para o próximo nó</span>
+    }
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;    <span class="cmt">// chegou ao fim sem achar → não encontrado</span>
+
+    <span class="kw">if</span> (ant == <span class="kw">NULL</span>)              <span class="cmt">// ant nunca mudou → o alvo é o primeiro nó</span>
+        *l = atu-&gt;prox;            <span class="cmt">// novo início passa a ser o segundo nó</span>
+    <span class="kw">else</span>                           <span class="cmt">// alvo está no meio ou no fim</span>
+        ant-&gt;prox = atu-&gt;prox;     <span class="cmt">// o anterior "pula" o alvo, ligando direto ao seguinte</span>
+    <span class="fn">free</span>(atu);                  <span class="cmt">// libera a memória do nó removido (evita vazamento)</span>
+    <span class="kw">return</span> <span class="num">1</span>;                    <span class="cmt">// sucesso</span>
+}</code></pre>
+
+    <div class="trace-box">
+      <div class="trace-header">remover(&amp;inicio, 20) — lista: [10]→[20]→[30]→NULL</div>
+      <div class="trace-body">ant=NULL, atu=inicio=[10|→20]
+
+Iteração 1:
+  atu->info = 10 == 20? Não.
+  ant = atu = [10|→]
+  atu = atu->prox = [20|→]
+
+Iteração 2:
+  atu->info = 20 == 20? Sim. Para o while.
+
+ant != NULL (ant aponta para [10|→])
+→ ant->prox = atu->prox = [30|NULL]
+→ [10|→] agora aponta para [30|NULL]
+
+free(atu)  → libera [20|→]
+
+Resultado: [10|→] → [30|NULL] ✓</div>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">remover(&amp;inicio, 10) — removendo o PRIMEIRO — [10]→[20]→NULL</div>
+      <div class="trace-body">ant=NULL, atu=inicio=[10|→]
+
+Iteração 1:
+  atu->info = 10 == 10? Sim. Para imediatamente.
+
+ant == NULL? SIM → estamos removendo o primeiro nó!
+*l = atu->prox = [20|NULL]
+→ inicio agora aponta para [20|NULL]
+
+free(atu)  → libera [10|→]
+
+Resultado: inicio → [20|NULL] ✓</div>
+    </div>
+
+    <h3>Percorrimento — leitura da lista</h3>
+
+    <div class="code-label">percorrer e imprimir</div>
+    <pre><code><span class="kw">void</span> <span class="fn">percorrer</span>(<span class="tp">No</span> *l) {        <span class="cmt">// recebe cópia do ponteiro (basta ler, não altera a lista)</span>
+    <span class="kw">while</span> (l != <span class="kw">NULL</span>) {       <span class="cmt">// repete enquanto não passou do último nó</span>
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, l-&gt;info);   <span class="cmt">// imprime o dado do nó atual</span>
+        l = l-&gt;prox;            <span class="cmt">// avança para o próximo (mexe só na cópia local)</span>
+    }
+}</code></pre>
+
+    <div class="concept-card">
+      <p>Para imprimir [10]→[20]→[30]→NULL: saída é <code>10 20 30</code>. O percorrimento usa uma variável local <code>l</code> — não modifica o ponteiro original da lista.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 4 ===== -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Lista duplamente encadeada — <span style="color:var(--accent)">dois ponteiros</span></h2>
+
+    <p>Cada nó tem dois ponteiros: <code>ant</code> (para o nó anterior) e <code>prox</code> (para o próximo). Permite percorrer nos dois sentidos e remover um nó sem precisar do nó anterior.</p>
+
+    <div class="code-label">estrutura do nó duplamente encadeado</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {        <span class="cmt">// nó com DUAS ligações</span>
+    <span class="kw">int</span>          info;        <span class="cmt">// o dado guardado</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *ant;   <span class="cmt">// anterior (NULL se for o primeiro)</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;  <span class="cmt">// próximo (NULL se for o último)</span>
+} <span class="tp">No</span>;                       <span class="cmt">// apelido "No"</span></code></pre>
+
+    <div class="diagram">Representação visual:
+NULL ← [ant|10|prox] ↔ [ant|20|prox] ↔ [ant|30|prox] → NULL
+        ↑
+      inicio
+
+O primeiro nó: ant = NULL
+O último nó:   prox = NULL</div>
+
+    <h3>Inserção no início com dupla ligação</h3>
+
+    <div class="code-label">inserirInicio com dois ponteiros</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// insere no começo da lista dupla</span>
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));   <span class="cmt">// cria o nó</span>
+    novo-&gt;info = valor;       <span class="cmt">// grava o dado</span>
+    novo-&gt;ant  = <span class="kw">NULL</span>;       <span class="cmt">// novo é o primeiro, não tem anterior</span>
+    novo-&gt;prox = *l;          <span class="cmt">// seu próximo é o antigo primeiro nó</span>
+    <span class="kw">if</span> (*l != <span class="kw">NULL</span>)         <span class="cmt">// se a lista não estava vazia...</span>
+        (*l)-&gt;ant = novo;     <span class="cmt">// CRÍTICO: o antigo primeiro agora aponta "ant" p/ o novo</span>
+    *l = novo;                <span class="cmt">// atualiza o início p/ o novo nó</span>
+}</code></pre>
+
+    <div class="warn">
+      <div class="warn-title">Atualizar (*l)->ant é obrigatório</div>
+      <p>Na lista duplamente encadeada, inserir um novo nó no início exige atualizar o ponteiro <code>ant</code> do antigo primeiro nó para apontar para o novo. Se esquecer, a lista terá um ponteiro <code>ant</code> errado no segundo nó — aponta para NULL em vez do novo primeiro.</p>
+    </div>
+
+    <h3>Remoção com dupla ligação</h3>
+
+    <div class="code-label">remover por valor — lista duplamente encadeada</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// remove por valor na lista dupla (não precisa de "ant" separado)</span>
+    <span class="tp">No</span> *atu = *l;               <span class="cmt">// começa no primeiro nó</span>
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor)   <span class="cmt">// procura o nó com o valor</span>
+        atu = atu-&gt;prox;        <span class="cmt">// avança</span>
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;   <span class="cmt">// não encontrado</span>
+
+    <span class="kw">if</span> (atu-&gt;ant != <span class="kw">NULL</span>)        <span class="cmt">// tem nó antes → não é o primeiro</span>
+        atu-&gt;ant-&gt;prox = atu-&gt;prox;   <span class="cmt">// o anterior pula o atual (liga ao seguinte)</span>
+    <span class="kw">else</span>
+        *l = atu-&gt;prox;            <span class="cmt">// era o primeiro → novo início é o seguinte</span>
+
+    <span class="kw">if</span> (atu-&gt;prox != <span class="kw">NULL</span>)        <span class="cmt">// tem nó depois → não é o último</span>
+        atu-&gt;prox-&gt;ant = atu-&gt;ant;   <span class="cmt">// o seguinte aponta "ant" de volta p/ o anterior</span>
+
+    <span class="fn">free</span>(atu);                  <span class="cmt">// libera a memória do nó removido</span>
+    <span class="kw">return</span> <span class="num">1</span>;                    <span class="cmt">// sucesso</span>
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Por que dois ifs de remoção?</strong> Precisamos atualizar dois ponteiros:</p>
+      <ol>
+        <li>O nó anterior ao removido deve ter seu <code>prox</code> pulando o nó removido</li>
+        <li>O nó posterior ao removido deve ter seu <code>ant</code> pulando o nó removido</li>
+        <li>Mas se o nó a ser removido for o primeiro (ant == NULL), atualizamos o início da lista em vez do nó anterior</li>
+        <li>E se for o último (prox == NULL), não há nó posterior para atualizar</li>
+      </ol>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 5 ===== -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Lista circular — <span style="color:var(--accent)">sem NULL, com do-while</span></h2>
+
+    <p>O último nó aponta para o primeiro, formando um ciclo. <strong>Não existe NULL nos ponteiros</strong> de uma lista circular não vazia. Isso muda como percorremos e como detectamos o fim.</p>
+
+    <div class="diagram">Lista circular simplesmente encadeada:
+inicio → [10|→] → [20|→] → [30|→] ─┐
+           ↑_________________________│
+
+O último nó (30) aponta de volta para o primeiro (10).</div>
+
+    <h3>Percorrimento — use do-while, não while</h3>
+
+    <div class="code-label">percorrer lista circular</div>
+    <pre><code><span class="kw">void</span> <span class="fn">percorrer</span>(<span class="tp">No</span> *inicio) {     <span class="cmt">// percorre lista circular</span>
+    <span class="kw">if</span> (inicio == <span class="kw">NULL</span>) <span class="kw">return</span>;   <span class="cmt">// lista vazia: nada a fazer</span>
+    <span class="tp">No</span> *atu = inicio;           <span class="cmt">// começa no primeiro nó</span>
+    <span class="kw">do</span> {                        <span class="cmt">// do-while: executa o corpo ANTES de testar (visita ao menos 1)</span>
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, atu-&gt;info);   <span class="cmt">// imprime o dado atual</span>
+        atu = atu-&gt;prox;        <span class="cmt">// avança um nó</span>
+    } <span class="kw">while</span> (atu != inicio);      <span class="cmt">// repete até dar a volta completa e voltar ao início</span>
+}</code></pre>
+
+    <div class="concept-card orange">
+      <p><strong>Por que do-while e não while?</strong> Com <code>while (atu != inicio)</code>, a condição seria checada antes da primeira iteração. Como atu começa em inicio, a condição seria falsa de imediato e o loop não executaria — visitaríamos zero elementos. O <code>do-while</code> garante que o primeiro elemento seja processado antes de checar a condição de parada.</p>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Lista circular com 1 elemento</div>
+      <p>Um único nó numa lista circular aponta para si mesmo: <code>nó->prox = nó</code>. O percorrimento do-while: visita o nó (info), atu = nó->prox = nó, atu == inicio? Sim → para. Correto — visita exatamente 1 elemento.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 6 ===== -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Ponteiro para ponteiro — <span style="color:var(--accent)">**l na prova</span></h2>
+
+    <p>Funções que modificam o início da lista precisam receber um <strong>ponteiro para ponteiro</strong> (<code>No **l</code>). Isso é uma das fontes de confusão mais comuns na prova.</p>
+
+    <div class="concept-card">
+      <p><strong>Por que **l e não *l?</strong></p>
+      <ul>
+        <li>Se a função recebe <code>No *l</code> e faz <code>l = novo</code>, modifica apenas a cópia local. O ponteiro original não é alterado.</li>
+        <li>Se recebe <code>No **l</code> e faz <code>*l = novo</code>, modifica o ponteiro original através de indireção dupla.</li>
+      </ul>
+    </div>
+
+    <div class="code-label">diferença — passagem por valor vs. por referência</div>
+    <pre><code><span class="cmt">// ERRADO — não modifica o inicio original</span>
+<span class="kw">void</span> <span class="fn">inserirErrado</span>(<span class="tp">No</span> *l, <span class="kw">int</span> valor) {   <span class="cmt">// recebe só uma CÓPIA do ponteiro inicio</span>
+    <span class="tp">No</span> *novo = ...;     <span class="cmt">// cria o nó (malloc omitido por brevidade)</span>
+    novo-&gt;prox = l;      <span class="cmt">// novo aponta p/ o antigo primeiro</span>
+    l = novo;            <span class="cmt">// muda só a cópia local; a variável da main continua igual!</span>
+}
+
+<span class="cmt">// CORRETO — modifica o inicio original via **</span>
+<span class="kw">void</span> <span class="fn">inserirCorreto</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {   <span class="cmt">// recebe o ENDEREÇO do ponteiro inicio</span>
+    <span class="tp">No</span> *novo = ...;     <span class="cmt">// cria o nó</span>
+    novo-&gt;prox = *l;     <span class="cmt">// *l = o inicio real; novo aponta p/ o antigo primeiro</span>
+    *l = novo;           <span class="cmt">// escreve no inicio real da main através do ponteiro</span>
+}</code></pre>
+
+    <div class="trace-box">
+      <div class="trace-header">entendendo **l</div>
+      <div class="trace-body">No *inicio = [10|→[20|NULL]]  ← variável na main
+
+inserirCorreto(&inicio, 5):
+  l = &inicio           ← l é o endereço de inicio
+  *l = inicio           ← *l é o valor de inicio (o nó [10|→])
+  novo->prox = *l       ← novo aponta para [10|→]
+  *l = novo             ← inicio (na main) agora aponta para novo
+
+Na main após a chamada:
+  inicio → [5|→] → [10|→] → [20|NULL] ✓</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 7 ===== -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Pegadinhas da prova — <span style="color:var(--accent)">estruturas lineares</span></h2>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #1 — perder ponteiro ao inserir</div>
+      <p>Ao inserir um nó, se você fizer <code>*l = novo</code> antes de <code>novo->prox = *l</code>, você sobrescreve o ponteiro para a lista antes de salvá-lo. A lista é perdida.</p>
+      <pre><code>// ERRADO:
+*l = novo;          // inicio agora aponta para novo
+novo->prox = *l;    // novo->prox = novo (aponta para si mesmo!)
+
+// CORRETO:
+novo->prox = *l;    // salva o inicio primeiro
+*l = novo;          // agora atualiza o inicio</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #2 — lista circular: while vs do-while</div>
+      <p>Se o código usar <code>while (atu != inicio)</code> numa lista circular, o loop não executa nenhuma iteração porque atu começa igual a inicio. Use <code>do-while</code> ou use uma variável de controle.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #3 — lista sequencial: limite de inserção é MAX, não MAX+1</div>
+      <p>A condição de lista cheia é <code>n == MAX</code>. Com MAX=100, a lista pode ter no máximo 100 elementos (índices 0 a 99). Se n=100, não cabe mais nenhum.</p>
+      <pre><code>// inserir falha se:
+if (l->n == MAX) return 0;  // n==MAX significa que está cheia</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #4 — deslocamento de inserção começa no fim, não no início</div>
+      <p>Para inserir na posição p, o loop começa em <code>i = n</code> e vai até <code>i > p</code>, decrementando. Se começasse em p e fosse até n, sobrescreveria dados antes de copiá-los.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #5 — lista duplamente encadeada: esquecer de atualizar ->ant</div>
+      <p>Na inserção de um nó, precisa atualizar o <code>ant</code> do nó seguinte. Na remoção, precisa atualizar o <code>ant</code> do nó posterior ao removido. Se só atualizar <code>prox</code>, os ponteiros <code>ant</code> ficam inconsistentes.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #6 — percorrer lista encadeada modifica o ponteiro local, não o original</div>
+      <pre><code>void percorrer(No *l) {
+    while (l != NULL) {
+        printf("%d ", l->info);
+        l = l->prox;    // modifica a cópia local, não a original
+    }
+}
+// O ponteiro original passado para percorrer() não foi modificado.</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #7 — remover nó que não existe não corrompe a lista</div>
+      <p>Se <code>atu == NULL</code> ao final do while de busca, a função retorna 0 sem modificar nada. A lista permanece intacta. Isso é um retorno de erro, não uma corrupção.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #8 — inserção válida na posição n (após o último)</div>
+      <p>Numa lista de n elementos, inserir na posição n é válido — equivale a inserir no final. A condição de validade é <code>p &gt;= 0 &amp;&amp; p &lt;= l-&gt;n</code>. A posição p = n não é erro!</p>
+      <pre><code>// Lista com n=3: posições válidas de inserção = 0, 1, 2, 3
+// p=3 insere no final (após o índice 2)</code></pre>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 8 ===== -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">estruturas lineares</span></h2>
+
+    <table>
+      <thead><tr><th>Operação</th><th>Sequencial</th><th>S. Encadeada</th><th>D. Encadeada</th><th>Circular</th></tr></thead>
+      <tbody>
+        <tr><td>Acesso por índice</td><td>O(1)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Inserção no início</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Inserção no fim</td><td>O(1)*</td><td>O(n)</td><td>O(1)**</td><td>O(1)**</td></tr>
+        <tr><td>Inserção no meio</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Remoção do início</td><td>O(n)</td><td>O(1)</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Remoção do fim</td><td>O(1)</td><td>O(n)</td><td>O(1)**</td><td>O(1)**</td></tr>
+        <tr><td>Busca por valor</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Memória por nó</td><td>1 int</td><td>1 ptr</td><td>2 ptrs</td><td>1 ou 2 ptrs</td></tr>
+        <tr><td>Tamanho</td><td>Fixo (MAX)</td><td>Dinâmico</td><td>Dinâmico</td><td>Dinâmico</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.85rem;color:var(--text-muted);">* Apenas se houver espaço (n &lt; MAX). ** Com ponteiro para o último nó mantido.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== SEC 9 ===== -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Questões no estilo da prova</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Analise o código e responda</div>
+
+      <div class="quiz-q" id="q1">
+        <p><strong>Q1.</strong> A lista sequencial tem n=3, MAX=5, v=[10,20,30,?,?]. Após <code>inserir(l, 99, 1)</code>, qual o estado?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) [99, 10, 20, 30, ?], n=4</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) [10, 99, 20, 30, ?], n=4</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) [10, 20, 30, 99, ?], n=4</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) [10, 20, 99, 30, ?], n=4</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q1">✔ Inserir na posição 1: loop i de n=3 até i>p=1. i=3: v[3]=v[2]=30. i=2: v[2]=v[1]=20. i=1: 1>1 falso, para. v[1]=99. n=4. Estado: [10,99,20,30,?].</div>
+        <div class="quiz-feedback err" id="fb_wrong_q1">✘ Inserção na posição 1: desloca v[2]→v[3] e v[1]→v[2]. Então v[1]=99. Resultado: [10,99,20,30,?], n=4.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p><strong>Q2.</strong> Qual a saída de <code>percorrer(inicio)</code> após as operações abaixo?</p>
+        <pre><code>No *inicio = NULL;
+inserirInicio(&amp;inicio, 30);
+inserirInicio(&amp;inicio, 20);
+inserirInicio(&amp;inicio, 10);
+// percorrer imprime do início ao fim</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 30 20 10</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) 10 20 30</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) 10 30 20</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 20 10 30</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q2">✔ Inserção no início inverte a ordem: após inserir 30 → [30]. Depois 20 → [20,30]. Depois 10 → [10,20,30]. Percorrimento: 10 20 30.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q2">✘ inserirInicio sempre insere na frente. Ordem de inserção: 30, 20, 10. Cada inserção empurra o anterior para trás: [30] → [20,30] → [10,20,30]. Saída: 10 20 30.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p><strong>Q3.</strong> Na lista circular com 1 elemento, o <code>prox</code> do nó aponta para:</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) NULL — não há próximo</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) O próprio nó — aponta para si mesmo</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) O início da lista — que é outro nó</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Um valor indefinido</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q3">✔ Na lista circular, o único elemento aponta para si mesmo (é tanto o primeiro quanto o último). prox = o próprio nó. O percorrimento do-while: visita o nó, atu = atu->prox = o próprio nó, atu == inicio? Sim → para.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q3">✘ Na lista circular, não existe NULL. Com 1 elemento, o nó aponta para si mesmo: prox = nó.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p><strong>Q4.</strong> Por que a função <code>inserirInicio</code> recebe <code>No **l</code> e não <code>No *l</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) Para poder acessar o campo info do nó</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) Para modificar o ponteiro inicio original, não apenas uma cópia local</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Porque No* não pode ser passado por parâmetro</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) Para economizar memória</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q4">✔ Com No *l, qualquer atribuição a l modifica apenas a cópia local na função. Com No **l, a atribuição a *l modifica o ponteiro original. Inserção no início precisa mudar o que "inicio" aponta — requer **l.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q4">✘ Parâmetros em C são cópias. Com No *l, fazer l=novo não afeta o ponteiro original. Com No **l e *l=novo, o ponteiro original é modificado através de dupla indireção.</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p><strong>Q5.</strong> Qual a complexidade de inserir no início da lista simplesmente encadeada e da lista sequencial, respectivamente?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) O(n) e O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) O(1) e O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) O(1) e O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) O(n) e O(n)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q5">✔ Lista encadeada: inserir no início é O(1) — aloca nó, ajusta 2 ponteiros, pronto. Lista sequencial: inserir no início exige deslocar todos os n elementos para a direita → O(n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q5">✘ Encadeada: inserção no início O(1) (sem deslocamento). Sequencial: inserção no início O(n) (desloca tudo).</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p><strong>Q6.</strong> Lista sequencial com v=[2,3,2,0,3] (5 primeiros dígitos da matrícula <strong>232037937</strong>), n=5. Após <code>remover(l, 2)</code> (remover posição 2), qual o estado?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) [2,3,0,0,3], n=4</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) [2,3,0,3,3], n=4 — deslocamento correto</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) [2,0,3,0,3], n=4</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) [2,3,3,0,3], n=4</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6">✔ Remover posição 2 (valor 2): loop i de p=2 até i&lt;n-1=4. i=2: v[2]=v[3]=0→[2,3,0,0,3]. i=3: v[3]=v[4]=3→[2,3,0,3,3]. i=4: 4&lt;4? Falso, para. n--→n=4. Porção válida: v[0..3]=[2,3,0,3]. O valor em v[4] (=3) ainda existe na memória mas está fora do alcance (n=4).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q6">✘ Remoção desloca de frente para trás: v[2]←v[3]=0, v[3]←v[4]=3. Array com posição válida n=4: [2,3,0,3].</div>
+      </div>
+
+      <div class="quiz-q" id="q7">
+        <p><strong>Q7.</strong> <code>inserirInicio</code> é chamada 3 vezes com os 3 primeiros dígitos da matrícula <strong>232037937</strong> (2, 3 e 2, nessa ordem). Qual a saída de <code>percorrer(inicio)</code>?</p>
+        <pre><code>No *inicio = NULL;
+inserirInicio(&amp;inicio, 2);
+inserirInicio(&amp;inicio, 3);
+inserirInicio(&amp;inicio, 2);</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 2 3 2 — na ordem de inserção</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 2 3 2 — inserção no início inverte, mas a ordem de inserção é 2→3→2, logo a saída é 2 3 2</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 3 2 2 — o 3 foi inserido por último antes do 2 final</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 2 2 3 — os iguais agrupam</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6_dup">✔ Inserir 2: [2|NULL]. Inserir 3: [3|→2|NULL]. Inserir 2: [2|→3|→2|NULL]. percorrer imprime da esquerda: 2 3 2. Coincidência: a string "2 3 2" é a mesma que a ordem de inserção (2, 3, 2), pois a última inserção (2) foi para o início. Não confunda com a regra geral de inversão — aqui o primeiro e terceiro valores são iguais.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q7">✘ Cada inserirInicio empurra o atual para trás: após inserir 2→[2], depois 3→[3,2], depois 2→[2,3,2]. percorrer: 2 3 2.</div>
+      </div>
+
+      <div class="quiz-q" id="q8">
+        <p><strong>Q8.</strong> Numa <em>lista simplesmente encadeada</em>, você recebe um ponteiro direto para um nó do meio (sem o anterior). Qual a complexidade de <em>removê-lo</em>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) O(1) — você tem o ponteiro, basta redirecionar</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) O(n) — precisa percorrer desde o início para encontrar o nó anterior</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) O(log n) — busca binária pelos ponteiros</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) O(1) se o nó não for o primeiro, O(n) se for</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q8">✔ Para remover um nó da lista simplesmente encadeada, precisa fazer ant->prox = atu->prox. Mas para isso precisa de ant — o nó anterior. Sem ele, é necessário percorrer desde *l até encontrar o nó cujo prox == atu. Isso é O(n). A lista simplesmente encadeada não tem ponteiro ant, ao contrário da duplamente encadeada.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q8">✘ Mesmo com ponteiro para o nó, remoção em lista simples exige o nó anterior (para ant->prox = atu->prox). Encontrar o anterior custa O(n).</div>
+      </div>
+
+      <div class="quiz-q" id="q9">
+        <p><strong>Q9.</strong> Na <em>lista duplamente encadeada</em>, você recebe um ponteiro direto para um nó do meio. Qual a complexidade de removê-lo? Por que difere da lista simplesmente encadeada?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) O(n) — mesma complexidade da lista simples</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) O(1) — o nó tem ponteiro ant, não precisa buscar o anterior</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) O(log n) — metade do custo da lista simples</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) O(1) apenas se o nó não for o primeiro nem o último</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q9">✔ Na lista duplamente encadeada, o próprio nó tem atu->ant (anterior) e atu->prox (próximo). Para remover: atu->ant->prox = atu->prox e atu->prox->ant = atu->ant. Ambas as operações são O(1) — sem percorrimento. Esta é a principal vantagem da lista dupla sobre a simples: remoção O(1) com ponteiro direto para o nó.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q9">✘ Lista dupla: atu->ant já aponta para o anterior. Remoção = 2 atribuições de ponteiro = O(1). Não precisa percorrer.</div>
+      </div>
+
+      <div class="quiz-q" id="q10">
+        <p><strong>Q10.</strong> Uma lista circular tem 3 nós com valores <code>[2, 3, 2]</code> (3 primeiros dígitos da matrícula <strong>232037937</strong>). O código de percorrimento usa <code>while (atu != inicio)</code> em vez de <code>do-while</code>. Quantos elementos são visitados?</p>
+        <pre><code>No *atu = inicio;
+while (atu != inicio) {   // ← while, não do-while
+    printf("%d ", atu->info);
+    atu = atu->prox;
+}</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) 3 — percorre normalmente</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) 2 — para antes do último</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q10')">c) 0 — loop nunca executa: atu==inicio desde o início</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) loop infinito — nunca para</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q10">✔ atu começa igual a inicio. A condição while (atu != inicio) é verificada ANTES da primeira iteração: atu==inicio → falso → loop não executa → 0 elementos visitados. O do-while resolve isso: executa o corpo primeiro, depois verifica a condição. Esta é a pegadinha #2 desta apostila: lista circular + while sem do = visita zero elementos.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q10">✘ atu = inicio na linha 1. while(atu != inicio) → while(false) → loop não executa. 0 elementos. Use do-while para listas circulares.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Teoria para Prova — Estruturas Lineares</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>
