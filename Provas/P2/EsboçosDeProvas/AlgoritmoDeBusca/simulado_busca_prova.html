@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado — Algoritmos de Busca · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a0f08 0%, #2a1a0a 50%, #180e08 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'SIMULADO'; position: absolute; right: 40px; top: 10px;
+    font-size: 130px; font-family: 'Fraunces', serif;
+    color: rgba(247,162,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent);  border-color: var(--accent);  background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent2); border-color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  section { margin: 48px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h2 span { color: var(--accent); }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+
+  .score-bar { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar span { color: var(--accent); font-size: 1.1rem; font-weight: 700; }
+
+  /* Quiz */
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 8px 0 56px; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q > p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q > p code { font-family: 'JetBrains Mono', monospace; font-size: .9em; color: var(--accent); }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; padding: 12px 16px; border-radius: 8px; line-height: 1.65; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); border: 1px solid rgba(106,247,196,0.2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); border: 1px solid rgba(247,106,154,0.2); }
+  .quiz-feedback pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin: 8px 0; font-size: 11.5px; line-height: 1.55; color: #9898c0; white-space: pre; overflow-x: auto; font-family: 'JetBrains Mono', monospace; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .quiz { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Simulado Prova 2</div>
+    <h1>Simulado: <span>Algoritmos de Busca</span></h1>
+    <p class="subtitle">Trace cada função com os dados da sua matrícula. Mesma complexidade das questões de prova — código C real, resposta única, feedback com fluxo completo.</p>
+    <div class="badge-row">
+      <span class="badge badge-orange">Busca Sequencial</span>
+      <span class="badge badge-green">Busca Binária</span>
+      <span class="badge badge-purple">Busca Recursiva</span>
+      <span class="badge badge-pink">Char em String</span>
+      <span class="badge badge-yellow">Contagem</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section>
+    <div class="section-number">// código comum</div>
+    <h2>Funções e <span>dados de entrada</span></h2>
+    <p>Todas as questões usam o bloco abaixo. Trace cada função com os parâmetros indicados.</p>
+    <pre><code>/* ── Dados do estudante ─────────────────────────────────────────── */
+int  mat[]  = {2, 3, 2, 0, 3, 7, 9, 3, 7};  /* dígitos de 232037937, n=9 */
+int  ord[]  = {0, 2, 2, 3, 3, 3, 7, 7, 9};  /* mat[] ordenado crescente  */
+char nome[] = "italo alves sampaio de oliveira"; /* strlen = 31           */
+
+/* ── Funções ────────────────────────────────────────────────────── */
+int busca1(int v[], int n, int x) {          /* sequencial                */
+    int i;
+    for (i = 0; i &lt; n &amp;&amp; v[i] != x; i++);
+    return (i &lt; n) ? i : -1;
+}
+
+int busca2(int v[], int n, int x) {          /* binária iterativa         */
+    int esq = 0, dir = n - 1;
+    while (esq &lt;= dir) {
+        int meio = (esq + dir) / 2;
+        if      (v[meio] == x) return meio;
+        else if (v[meio] &lt;  x) esq = meio + 1;
+        else                   dir = meio - 1;
+    }
+    return -1;
+}
+
+int busca3(int v[], int n, int x) {          /* seq em vetor ordenado     */
+    for (int i = 0; i &lt; n; i++) {
+        if (v[i] &gt; x) return -1;
+        if (v[i] == x) return i;
+    }
+    return -1;
+}
+
+int busca4(char *s, char c) {                /* 1ª ocorrência de char     */
+    for (int i = 0; s[i]; i++)
+        if (s[i] == c) return i;
+    return -1;
+}
+
+int busca5(int v[], int n, int x) {          /* binária — conta passos    */
+    int esq = 0, dir = n - 1, passos = 0;
+    while (esq &lt;= dir) {
+        passos++;
+        int meio = (esq + dir) / 2;
+        if      (v[meio] == x) return passos;
+        else if (v[meio] &lt;  x) esq = meio + 1;
+        else                   dir = meio - 1;
+    }
+    return -1;
+}
+
+int busca6(int v[], int i, int n, int x) {   /* recursiva a partir de i  */
+    if (i &gt;= n)    return -1;
+    if (v[i] == x) return i;
+    return busca6(v, i + 1, n, x);
+}
+
+int conta(int v[], int n, int x) {           /* conta ocorrências de x   */
+    int c = 0;
+    for (int i = 0; i &lt; n; i++) c += (v[i] == x);
+    return c;
+}</code></pre>
+  </section>
+
+  <div class="score-bar">Pontuação atual: <span id="score-val">0</span> / 10</div>
+
+  <div class="quiz">
+    <div class="quiz-title">Analise o código e responda</div>
+
+    <!-- Q1 -->
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>busca1(mat, 9, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) &nbsp;-1 &nbsp;&nbsp;(9 não encontrado)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) &nbsp;6 &nbsp;&nbsp;(índice onde 9 foi achado)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) &nbsp;7 &nbsp;&nbsp;(posição após o 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) &nbsp;9 &nbsp;&nbsp;(o próprio valor)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">✔ Correto! O laço percorre até v[i]==x, saindo com i=6.
+<pre>
+v = {2, 3, 2, 0, 3, 7, 9, 3, 7},  n=9,  x=9
+─────────────────────────────────────────────────
+  i=0: v[0]=2 ≠ 9 → continua
+  i=1: v[1]=3 ≠ 9 → continua
+  i=2: v[2]=2 ≠ 9 → continua
+  i=3: v[3]=0 ≠ 9 → continua
+  i=4: v[4]=3 ≠ 9 → continua
+  i=5: v[5]=7 ≠ 9 → continua
+  i=6: v[6]=9 = 9 → condição v[i]!=x FALSA → sai
+─────────────────────────────────────────────────
+Pós-laço: i=6,  6 &lt; 9  →  return 6</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">✘ Atenção: o laço para quando encontra x, retornando o ÍNDICE i, não o valor.
+<pre>
+  for (i=0; i&lt;9 &amp;&amp; v[i]!=9; i++)   ← para quando v[i]==x
+  v[6]=9 → sai com i=6
+  return (6 &lt; 9) ? 6 : -1  →  6
+
+  ✘ Erro comum: confundir índice com valor, ou
+    pensar que -1 é retornado porque 9 está no fim.</pre>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>busca2(ord, 9, 3)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) &nbsp;3 &nbsp;&nbsp;(o próprio valor buscado)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) &nbsp;4 &nbsp;&nbsp;(índice onde 3 foi achado)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) &nbsp;5 &nbsp;&nbsp;(outra ocorrência de 3)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) &nbsp;-1 &nbsp;&nbsp;(não encontrado)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">✔ Correto! A busca binária acerta na 1ª iteração: meio=4, v[4]=3.
+<pre>
+ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9},  n=9,  x=3
+         0  1  2  3  4  5  6  7  8
+─────────────────────────────────────────────────
+Iteração 1:
+  esq=0, dir=8
+  meio = (0+8)/2 = 4
+  v[4] = 3  →  3 == 3  ✓  ENCONTRADO
+─────────────────────────────────────────────────
+  return 4  (índice, não o valor)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">✘ A função retorna o ÍNDICE onde x foi achado.
+<pre>
+  meio = (0+8)/2 = 4
+  v[4] = 3  →  x encontrado no índice 4
+
+  ✘ Retornar 3: confunde valor com índice.
+  ✘ Retornar -1: x=3 existe em ord[], não é ausente.</pre>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Qual o valor retornado por <code>busca3(ord, 9, 4)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">a) &nbsp;-1 &nbsp;&nbsp;(4 não existe; detectado por v[i]&gt;x)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) &nbsp;4 &nbsp;&nbsp;(índice onde 4 estaria)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) &nbsp;6 &nbsp;&nbsp;(índice onde parou)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) &nbsp;9 &nbsp;&nbsp;(fim do vetor)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">✔ Correto! A busca ordenada aborta quando v[i]>x, sem percorrer até o fim.
+<pre>
+ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9},  x=4
+─────────────────────────────────────────────────
+  i=0: v[0]=0 │ 0&gt;4? não │ 0==4? não
+  i=1: v[1]=2 │ 2&gt;4? não │ 2==4? não
+  i=2: v[2]=2 │ 2&gt;4? não │ 2==4? não
+  i=3: v[3]=3 │ 3&gt;4? não │ 3==4? não
+  i=4: v[4]=3 │ 3&gt;4? não │ 3==4? não
+  i=5: v[5]=3 │ 3&gt;4? não │ 3==4? não
+  i=6: v[6]=7 │ 7&gt;4? SIM → return -1
+─────────────────────────────────────────────────
+Vantagem: parou em i=6 em vez de varrer até o fim.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">✘ busca3 usa a ordenação para sair cedo: quando v[i]>x, x nunca será encontrado.
+<pre>
+  if (v[i] &gt; x) return -1;   ← saída antecipada
+  O 4 ficaria entre v[5]=3 e v[6]=7, mas não existe.
+  Em i=6: v[6]=7 &gt; 4  →  return -1</pre>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Qual o valor retornado por <code>busca4(nome, 'v')</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) &nbsp;7 &nbsp;&nbsp;(posição de 'l')</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) &nbsp;9 &nbsp;&nbsp;(posição de 'e')</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) &nbsp;8 &nbsp;&nbsp;(1ª ocorrência de 'v')</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) &nbsp;-1 &nbsp;&nbsp;('v' não existe)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">✔ Correto! O 'v' aparece pela primeira vez no índice 8 de "italo alves...".
+<pre>
+nome[] = "italo alves sampaio de oliveira"
+índice:   0 1 2 3 4 5 6 7 8 9 10 ...
+─────────────────────────────────────────────────
+  i=0: 'i' ≠ 'v'
+  i=1: 't' ≠ 'v'
+  i=2: 'a' ≠ 'v'
+  i=3: 'l' ≠ 'v'
+  i=4: 'o' ≠ 'v'
+  i=5: ' ' ≠ 'v'  (espaço!)
+  i=6: 'a' ≠ 'v'
+  i=7: 'l' ≠ 'v'
+  i=8: 'v' = 'v'  ✓  →  return 8</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">✘ Conte caractere a caractere, incluindo o espaço na posição 5.
+<pre>
+  i t a l o   a l v
+  0 1 2 3 4 5 6 7 8
+                  ↑ primeiro 'v'
+
+  Posição 5 é ESPAÇO — desloca todos em +1 vs. o esperado.
+  return 8</pre>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Qual o valor retornado por <code>busca5(ord, 9, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) &nbsp;3 &nbsp;&nbsp;(estimativa ⌊log₂9⌋)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) &nbsp;2 &nbsp;&nbsp;(muito pouco)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) &nbsp;4 &nbsp;&nbsp;(passos reais até achar 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) &nbsp;5 &nbsp;&nbsp;(demais)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">✔ Correto! São 4 iterações — o 9 fica no extremo direito.
+<pre>
+ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9},  n=9,  x=9
+─────────────────────────────────────────────────
+Passo 1:  esq=0  dir=8  meio=4  v[4]=3 &lt; 9  →  esq=5
+Passo 2:  esq=5  dir=8  meio=6  v[6]=7 &lt; 9  →  esq=7
+Passo 3:  esq=7  dir=8  meio=7  v[7]=7 &lt; 9  →  esq=8
+Passo 4:  esq=8  dir=8  meio=8  v[8]=9 = 9  ✓  return 4
+─────────────────────────────────────────────────
+⌊log₂9⌋+1 = 4 — máximo possível para n=9.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">✘ O 9 está no extremo — o meio inicial (4) aponta para 3, longe do 9.
+<pre>
+  Passo 1: meio=4, v[4]=3 &lt; 9 → esq=5   (não achou)
+  Passo 2: meio=6, v[6]=7 &lt; 9 → esq=7   (não achou)
+  Passo 3: meio=7, v[7]=7 &lt; 9 → esq=8   (não achou)
+  Passo 4: meio=8, v[8]=9 = 9 → return 4 ✓
+
+  São 4 passos, não 3.</pre>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>busca6(mat, 3, 9, 0)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) &nbsp;-1 &nbsp;&nbsp;(0 não achado a partir de i=3)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) &nbsp;0 &nbsp;&nbsp;(o próprio valor buscado)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">c) &nbsp;3 &nbsp;&nbsp;(índice onde 0 foi achado)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) &nbsp;4 &nbsp;&nbsp;(próximo após o 0)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">✔ Correto! A chamada começa em i=3 e mat[3]=0 é encontrado de imediato.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7},  i=3,  n=9,  x=0
+                   ↑
+                 i=3 ← ponto de partida
+─────────────────────────────────────────────────
+busca6(mat, 3, 9, 0):
+  i=3 &gt;= 9?   Não
+  v[3]=0 == 0? SIM  →  return 3  ✓
+
+  (A recursão nem chega a i=4 — acha na 1ª chamada)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">✘ A busca começa em i=3, não em i=0. mat[3]=0 é achado imediatamente.
+<pre>
+  ✘ -1: 0 existe em mat[3]; a busca não falha.
+  ✘  0: a função retorna o ÍNDICE, não o valor.
+  ✓  3: v[3]==0 → return 3</pre>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Qual o valor retornado por <code>busca2(ord, 9, 1)</code>? O valor 1 <em>não existe</em> em <code>ord[]</code>.</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) &nbsp;0 &nbsp;&nbsp;(índice mais próximo)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) &nbsp;1 &nbsp;&nbsp;(o próprio valor)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) &nbsp;2 &nbsp;&nbsp;(próxima posição)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">d) &nbsp;-1 &nbsp;&nbsp;(esq &gt; dir → não encontrado)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">✔ Correto! Quando esq > dir o laço termina sem encontrar e retorna -1.
+<pre>
+ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9},  n=9,  x=1
+─────────────────────────────────────────────────
+It.1: esq=0 dir=8  meio=4  v[4]=3 &gt; 1  →  dir=3
+It.2: esq=0 dir=3  meio=1  v[1]=2 &gt; 1  →  dir=0
+It.3: esq=0 dir=0  meio=0  v[0]=0 &lt; 1  →  esq=1
+─────────────────────────────────────────────────
+esq=1 &gt; dir=0  →  while falha  →  return -1
+O 1 ficaria entre v[0]=0 e v[1]=2, mas não existe.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">✘ O 1 não existe. A busca binária detecta isso quando esq > dir.
+<pre>
+  It.1: meio=4, v[4]=3 &gt; 1 → dir=3
+  It.2: meio=1, v[1]=2 &gt; 1 → dir=0
+  It.3: meio=0, v[0]=0 &lt; 1 → esq=1
+  esq=1 &gt; dir=0  →  return -1</pre>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Qual o valor retornado por <code>conta(mat, 9, 3)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) &nbsp;2</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) &nbsp;3 &nbsp;&nbsp;(o dígito 3 aparece 3 vezes)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) &nbsp;4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) &nbsp;1</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">✔ Correto! O dígito 3 ocorre 3 vezes na matrícula 232037937.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7},  x=3
+         0  1  2  3  4  5  6  7  8
+─────────────────────────────────────────────────
+  i=1: v[1]=3 == 3  →  c=1  ◄─ posição 1
+  i=4: v[4]=3 == 3  →  c=2  ◄─ posição 4
+  i=7: v[7]=3 == 3  →  c=3  ◄─ posição 7
+  (demais não são iguais a 3)
+─────────────────────────────────────────────────
+  return 3</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">✘ Trace o vetor completo — o 3 aparece nos índices 1, 4 e 7.
+<pre>
+  mat = {2, 3, 2, 0, 3, 7, 9, 3, 7}
+              ↑        ↑        ↑
+            idx=1    idx=4    idx=7   →   3 ocorrências</pre>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor retornado por <code>busca1(mat, 9, 0)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) &nbsp;0 &nbsp;&nbsp;(o próprio valor)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) &nbsp;3 &nbsp;&nbsp;(índice único do dígito 0)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) &nbsp;4 &nbsp;&nbsp;(posição seguinte)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) &nbsp;-1 &nbsp;&nbsp;(0 não existe na matrícula)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">✔ Correto! O único 0 da matrícula está no índice 3.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7},  n=9,  x=0
+─────────────────────────────────────────────────
+  i=0: v[0]=2 ≠ 0 → continua
+  i=1: v[1]=3 ≠ 0 → continua
+  i=2: v[2]=2 ≠ 0 → continua
+  i=3: v[3]=0 = 0 → condição v[i]!=x FALSA, sai
+─────────────────────────────────────────────────
+Pós-laço: i=3,  3 &lt; 9  →  return 3</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">✘ Retorna o ÍNDICE, não o valor. E o 0 existe na matrícula (232037937).
+<pre>
+  v[3]=0 é encontrado → return 3
+
+  ✘ Resposta 0: confunde índice com valor.
+  ✘ Resposta -1: o dígito 0 existe na matrícula!</pre>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Qual o valor retornado por <code>busca5(ord, 9, 2)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) &nbsp;1 &nbsp;&nbsp;(muito poucos passos)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) &nbsp;2 &nbsp;&nbsp;(passos reais para achar 2)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) &nbsp;4</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">✔ Correto! Apenas 2 iterações para encontrar 2 em ord[].
+<pre>
+ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9},  n=9,  x=2
+         0  1  2  3  4  5  6  7  8
+─────────────────────────────────────────────────
+Passo 1:  esq=0  dir=8  meio=4  v[4]=3 &gt; 2  →  dir=3   passos=1
+Passo 2:  esq=0  dir=3  meio=1  v[1]=2 = 2  ✓           passos=2  →  return 2
+─────────────────────────────────────────────────
+O meio vai de 4 para 1 — direto ao primeiro 2.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">✘ Trace as iterações: o meio cai de 4 para 1, achando o 2 na 2ª iteração.
+<pre>
+  Passo 1: esq=0, dir=8, meio=4, v[4]=3 &gt; 2 → dir=3
+  Passo 2: esq=0, dir=3, meio=1, v[1]=2 = 2 → return 2
+
+  Não é 3 nem 4: na 2ª iteração já encontra.</pre>
+      </div>
+    </div>
+
+  </div><!-- .quiz -->
+
+</div><!-- .container -->
+
+<footer>
+  <strong>EDA · UnB Gama</strong> — Simulado: Algoritmos de Busca · Matrícula 232037937
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

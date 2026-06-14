@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulado Prova P2 — Modelo 2 · EDA 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #17171e;
+      --surface2: #1e1e28;
+      --border: #2a2a38;
+      --accent: #6ab4f7;
+      --accent2: #4a94d7;
+      --accent3: #9fd0ff;
+      --accent4: #0f1e30;
+      --text: #e8e8f0;
+      --text-muted: #7a7a9a;
+      --code-bg: #12121a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #08101a 0%, #0f1e30 50%, #08101a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(106,180,247,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    header::after {
+      content: 'SIMULADO';
+      position: absolute;
+      top: 50%;
+      right: 2rem;
+      transform: translateY(-50%);
+      font-family: 'Fraunces', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      color: rgba(106,180,247,0.06);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .header-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      opacity: 0.9;
+    }
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .header-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .badge strong { color: var(--accent); }
+
+    .score-bar {
+      max-width: 900px;
+      margin: 1.5rem auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .score-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .score-val {
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .code-block-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.6;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .quiz {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .quiz-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+
+    .quiz-q p { font-size: 0.95rem; margin-bottom: 1rem; }
+
+    .quiz-q code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      background: var(--code-bg);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      color: var(--accent3);
+    }
+
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .quiz-opt {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .quiz-opt:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--surface2);
+    }
+
+    .quiz-opt.correct { background: #0d2e1a; border-color: #3d9e5e; color: #7fdd9a; }
+    .quiz-opt.wrong   { background: #2e0d0d; border-color: #9e3d3d; color: #dd7f7f; }
+
+    .quiz-feedback {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .quiz-feedback.ok  { background: #0d2218; border: 1px solid #2a6640; color: #a0d4b0; }
+    .quiz-feedback.err { background: #1e0e0e; border: 1px solid #5a2020; color: #d4a0a0; }
+
+    .quiz-feedback pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.5rem; }
+      header { padding: 1.5rem 1rem 1.25rem; }
+      main { padding: 1rem 1rem 3rem; }
+      header::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">EDA 1 · Estrutura de Dados e Algoritmos · P2</div>
+    <h1>Simulado — <span>Prova P2</span> · Modelo 2</h1>
+    <p class="header-sub">Busca Recursiva · Insertion Sort · QuickSort · Estruturas Lineares</p>
+    <div class="badge-row">
+      <div class="badge"><strong>Aluno:</strong> italo alves sampaio de oliveira</div>
+      <div class="badge"><strong>Matrícula:</strong> 232037937</div>
+      <div class="badge"><strong>Questões:</strong> 10</div>
+      <div class="badge"><strong>Modelo:</strong> 2 / 2</div>
+    </div>
+  </div>
+</header>
+
+<div class="score-bar" style="max-width:900px;margin:1.5rem auto;padding:1rem 1.5rem;">
+  <div class="score-label">Pontuação</div>
+  <div class="score-val" id="score-val">0</div>
+  <div class="score-label">/ 10</div>
+</div>
+
+<main>
+
+  <div class="code-block">
+    <div class="code-block-title">// Código de referência — leia antes de responder</div>
+    <pre>
+/* Parâmetros do aluno ──────────────────────────────────────── */
+int mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7};   /* matrícula: 232037937, n=9 */
+int ord[] = {0, 2, 2, 3, 3, 3, 7, 7, 9};   /* mat[] ordenado            */
+
+/* ── Busca ─────────────────────────────────────────────────── */
+int busca_rec(int v[], int ini, int fim, int x) {
+    if (ini &gt; fim) return -1;
+    int meio = (ini + fim) / 2;
+    if (v[meio] == x) return meio;
+    if (v[meio] &lt; x)  return busca_rec(v, meio + 1, fim, x);
+    return busca_rec(v, ini, meio - 1, x);
+}
+
+int contaOcorr(int v[], int n, int x) {
+    int c = 0;
+    for (int i = 0; i &lt; n; i++)
+        if (v[i] == x) c++;
+    return c;
+}
+
+/* ── Ordenação ──────────────────────────────────────────────── */
+void insertionSort(int v[], int n) {
+    for (int i = 1; i &lt; n; i++) {
+        int chave = v[i], j = i - 1;
+        while (j &gt;= 0 &amp;&amp; v[j] &gt; chave) {
+            v[j+1] = v[j];
+            j--;
+        }
+        v[j+1] = chave;
+    }
+}
+
+int separa(int v[], int ini, int fim) {
+    int pivo = v[fim], i = ini - 1;
+    for (int j = ini; j &lt; fim; j++) {
+        if (v[j] &lt;= pivo) {
+            i++;
+            int tmp = v[i]; v[i] = v[j]; v[j] = tmp;
+        }
+    }
+    int tmp = v[i+1]; v[i+1] = v[fim]; v[fim] = tmp;
+    return i + 1;
+}
+
+/* ── Complexidade ───────────────────────────────────────────── */
+int f3(int n) {
+    int c = 0;
+    for (int i = 0; i &lt; n; i++)
+        for (int j = 0; j &lt; n; j += 2)
+            c++;
+    return c;
+}
+
+int f4(int n) {
+    if (n &lt;= 1) return 1;
+    return f4(n / 2) + 1;
+}
+
+/* ── Estruturas Lineares ────────────────────────────────────── */
+typedef struct No { int val; struct No* prox; } No;
+/* lista: 2→3→2→0→3→7→9→3→7→NULL  (dígitos da matrícula) */
+
+int nth(No* l, int n) {
+    while (n &gt; 0) { l = l-&gt;prox; n--; }
+    return l-&gt;val;
+}
+
+int penultimo(No* l) {
+    while (l-&gt;prox-&gt;prox != NULL)
+        l = l-&gt;prox;
+    return l-&gt;val;
+}
+
+int somaPos(No* l) {
+    int s = 0, i = 0;
+    while (l) {
+        if (i % 2 == 0) s += l-&gt;val;
+        l = l-&gt;prox;
+        i++;
+    }
+    return s;
+}
+
+int busca_lista(No* l, int x) {
+    int i = 0;
+    while (l) {
+        if (l-&gt;val == x) return i;
+        l = l-&gt;prox;
+        i++;
+    }
+    return -1;
+}</pre>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 1 — Busca Binária Recursiva</div>
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>busca_rec(ord, 0, 8, 2)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) 0</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) 1</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) -1</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">
+        ✔ Correto! A busca binária recursiva encontra o valor 2 no índice 1 em 2 chamadas.
+        <pre>
+ord = { 0,  2,  2,  3,  3,  3,  7,  7,  9 }
+idx =   0   1   2   3   4   5   6   7   8
+
+chamada 1: ini=0, fim=8, meio=4
+           ord[4]=3  &gt; x=2  →  busca_rec(v, 0, 3, 2)
+
+chamada 2: ini=0, fim=3, meio=1
+           ord[1]=2 == x=2  →  return 1  ✓
+
+Resultado: índice 1 (a primeira ocorrência de 2 encontrada)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">
+        ✘ Errado. A função retorna o ÍNDICE, não o valor. Meio da primeira chamada é 4 (val=3 &gt; 2), então busca na metade esquerda. Meio de [0,3] é 1 (val=2) → return 1.
+        <pre>
+ini=0 fim=8 meio=4 → ord[4]=3 &gt; 2 → busca em [0,3]
+ini=0 fim=3 meio=1 → ord[1]=2 == 2 → return 1</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 2 — Contagem de Ocorrências</div>
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>contaOcorr(mat, 9, 3)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 1</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">d) 3</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">
+        ✔ Correto! O valor 3 aparece exatamente 3 vezes em mat[] (índices 1, 4 e 7).
+        <pre>
+mat = { 2,  3,  2,  0,  3,  7,  9,  3,  7 }
+idx =   0   1   2   3   4   5   6   7   8
+
+i=0: mat[0]=2 ≠ 3
+i=1: mat[1]=3 == 3  →  c=1  ✓
+i=2: mat[2]=2 ≠ 3
+i=3: mat[3]=0 ≠ 3
+i=4: mat[4]=3 == 3  →  c=2  ✓
+i=5: mat[5]=7 ≠ 3
+i=6: mat[6]=9 ≠ 3
+i=7: mat[7]=3 == 3  →  c=3  ✓
+i=8: mat[8]=7 ≠ 3
+
+return 3  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">
+        ✘ Errado. Percorra mat[] e conte todas as posições onde mat[i]==3: índices 1, 4 e 7 → contagem = 3.
+        <pre>
+mat = { 2, 3, 2, 0, 3, 7, 9, 3, 7 }
+            ↑        ↑        ↑
+           i=1      i=4      i=7   →  c=3</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 3 — Insertion Sort</div>
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Após a execução de <code>insertionSort(mat, 9)</code>, qual o valor de <code>mat[5]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 7</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) 0</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 2</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">d) 3</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">
+        ✔ Correto! O insertionSort ordena mat[] em {0,2,2,3,3,3,7,7,9}. A posição 5 recebe o valor 3.
+        <pre>
+mat inicial = { 2, 3, 2, 0, 3, 7, 9, 3, 7 }
+
+Trace completo:
+i=1: chave=3, v[0]=2 não &gt; 3 → sem deslocamento → {2,3,2,0,3,7,9,3,7}
+i=2: chave=2, v[1]=3 &gt; 2 → v[2]=3; v[0]=2 não &gt; 2 → v[1]=2
+     → {2,2,3,0,3,7,9,3,7}
+i=3: chave=0, v[2]=3,v[1]=2,v[0]=2 todos &gt; 0 → desloca todos
+     → {0,2,2,3,3,7,9,3,7}
+i=4: chave=3, v[3]=3 não &gt; 3 → sem deslocamento
+     → {0,2,2,3,3,7,9,3,7}
+i=5: chave=7, v[4]=3 não &gt; 7 → sem deslocamento
+     → {0,2,2,3,3,7,9,3,7}
+i=6: chave=9, v[5]=7 não &gt; 9 → sem deslocamento
+     → {0,2,2,3,3,7,9,3,7}
+i=7: chave=3, v[6]=9,v[5]=7 &gt; 3 → desloca; v[4]=3 não &gt; 3
+     → {0,2,2,3,3,3,7,9,7}
+i=8: chave=7, v[7]=9 &gt; 7 → desloca; v[6]=7 não &gt; 7
+     → {0,2,2,3,3,3,7,7,9}
+
+mat[5] = 3  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">
+        ✘ Errado. O insertionSort produz a sequência ordenada {0,2,2,3,3,3,7,7,9}. O índice 5 contém o valor 3.
+        <pre>
+Resultado de insertionSort(mat, 9):
+idx = 0  1  2  3  4  5  6  7  8
+val = 0  2  2  3  3  3  7  7  9
+                    ↑
+                 mat[5] = 3</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 4 — QuickSort (separa)</div>
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Qual o valor retornado por <code>separa(mat, 0, 8)</code>? (pivô = mat[8] = 7)</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) 5</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) 6</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) 8</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">d) 7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">
+        ✔ Correto! Com pivô=7, todos os elementos exceto mat[6]=9 são ≤7, então o pivô vai para o índice 7.
+        <pre>
+mat = { 2, 3, 2, 0, 3, 7, 9, 3, 7 }
+pivo = mat[8] = 7,  i = -1
+
+j=0: mat[0]=2  ≤ 7  →  i=0, swap mat[0]↔mat[0]  (sem efeito)
+j=1: mat[1]=3  ≤ 7  →  i=1, swap mat[1]↔mat[1]  (sem efeito)
+j=2: mat[2]=2  ≤ 7  →  i=2, swap mat[2]↔mat[2]  (sem efeito)
+j=3: mat[3]=0  ≤ 7  →  i=3, swap mat[3]↔mat[3]  (sem efeito)
+j=4: mat[4]=3  ≤ 7  →  i=4, swap mat[4]↔mat[4]  (sem efeito)
+j=5: mat[5]=7  ≤ 7  →  i=5, swap mat[5]↔mat[5]  (sem efeito)
+j=6: mat[6]=9  &gt; 7  →  sem swap
+j=7: mat[7]=3  ≤ 7  →  i=6, swap mat[6]↔mat[7]
+     mat = { 2, 3, 2, 0, 3, 7, 3, 9, 7 }
+
+fim do loop: swap mat[i+1]=mat[7] ↔ mat[8] (pivô)
+     mat = { 2, 3, 2, 0, 3, 7, 3, 7, 9 }
+
+return i+1 = 7  ✓
+
+Verificação: mat[0..6] ≤ 7 e mat[8]=9 &gt; 7 ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">
+        ✘ Errado. O pivô é mat[8]=7. Após particionar, todos elementos ≤7 ficam à esquerda. O único elemento &gt;7 é mat[6]=9, que fica à direita. O pivô 7 vai para o índice 7.
+        <pre>
+Antes: { 2, 3, 2, 0, 3, 7, 9, 3, 7 }
+                             ↑
+                          único &gt; pivô → fica à direita
+
+Após:  { 2, 3, 2, 0, 3, 7, 3, 7, 9 }
+                              ↑  ↑
+                           pivô=7 em idx=7, 9 em idx=8
+
+return 7</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 5 — Complexidade O(n · n/2)</div>
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Qual o valor retornado por <code>f3(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) 36</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) 81</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) 45</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) 18</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">
+        ✔ Correto! O loop externo itera n=9 vezes; o interno pula de 2 em 2, fazendo ⌈9/2⌉=5 iterações.
+        <pre>
+f3(9): loop externo i=0..8 (9 vezes)
+       loop interno j=0,2,4,6,8 enquanto j&lt;9 (5 vezes)
+
+i=0: j=0,2,4,6,8  →  5 incrementos
+i=1: j=0,2,4,6,8  →  5 incrementos
+i=2: j=0,2,4,6,8  →  5 incrementos
+...  (igual para cada i)
+i=8: j=0,2,4,6,8  →  5 incrementos
+
+Total = 9 × 5 = 45
+
+Complexidade: O(n × n/2) = O(n²/2) = O(n²)  →  return 45  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">
+        ✘ Errado. O loop interno j+=2 faz ⌈n/2⌉=5 passos (j=0,2,4,6,8). O externo faz 9. Total = 9×5 = 45.
+        <pre>
+Loop interno com j+=2, n=9:
+j = 0, 2, 4, 6, 8  →  5 iterações (j=10 seria ≥ 9, para)
+Loop externo: 9 iterações
+9 × 5 = 45</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 6 — Recursão (f4)</div>
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>f4(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) 5</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">
+        ✔ Correto! f4 divide n por 2 a cada chamada até n≤1. São 4 chamadas para n=9.
+        <pre>
+f4(9)  →  f4(9/2)  + 1  =  f4(4) + 1
+f4(4)  →  f4(4/2)  + 1  =  f4(2) + 1
+f4(2)  →  f4(2/2)  + 1  =  f4(1) + 1
+f4(1)  →  n≤1  →  return 1  ← base
+
+Desdobrando de baixo para cima:
+f4(1) = 1
+f4(2) = f4(1) + 1 = 1 + 1 = 2
+f4(4) = f4(2) + 1 = 2 + 1 = 3
+f4(9) = f4(4) + 1 = 3 + 1 = 4
+
+return 4  ✓
+
+(f4 conta a profundidade da recursão: ⌊log₂(9)⌋ + 1 = 3 + 1 = 4)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">
+        ✘ Errado. Trace as chamadas: f4(9)→f4(4)→f4(2)→f4(1)=1. Cada retorno soma 1: 1+1+1+1=4.
+        <pre>
+f4(9) → f4(4) → f4(2) → f4(1)=1
+                          ↑
+                    retorna 1+1=2
+               ↑
+         retorna 2+1=3
+    ↑
+retorna 3+1=4</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 7 — Lista Ligada (nth)</div>
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Qual o valor retornado por <code>nth(lista, 5)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">c) 7</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 0</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">
+        ✔ Correto! nth avança 5 nós a partir da cabeça. O nó de índice 5 tem valor 7.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+idx =  0   1   2   3   4   5   6   7   8
+
+nth(lista, 5): avança o ponteiro 5 vezes.
+
+n=5: l = l→prox  (l aponta para nó val=3, idx=1)
+n=4: l = l→prox  (l aponta para nó val=2, idx=2)
+n=3: l = l→prox  (l aponta para nó val=0, idx=3)
+n=2: l = l→prox  (l aponta para nó val=3, idx=4)
+n=1: l = l→prox  (l aponta para nó val=7, idx=5)
+n=0: para
+
+return l→val = 7  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">
+        ✘ Errado. nth avança n=5 vezes. Índice 5 corresponde ao 6º elemento da lista (0-indexado).
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+       0   1   2   3   4   5   6   7   8
+                           ↑
+                        índice 5  →  val = 7</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 8 — Lista Ligada (penultimo)</div>
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Qual o valor retornado por <code>penultimo(lista)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) 7</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">c) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) 2</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">
+        ✔ Correto! O penúltimo nó da lista tem valor 3 (oitavo nó, antes do último 7).
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+       0   1   2   3   4   5   6   7   8
+
+penultimo avança enquanto l→prox→prox != NULL:
+
+l=nó0(2):  l→prox→prox=nó2  ≠ NULL  →  l=nó1(3)
+l=nó1(3):  l→prox→prox=nó3  ≠ NULL  →  l=nó2(2)
+l=nó2(2):  l→prox→prox=nó4  ≠ NULL  →  l=nó3(0)
+l=nó3(0):  l→prox→prox=nó5  ≠ NULL  →  l=nó4(3)
+l=nó4(3):  l→prox→prox=nó6  ≠ NULL  →  l=nó5(7)
+l=nó5(7):  l→prox→prox=nó7  ≠ NULL  →  l=nó6(9)
+l=nó6(9):  l→prox→prox=nó8  ≠ NULL  →  l=nó7(3)
+l=nó7(3):  l→prox→prox=NULL == NULL →  para
+
+return l→val = 3  ✓  (penúltimo elemento)
+
+Último=7 (idx 8), penúltimo=3 (idx 7)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">
+        ✘ Errado. A função para quando l→prox→prox==NULL, ou seja, quando l aponta para o penúltimo nó. O último da lista é 7 (idx 8), então o penúltimo é 3 (idx 7).
+        <pre>
+... → 9 → 3 → 7 → NULL
+       6   7   8
+            ↑
+       penúltimo = 3</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 9 — Lista Ligada (somaPos)</div>
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor retornado por <code>somaPos(lista)</code>? (soma nós em posições pares: 0,2,4,...)</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) 36</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) 13</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) 23</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) 19</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">
+        ✔ Correto! Somando os valores nos índices pares (0,2,4,6,8): 2+2+3+9+7 = 23.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+idx =  0   1   2   3   4   5   6   7   8
+
+i%2==0? SIM NÃO SIM NÃO SIM NÃO SIM NÃO SIM
+
+s=0
+i=0: 0%2==0 → s += 2   s=2
+i=1: 1%2==1 → pula
+i=2: 2%2==0 → s += 2   s=4
+i=3: 3%2==1 → pula
+i=4: 4%2==0 → s += 3   s=7
+i=5: 5%2==1 → pula
+i=6: 6%2==0 → s += 9   s=16
+i=7: 7%2==1 → pula
+i=8: 8%2==0 → s += 7   s=23
+
+return 23  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">
+        ✘ Errado. somaPos soma apenas os valores em posições PARES (i%2==0). Índices 0,2,4,6,8 têm valores 2,2,3,9,7 → soma = 23.
+        <pre>
+Posições pares: idx 0,2,4,6,8
+Valores:         2, 2, 3, 9, 7
+Soma:     2+2+3+9+7 = 23</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 10 — Lista Ligada (busca_lista)</div>
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Qual o valor retornado por <code>busca_lista(lista, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) -1</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">c) 6</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) 7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">
+        ✔ Correto! O valor 9 está no 7º nó da lista (índice 6). A função retorna o índice 6.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+idx =  0   1   2   3   4   5   6   7   8
+
+i=0: l→val=2 ≠ 9  →  l=l→prox, i=1
+i=1: l→val=3 ≠ 9  →  l=l→prox, i=2
+i=2: l→val=2 ≠ 9  →  l=l→prox, i=3
+i=3: l→val=0 ≠ 9  →  l=l→prox, i=4
+i=4: l→val=3 ≠ 9  →  l=l→prox, i=5
+i=5: l→val=7 ≠ 9  →  l=l→prox, i=6
+i=6: l→val=9 == 9 →  return 6  ✓
+
+Resultado: índice 6 (não o valor 9 em si)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">
+        ✘ Errado. A função retorna o ÍNDICE da primeira ocorrência de x=9, não o valor. O 9 está no índice 6 da lista.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+       0   1   2   3   4   5   6   7   8
+                                   ↑
+                                val=9 está em índice 6  →  return 6</pre>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  EDA 1 · Simulado Prova P2 — Modelo 2 · Matrícula 232037937 · italo alves sampaio de oliveira
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>

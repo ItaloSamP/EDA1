@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado — Algoritmos de Ordenação · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #0f0a1a 0%, #1a0a2e 50%, #0e081a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(124,106,247,0.14) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'SIMULADO'; position: absolute; right: 40px; top: 10px;
+    font-size: 130px; font-family: 'Fraunces', serif;
+    color: rgba(124,106,247,0.05); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent2); border-color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .badge-purple { color: var(--accent);  border-color: var(--accent);  background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  section { margin: 48px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h2 span { color: var(--accent); }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; }
+
+  .score-bar { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar span { color: var(--accent); font-size: 1.1rem; font-weight: 700; }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 8px 0 56px; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q > p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q > p code { font-family: 'JetBrains Mono', monospace; font-size: .9em; color: var(--accent); }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; padding: 12px 16px; border-radius: 8px; line-height: 1.65; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); border: 1px solid rgba(106,247,196,0.2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); border: 1px solid rgba(247,106,154,0.2); }
+  .quiz-feedback pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin: 8px 0; font-size: 11.5px; line-height: 1.55; color: #9898c0; white-space: pre; overflow-x: auto; font-family: 'JetBrains Mono', monospace; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .quiz { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Simulado Prova 2</div>
+    <h1>Simulado: <span>Algoritmos de Ordenação</span></h1>
+    <p class="subtitle">Trace cada função com os dados da sua matrícula. Mesma complexidade das questões de prova — código C real, resposta única, feedback com fluxo completo.</p>
+    <div class="badge-row">
+      <span class="badge badge-purple">Bubble Sort</span>
+      <span class="badge badge-green">Selection Sort</span>
+      <span class="badge badge-orange">Insertion Sort</span>
+      <span class="badge badge-pink">QuickSort — separa</span>
+      <span class="badge badge-yellow">Trocas e Passes</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section>
+    <div class="section-number">// código comum</div>
+    <h2>Funções e <span>dados de entrada</span></h2>
+    <p>Todas as questões usam o bloco abaixo. Trace cada função com os parâmetros indicados.</p>
+    <pre><code>/* ── Dado do estudante ──────────────────────────────────────────── */
+int mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7};  /* dígitos de 232037937, n=9 */
+
+/* ── Selection Sort ─────────────────────────────────────────────── */
+int minIdx(int v[], int esq, int n) {
+    int m = esq;
+    for (int j = esq+1; j &lt; n; j++)
+        if (v[j] &lt; v[m]) m = j;
+    return m;
+}
+
+int selTrocas(int v[], int n) {             /* retorna total de trocas   */
+    int trocas = 0;
+    for (int i = 0; i &lt; n-1; i++) {
+        int m = minIdx(v, i, n);
+        if (m != i) {
+            int tmp = v[i]; v[i] = v[m]; v[m] = tmp;
+            trocas++;
+        }
+    }
+    return trocas;
+}
+
+/* ── Bubble Sort ────────────────────────────────────────────────── */
+int bubblePasse1(int v[], int n) {          /* trocas na 1ª passagem     */
+    int trocas = 0;
+    for (int j = 0; j &lt; n-1; j++) {
+        if (v[j] &gt; v[j+1]) {
+            int tmp = v[j]; v[j] = v[j+1]; v[j+1] = tmp;
+            trocas++;
+        }
+    }
+    return trocas;
+}
+
+/* ── Insertion Sort ─────────────────────────────────────────────── */
+/* Simule manualmente os estados após i=1, i=2, i=3... */
+
+/* ── QuickSort — partição ───────────────────────────────────────── */
+int separa(int v[], int esq, int dir) {
+    int piv = v[dir], i = esq - 1, tmp;
+    for (int j = esq; j &lt; dir; j++) {
+        if (v[j] &lt;= piv) {
+            i++;
+            tmp = v[i]; v[i] = v[j]; v[j] = tmp;
+        }
+    }
+    tmp = v[i+1]; v[i+1] = v[dir]; v[dir] = tmp;
+    return i + 1;
+}</code></pre>
+  </section>
+
+  <div class="score-bar">Pontuação atual: <span id="score-val">0</span> / 10</div>
+
+  <div class="quiz">
+    <div class="quiz-title">Analise o código e responda</div>
+
+    <!-- Q1 -->
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>bubblePasse1(mat, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) &nbsp;3 &nbsp;&nbsp;(trocas a menos)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) &nbsp;4 &nbsp;&nbsp;(trocas na 1ª passagem)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) &nbsp;5</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) &nbsp;2</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">✔ Correto! Há exatamente 4 trocas na primeira passagem.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7},  n=9
+─────────────────────────────────────────────────
+j=0: v[0]=2, v[1]=3 │ 2&gt;3? NÃO
+j=1: v[1]=3, v[2]=2 │ 3&gt;2? SIM ✓  →  {2,2,3,0,...}   trocas=1
+j=2: v[2]=3, v[3]=0 │ 3&gt;0? SIM ✓  →  {2,2,0,3,...}   trocas=2
+j=3: v[3]=3, v[4]=3 │ 3&gt;3? NÃO
+j=4: v[4]=3, v[5]=7 │ 3&gt;7? NÃO
+j=5: v[5]=7, v[6]=9 │ 7&gt;9? NÃO
+j=6: v[6]=9, v[7]=3 │ 9&gt;3? SIM ✓  →  {...,3,9,7}     trocas=3
+j=7: v[7]=9, v[8]=7 │ 9&gt;7? SIM ✓  →  {...,7,9}       trocas=4
+─────────────────────────────────────────────────
+Após passe 1: {2, 2, 0, 3, 3, 7, 3, 7, 9}   return 4</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">✘ Trace cada par adjacente do início ao fim.
+<pre>
+  Trocas em j=1 (3&gt;2), j=2 (3&gt;0), j=6 (9&gt;3), j=7 (9&gt;7)
+  Total: 4 trocas — não 3, não 5.</pre>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>minIdx(mat, 0, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) &nbsp;0 &nbsp;&nbsp;(primeiro índice)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) &nbsp;2 &nbsp;&nbsp;(índice de outro 2)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">c) &nbsp;3 &nbsp;&nbsp;(índice do mínimo: v[3]=0)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) &nbsp;4</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">✔ Correto! O menor valor é 0, localizado no índice 3.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7},  esq=0, n=9
+─────────────────────────────────────────────────
+  m=0 (v[0]=2 é o atual mínimo)
+  j=1: v[1]=3, 3&lt;2? não  →  m=0
+  j=2: v[2]=2, 2&lt;2? não  →  m=0
+  j=3: v[3]=0, 0&lt;2? SIM  →  m=3  ◄─ novo mínimo
+  j=4..8: nenhum &lt; 0     →  m=3
+─────────────────────────────────────────────────
+  return 3  (índice do mínimo, não o valor)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">✘ minIdx retorna o ÍNDICE do menor elemento, não o valor.
+<pre>
+  O menor elemento é 0, que está em mat[3].
+  return 3 (índice), não 0 (valor).</pre>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Após a <em>primeira iteração</em> (i=0) de <code>selTrocas(mat, 9)</code>, qual é <code>mat[0]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) &nbsp;2 &nbsp;&nbsp;(valor original)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">c) &nbsp;0 &nbsp;&nbsp;(mínimo trocado para a posição 0)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) &nbsp;7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">✔ Correto! O mínimo global (0, índice 3) é trocado com mat[0].
+<pre>
+Antes: mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7}
+                ↑           ↑
+              i=0          m=3 (mínimo)
+─────────────────────────────────────────────────
+  i=0: m = minIdx(mat, 0, 9) = 3
+       m ≠ i  →  swap(mat[0], mat[3])
+       mat[0]=0,  mat[3]=2
+
+Depois: {0, 3, 2, 2, 3, 7, 9, 3, 7}
+         ↑
+       mat[0] = 0  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">✘ O Selection Sort move o mínimo global para mat[0] na 1ª iteração.
+<pre>
+  mínimo de mat[0..8] = 0, no índice 3
+  swap mat[0] ↔ mat[3]  →  mat[0] recebe 0</pre>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Qual o valor retornado por <code>selTrocas(mat, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) &nbsp;8 &nbsp;&nbsp;(n−1, mas nem todas são necessárias)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) &nbsp;7</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) &nbsp;6 &nbsp;&nbsp;(trocas efetivas; 2 iterações sem swap)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) &nbsp;9</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">✔ Correto! Apenas 6 das 8 iterações resultam em troca efetiva.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7}
+─────────────────────────────────────────────────
+i=0: min=3(val=0)  ≠0  TROCA  → {0,3,2,2,3,7,9,3,7}  t=1
+i=1: min=2(val=2)  ≠1  TROCA  → {0,2,3,2,3,7,9,3,7}  t=2
+i=2: min=3(val=2)  ≠2  TROCA  → {0,2,2,3,3,7,9,3,7}  t=3
+i=3: min=3(val=3)  =3  NÃO TROCA
+i=4: min=4(val=3)  =4  NÃO TROCA
+i=5: min=7(val=3)  ≠5  TROCA  → {0,2,2,3,3,3,9,7,7}  t=4
+i=6: min=7(val=7)  ≠6  TROCA  → {0,2,2,3,3,3,7,9,7}  t=5
+i=7: min=8(val=7)  ≠7  TROCA  → {0,2,2,3,3,3,7,7,9}  t=6
+─────────────────────────────────────────────────
+  return 6   (i=3 e i=4 não trocam: min==i)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">✘ O Selection Sort só troca quando m≠i — nas iterações i=3 e i=4 o mínimo já está no lugar.
+<pre>
+  8 iterações totais − 2 sem troca = 6 trocas
+  ✘ Erro comum: assumir sempre n−1=8 trocas.</pre>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Após o Insertion Sort processar <em>i=3</em> sobre <code>mat[]</code>, qual é o estado de <code>mat[0..3]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) &nbsp;{2, 2, 3, 0}</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) &nbsp;{0, 2, 3, 2}</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) &nbsp;{0, 2, 2, 3}</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) &nbsp;{0, 3, 2, 2}</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">✔ Correto! Após i=3, os 4 primeiros elementos estão ordenados.
+<pre>
+mat[] inicial = {2, 3, 2, 0, 3, 7, 9, 3, 7}
+─────────────────────────────────────────────────
+i=1: key=3, j=0: v[0]=2 &lt; 3  → sem deslocamento
+     mat = {2, 3, 2, 0, ...}
+
+i=2: key=2, j=1: v[1]=3 &gt; 2  → v[2]=3, j=0: 2≤2 para
+     v[1]=2  →  mat = {2, 2, 3, 0, ...}
+
+i=3: key=0, j=2: 3&gt;0 → v[3]=3
+            j=1: 2&gt;0 → v[2]=2
+            j=0: 2&gt;0 → v[1]=2, j=-1 → v[0]=0
+     mat = {0, 2, 2, 3, 3, 7, 9, 3, 7}
+─────────────────────────────────────────────────
+mat[0..3] = {0, 2, 2, 3}  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">✘ Trace i=1, i=2 e i=3 em sequência — o 0 desloca tudo à direita.
+<pre>
+  i=1: nenhuma troca (key=3 ≥ v[0]=2)
+  i=2: key=2 desloca o 3 → {2,2,3,...}
+  i=3: key=0 desloca 3,2,2 → {0,2,2,3,...}</pre>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>separa(mat, 0, 8)</code>? O pivô é <code>mat[8]=7</code>.</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) &nbsp;5</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) &nbsp;6</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">c) &nbsp;7 &nbsp;&nbsp;(posição final do pivô 7)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) &nbsp;8</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">✔ Correto! O pivô 7 termina no índice 7 após a partição.
+<pre>
+mat[] = {2,3,2,0,3,7,9,3,7}  piv=v[8]=7,  i=-1
+─────────────────────────────────────────────────
+j=0..5: v[j] ≤ 7 em todos → i cresce: i=0,1,2,3,4,5
+j=6: v[6]=9 &gt; 7 → pula
+j=7: v[7]=3 ≤ 7 → i=6, swap(v[6],v[7]):
+     {2,3,2,0,3,7,3,9,7}
+─────────────────────────────────────────────────
+Pós-loop: swap(v[i+1], v[dir]) = swap(v[7], v[8])
+     {2,3,2,0,3,7,3, 7, 9}
+                     ↑ pivô na pos 7
+     return i+1 = 7</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">✘ separa retorna o índice final do pivô, não o valor do pivô.
+<pre>
+  Após partição: {..., 7, 9}
+                       ↑
+                    índice 7  ← posição final do pivô 7
+  Todos os elementos antes ≤ 7; único após (9) &gt; 7.
+  return 7  (aqui o valor e o índice coincidem — raridade!)</pre>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Após a <em>segunda passagem</em> (i=1) do Bubble Sort sobre <code>mat[]</code>, qual é <code>mat[1]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) &nbsp;2</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) &nbsp;0 &nbsp;&nbsp;(o 0 borbulhou para a 2ª posição)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) &nbsp;7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">✔ Correto! Após o 2º passe, mat[1]=0 sobe para a segunda posição.
+<pre>
+Passe 1: {2,3,2,0,3,7,9,3,7} → {2,2,0,3,3,7,3,7,9}
+─────────────────────────────────────────────────
+Passe 2 (j=0..6):
+j=0: v[0]=2, v[1]=2 │ 2&gt;2? NÃO
+j=1: v[1]=2, v[2]=0 │ 2&gt;0? SIM ✓ → {2,0,2,3,3,7,3,7,9}
+j=2..4: nenhuma troca
+j=5: v[5]=7, v[6]=3 │ 7&gt;3? SIM ✓ → {...,3,7,7,9}
+j=6: 7&gt;7? NÃO
+─────────────────────────────────────────────────
+Após passe 2: {2, 0, 2, 3, 3, 3, 7, 7, 9}
+                   ↑
+              mat[1] = 0  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">✘ Aplique o passe 1 completo, depois trace o passe 2 a partir do resultado.
+<pre>
+  Passe 1 → {2, 2, 0, 3, 3, 7, 3, 7, 9}
+  Passe 2: j=1: v[1]=2 &gt; v[2]=0 → troca → {2,0,2,...}
+  mat[1] = 0 (o zero borbulhou para cima)</pre>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Em quantas passagens mínimas o Bubble Sort ordena completamente <code>mat[]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">a) &nbsp;3 &nbsp;&nbsp;(passe 4 seria sem trocas)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) &nbsp;4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">c) &nbsp;8 &nbsp;&nbsp;(n−1, mas o pior caso)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) &nbsp;5</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">✔ Correto! O vetor fica ordenado após apenas 3 passagens.
+<pre>
+Inicial: {2, 3, 2, 0, 3, 7, 9, 3, 7}
+─────────────────────────────────────────────────
+Passe 1: {2, 2, 0, 3, 3, 7, 3, 7, 9}   4 trocas
+Passe 2: {2, 0, 2, 3, 3, 3, 7, 7, 9}   2 trocas
+Passe 3: {0, 2, 2, 3, 3, 3, 7, 7, 9}   1 troca (j=0)
+─────────────────────────────────────────────────
+Passe 4: 0 trocas → vetor já ordenado!
+  3 passes são suficientes para este vetor.
+  n−1=8 é o pior caso, não este.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">✘ O vetor fica ordenado muito antes do n−1=8º passe.
+<pre>
+  Passe 1 → {2,2,0,3,3,7,3,7,9}
+  Passe 2 → {2,0,2,3,3,3,7,7,9}
+  Passe 3 → {0,2,2,3,3,3,7,7,9}  ← ordenado!
+  Passe 4 → sem trocas (confirma ordenação)
+
+  3 passos suficientes; n−1=8 é o pior caso.</pre>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor retornado por <code>separa(sub, 0, 4)</code> onde <code>sub[]={2,3,2,0,3}</code>? O pivô é <code>sub[4]=3</code>.</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) &nbsp;2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) &nbsp;4 &nbsp;&nbsp;(todos ≤ pivô → pivô vai ao fim)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) &nbsp;1</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">✔ Correto! Todos os elementos são ≤ 3, então o pivô fica no índice 4.
+<pre>
+sub[] = {2, 3, 2, 0, 3},  piv=sub[4]=3,  i=-1
+─────────────────────────────────────────────────
+j=0: sub[0]=2 ≤ 3 → i=0, swap(sub[0],sub[0])
+j=1: sub[1]=3 ≤ 3 → i=1, swap(sub[1],sub[1])
+j=2: sub[2]=2 ≤ 3 → i=2, swap(sub[2],sub[2])
+j=3: sub[3]=0 ≤ 3 → i=3, swap(sub[3],sub[3])
+─────────────────────────────────────────────────
+Pós-loop: swap(sub[i+1], sub[dir]) = swap(sub[4], sub[4])
+Nenhum elemento é maior que o pivô → pivô fica em dir=4.
+  return i+1 = 4</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">✘ Quando todos são ≤ pivô, o pivô termina na última posição (dir=4).
+<pre>
+  Todos os 4 elementos do subvetor são ≤ 3.
+  i chega a 3, e swap(sub[4], sub[4]) não muda nada.
+  return i+1 = 4</pre>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Após o Insertion Sort processar <em>i=1</em> e <em>i=2</em> sobre <code>mat[]</code>, quais são <code>mat[1]</code> e <code>mat[2]</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) &nbsp;mat[1]=2 após i=1; mat[2]=2 após i=2</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) &nbsp;mat[1]=3 após i=1; mat[2]=3 após i=2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) &nbsp;mat[1]=3 após i=1; mat[2]=2 após i=2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) &nbsp;mat[1]=0 após i=1; mat[2]=2 após i=2</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">✔ Correto! i=1 não altera o vetor; i=2 insere 2 antes do 3, deslocando o 3.
+<pre>
+mat[] = {2, 3, 2, 0, 3, 7, 9, 3, 7}
+─────────────────────────────────────────────────
+i=1: key=v[1]=3, j=0: v[0]=2, 2&gt;3? NÃO → para
+     v[1]=3 (sem mudança)  →  mat[1] = 3 ✓
+
+i=2: key=v[2]=2, j=1: v[1]=3, 3&gt;2? SIM → v[2]=3
+     j=0: v[0]=2, 2&gt;2? NÃO → para
+     v[1]=2
+     Após i=2: {2, 2, 3, 0, ...}
+     mat[2] = 3 ✓  (o 3 foi deslocado para frente)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">✘ Em i=1 o vetor não muda (key=3 ≥ v[0]=2). Em i=2 o 3 é deslocado para mat[2].
+<pre>
+  i=1: key=3, v[0]=2&lt;3 → sem deslocamento → mat[1]=3
+  i=2: key=2, v[1]=3&gt;2 → v[2] recebe v[1]=3 → mat[2]=3</pre>
+      </div>
+    </div>
+
+  </div><!-- .quiz -->
+
+</div><!-- .container -->
+
+<footer>
+  <strong>EDA · UnB Gama</strong> — Simulado: Algoritmos de Ordenação · Matrícula 232037937
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado — Complexidade Computacional · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7e06a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a1a08 0%, #2a2a0a 50%, #181808 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,224,106,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'SIMULADO'; position: absolute; right: 40px; top: 10px;
+    font-size: 130px; font-family: 'Fraunces', serif;
+    color: rgba(247,224,106,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: #f7a26a; border-color: #f7a26a; background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent2); border-color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  section { margin: 48px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h2 span { color: var(--accent); }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; }
+
+  .score-bar { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar span { color: var(--accent); font-size: 1.1rem; font-weight: 700; }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 8px 0 56px; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q > p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q > p code { font-family: 'JetBrains Mono', monospace; font-size: .9em; color: var(--accent); }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; padding: 12px 16px; border-radius: 8px; line-height: 1.65; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); border: 1px solid rgba(106,247,196,0.2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); border: 1px solid rgba(247,106,154,0.2); }
+  .quiz-feedback pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin: 8px 0; font-size: 11.5px; line-height: 1.55; color: #9898c0; white-space: pre; overflow-x: auto; font-family: 'JetBrains Mono', monospace; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .quiz { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Simulado Prova 2</div>
+    <h1>Simulado: <span>Complexidade Computacional</span></h1>
+    <p class="subtitle">Trace cada função com os dados da sua matrícula. Mesma complexidade das questões de prova — código C real, resposta única, feedback com fluxo completo.</p>
+    <div class="badge-row">
+      <span class="badge badge-yellow">O(log n)</span>
+      <span class="badge badge-green">O(n²) — laço duplo</span>
+      <span class="badge badge-purple">Recursão T(n/2)</span>
+      <span class="badge badge-orange">Série geométrica</span>
+      <span class="badge badge-pink">MDC Euclides</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section>
+    <div class="section-number">// código comum</div>
+    <h2>Funções e <span>dados de entrada</span></h2>
+    <p>Todas as questões usam o bloco abaixo. Trace cada função com os parâmetros indicados.</p>
+    <pre><code>/* ── Dados do estudante ─────────────────────────────────────────── */
+int M = 232037937;   /* matrícula                                     */
+int N = 9;           /* número de dígitos                             */
+
+/* ── Funções ────────────────────────────────────────────────────── */
+int f1(int m) {                      /* conta dígitos de m            */
+    int c = 0;
+    while (m &gt; 0) { c++; m /= 10; }
+    return c;
+}
+
+int f2(int n) {                      /* pares (i,j) com j&gt;i           */
+    int s = 0;
+    for (int i = 0; i &lt; n; i++)
+        for (int j = i+1; j &lt; n; j++)
+            s++;
+    return s;
+}
+
+int f3(int n) {                      /* iterações: i=1; i*=2; i&lt;=n   */
+    int s = 0;
+    for (int i = 1; i &lt;= n; i *= 2)
+        s++;
+    return s;
+}
+
+int f4(int n) {                      /* profundidade da recursão /2   */
+    if (n &lt;= 1) return 1;
+    return f4(n / 2) + 1;
+}
+
+int f5(int n) {                      /* soma geométrica n+n/2+n/4+…   */
+    int s = 0;
+    for (int i = n; i &gt; 0; i /= 2)
+        s += i;
+    return s;
+}
+
+int f6(int n) {                      /* laço: outer×inner(j*j&lt;=n)    */
+    int s = 0;
+    for (int i = 0; i &lt; n; i++)
+        for (int j = 1; j*j &lt;= n; j++)
+            s++;
+    return s;
+}
+
+int f7(int a, int b) {               /* MDC — algoritmo de Euclides   */
+    while (b != 0) { int t = b; b = a % b; a = t; }
+    return a;
+}</code></pre>
+  </section>
+
+  <div class="score-bar">Pontuação atual: <span id="score-val">0</span> / 10</div>
+
+  <div class="quiz">
+    <div class="quiz-title">Analise o código e responda</div>
+
+    <!-- Q1 -->
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>f1(232037937)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) &nbsp;8</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) &nbsp;9 &nbsp;&nbsp;(9 dígitos na matrícula)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) &nbsp;10</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) &nbsp;7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">✔ Correto! A matrícula 232037937 possui 9 dígitos — 9 divisões por 10 até zerar.
+<pre>
+m = 232037937,  c = 0
+─────────────────────────────────────────────────
+  1: m=232037937 → c=1, m=23203793
+  2: m=23203793  → c=2, m=2320379
+  3: m=2320379   → c=3, m=232037
+  4: m=232037    → c=4, m=23203
+  5: m=23203     → c=5, m=2320
+  6: m=2320      → c=6, m=232
+  7: m=232       → c=7, m=23
+  8: m=23        → c=8, m=2
+  9: m=2         → c=9, m=0
+─────────────────────────────────────────────────
+m=0 → loop termina.   return 9
+Complexidade: O(log₁₀ m)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">✘ Conte quantas vezes divide por 10 até zerar — são 9 divisões.
+<pre>
+  232037937 → 23203793 → ... → 2 → 0
+  9 passos  →  return 9</pre>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>f2(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) &nbsp;81 &nbsp;&nbsp;(n² — sem restrição j&gt;i)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) &nbsp;45 &nbsp;&nbsp;(n(n+1)/2 — inclui j==i)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">c) &nbsp;36 &nbsp;&nbsp;(n(n−1)/2 = 9×8/2)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) &nbsp;72</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">✔ Correto! Laço triangular: n(n−1)/2 = 9×8/2 = 36 pares.
+<pre>
+n=9: laço duplo com j&gt;i
+─────────────────────────────────────────────────
+i=0: j=1..8  →  8
+i=1: j=2..8  →  7
+i=2: j=3..8  →  6
+i=3: j=4..8  →  5
+i=4: j=5..8  →  4
+i=5: j=6..8  →  3
+i=6: j=7..8  →  2
+i=7: j=8     →  1
+i=8: nenhum  →  0
+─────────────────────────────────────────────────
+Total: 8+7+6+5+4+3+2+1 = 36
+= n(n-1)/2 = 9×8/2 = 36   →  O(n²)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">✘ Laço triangular com j&gt;i: soma de 8+7+...+1 = n(n−1)/2 = 36.
+<pre>
+  ✘ 81 = n²: conta (i,j) sem restrição (inclui j≤i)
+  ✘ 45 = n(n+1)/2: incluiria j=i (laço j&gt;=i)
+  ✓ 36 = n(n-1)/2: j começa em i+1</pre>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Qual o valor retornado por <code>f3(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">a) &nbsp;4 &nbsp;&nbsp;(i=1,2,4,8 — todos ≤ 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) &nbsp;3 &nbsp;&nbsp;(esqueceu i=8)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) &nbsp;5 &nbsp;&nbsp;(i=16 já ultrapassa 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) &nbsp;9</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">✔ Correto! i assume 4 valores antes de ultrapassar n=9.
+<pre>
+n=9, i começa em 1 e dobra a cada passo
+─────────────────────────────────────────────────
+  i=1  │  1 ≤ 9? SIM  s=1
+  i=2  │  2 ≤ 9? SIM  s=2
+  i=4  │  4 ≤ 9? SIM  s=3
+  i=8  │  8 ≤ 9? SIM  s=4
+  i=16 │ 16 ≤ 9? NÃO  → para
+─────────────────────────────────────────────────
+return 4
+Fórmula: ⌊log₂ 9⌋ + 1 = ⌊3.17⌋ + 1 = 4
+Modela complexidade O(log n).</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">✘ Trace os valores de i: 1, 2, 4, 8 — todos ≤ 9. i=16 já não entra.
+<pre>
+  i=1: ok  i=2: ok  i=4: ok  i=8: ok  i=16: falha
+  ✘ 3: esqueceu i=8 (8 ≤ 9 é verdadeiro)
+  ✓ 4: i=1,2,4,8 (4 iterações)</pre>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Qual o valor retornado por <code>f4(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) &nbsp;4 &nbsp;&nbsp;(4 chamadas até base case)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) &nbsp;5</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) &nbsp;2</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">✔ Correto! A recursão divide por 2 até n≤1 — 4 chamadas no total.
+<pre>
+f4(9):
+─────────────────────────────────────────────────
+  f4(9) = f4(4) + 1
+  f4(4) = f4(2) + 1
+  f4(2) = f4(1) + 1
+  f4(1) = 1  ← caso base
+─────────────────────────────────────────────────
+Resolvendo de baixo para cima:
+  f4(1) = 1
+  f4(2) = 1+1 = 2
+  f4(4) = 2+1 = 3
+  f4(9) = 3+1 = 4
+─────────────────────────────────────────────────
+return 4   →   ⌊log₂ 9⌋ + 1 = 4</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">✘ Expanda a cadeia de recursão e some os +1 de cada nível.
+<pre>
+  f4(9)→f4(4)→f4(2)→f4(1)=1
+  Cada nível adiciona 1: f4(1)=1, f4(2)=2, f4(4)=3, f4(9)=4</pre>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Qual o valor retornado por <code>f5(8)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) &nbsp;12</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) &nbsp;14</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) &nbsp;15 &nbsp;&nbsp;(8+4+2+1)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) &nbsp;16</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">✔ Correto! Série geométrica de razão 1/2: 8+4+2+1 = 15.
+<pre>
+n=8, s=0
+─────────────────────────────────────────────────
+  i=8: s+=8=8,   i=8/2=4
+  i=4: s+=4=12,  i=4/2=2
+  i=2: s+=2=14,  i=2/2=1
+  i=1: s+=1=15,  i=1/2=0
+  i=0: i&gt;0? NÃO → para
+─────────────────────────────────────────────────
+return 15
+Fórmula: 2n−1 = 2×8−1 = 15 (quando n é potência de 2)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">✘ Some todos os termos: 8+4+2+1, não pare no 4.
+<pre>
+  i percorre: 8 → 4 → 2 → 1 → 0(para)
+  ✘ 12: somou só 8+4, esqueceu 2 e 1
+  ✘ 16: adicionou i=0 (mas 0&gt;0 é falso)
+  ✓ 15: 8+4+2+1 = 15</pre>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>f6(9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) &nbsp;18 &nbsp;&nbsp;(esqueceu j=3: 3²=9≤9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) &nbsp;36 &nbsp;&nbsp;(laço triangular — não é esse)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">c) &nbsp;27 &nbsp;&nbsp;(9 externas × 3 internas)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) &nbsp;9</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">✔ Correto! 9 iterações externas × 3 internas = 27. Complexidade O(n√n).
+<pre>
+n=9, s=0
+─────────────────────────────────────────────────
+Laço interno: j=1: 1²=1≤9? SIM
+              j=2: 2²=4≤9? SIM
+              j=3: 3²=9≤9? SIM
+              j=4: 4²=16≤9? NÃO → para
+              →  3 iterações por i externo
+
+Laço externo: i=0..8  →  9 iterações
+─────────────────────────────────────────────────
+Total: 9 × 3 = 27   →   O(n × √n) = O(n^1.5)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">✘ O laço interno conta j=1,2,3 (pois j²≤9 = j≤3) — são 3 iterações.
+<pre>
+  j=1: 1≤9  j=2: 4≤9  j=3: 9≤9  j=4: 16&gt;9(para)
+  9 × 3 = 27
+  ✘ 18: contou apenas j=1,2 (esqueceu j=3, 3²=9=9)</pre>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Qual o valor retornado por <code>f3(232037937)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) &nbsp;27</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) &nbsp;28 &nbsp;&nbsp;(⌊log₂(232037937)⌋ + 1)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) &nbsp;29</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) &nbsp;26</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">✔ Correto! ⌊log₂(232037937)⌋ + 1 = 27 + 1 = 28.
+<pre>
+n = 232037937
+─────────────────────────────────────────────────
+  2^27 = 134.217.728  ≤  232.037.937  ✓  entra
+  2^28 = 268.435.456  &gt;  232.037.937  ✗  não entra
+─────────────────────────────────────────────────
+Valores válidos: 2^0, 2^1, ..., 2^27  →  28 iterações
+⌊log₂(232037937)⌋ + 1 = 27+1 = 28
+                return 28</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">✘ Calcule ⌊log₂(232037937)⌋ + 1 — o laço inclui i=2²⁷ pois 134M < 232M.
+<pre>
+  2^27 = 134.217.728 &lt; 232.037.937 → ainda entra
+  2^28 = 268.435.456 &gt; 232.037.937 → não entra
+  28 iterações (i de 2^0 até 2^27)  →  return 28</pre>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Qual o valor retornado por <code>f5(9)</code>? Atenção: 9 <em>não</em> é potência de 2.</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) &nbsp;13 &nbsp;&nbsp;(parou em i=4)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) &nbsp;15 &nbsp;&nbsp;(esqueceu +1 de i=1)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">c) &nbsp;16 &nbsp;&nbsp;(9+4+2+1 com divisão inteira)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) &nbsp;17</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">✔ Correto! Divisão inteira: 9/2=4 (não 4.5). Soma: 9+4+2+1 = 16.
+<pre>
+n=9, s=0
+─────────────────────────────────────────────────
+  i=9: s+=9=9,   i=9/2=4  (divisão inteira!)
+  i=4: s+=4=13,  i=4/2=2
+  i=2: s+=2=15,  i=2/2=1
+  i=1: s+=1=16,  i=1/2=0
+  i=0: i&gt;0? NÃO → para
+─────────────────────────────────────────────────
+return 16   (compare com f5(8)=15 — 9 dá 16)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">✘ Divisão inteira em C: 9/2=4, não 4.5. Some 9+4+2+1.
+<pre>
+  ✘ 13: somou 9+4 e parou (esqueceu i=2 e i=1)
+  ✘ 15: somou 9+4+2 (esqueceu +1 de i=1)
+  ✓ 16: 9+4+2+1 = 16  (4 passos)</pre>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor retornado por <code>f7(232037937, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) &nbsp;3 &nbsp;&nbsp;(MDC errado)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) &nbsp;1</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) &nbsp;9 &nbsp;&nbsp;(matrícula é divisível por 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) &nbsp;37</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">✔ Correto! MDC(232037937, 9) = 9 — soma dos dígitos = 36 = 4×9.
+<pre>
+a=232037937, b=9
+─────────────────────────────────────────────────
+Regra de divisibilidade por 9:
+  2+3+2+0+3+7+9+3+7 = 36
+  36 ÷ 9 = 4 exato  →  232037937 % 9 = 0
+─────────────────────────────────────────────────
+Iteração única:
+  t=9, b = 232037937 % 9 = 0, a = 9
+  b=0 → loop termina
+  return a = 9</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">✘ Use a regra: soma dos dígitos de 232037937 = 36, divisível por 9.
+<pre>
+  Soma: 2+3+2+0+3+7+9+3+7 = 36 = 4×9
+  232037937 % 9 = 0  →  MDC = 9
+  Uma única iteração no loop de Euclides.</pre>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Qual o valor retornado por <code>f4(232037937)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) &nbsp;27</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">b) &nbsp;28 &nbsp;&nbsp;(⌊log₂(M)⌋ + 1 = 27+1)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) &nbsp;29</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) &nbsp;9 &nbsp;&nbsp;(número de dígitos — função diferente)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">✔ Correto! f4 divide por 2 até n≤1 — 28 chamadas para a matrícula.
+<pre>
+f4(n) = f4(n/2) + 1   →   cresce como log₂(n)
+─────────────────────────────────────────────────
+  2^27 = 134.217.728  ≤  232.037.937
+  2^28 = 268.435.456  &gt;  232.037.937
+  ⌊log₂(232037937)⌋ = 27
+─────────────────────────────────────────────────
+  f4(1)=1, f4(2)=2, ..., f4(2^k)=k+1
+  f4(232037937) = 27+1 = 28
+                  return 28</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">✘ f4 conta níveis de divisão por 2 — equivale a ⌊log₂ m⌋+1, não dígitos.
+<pre>
+  ✘ 9: f1 conta dígitos decimais; f4 conta halvings.
+  ✓ 28: 2^27 &lt; M &lt; 2^28  →  floor(log2(M))+1 = 28</pre>
+      </div>
+    </div>
+
+  </div><!-- .quiz -->
+
+</div><!-- .container -->
+
+<footer>
+  <strong>EDA · UnB Gama</strong> — Simulado: Complexidade Computacional · Matrícula 232037937
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado — Estruturas Lineares · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #f7a26a;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2e1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: 'SIMULADO'; position: absolute; right: 40px; top: 10px;
+    font-size: 130px; font-family: 'Fraunces', serif;
+    color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-orange { color: var(--accent2); border-color: var(--accent2); background: rgba(247,162,106,0.08); }
+  .badge-green  { color: var(--accent);  border-color: var(--accent);  background: rgba(106,247,196,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  section { margin: 48px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h2 span { color: var(--accent); }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; }
+
+  .score-bar { display: flex; align-items: center; gap: 12px; margin: 32px 0 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-bar span { color: var(--accent); font-size: 1.1rem; font-weight: 700; }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 8px 0 56px; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q > p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q > p code { font-family: 'JetBrains Mono', monospace; font-size: .9em; color: var(--accent); }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(247,162,106,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; display: none; padding: 12px 16px; border-radius: 8px; line-height: 1.65; }
+  .quiz-feedback.ok  { background: rgba(247,162,106,0.07); color: var(--accent2); border: 1px solid rgba(247,162,106,0.2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); border: 1px solid rgba(247,106,154,0.2); }
+  .quiz-feedback pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin: 8px 0; font-size: 11.5px; line-height: 1.55; color: #9898c0; white-space: pre; overflow-x: auto; font-family: 'JetBrains Mono', monospace; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .quiz { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Simulado Prova 2</div>
+    <h1>Simulado: <span>Estruturas Lineares</span></h1>
+    <p class="subtitle">Trace cada função com os dados da sua matrícula. Mesma complexidade das questões de prova — código C real, resposta única, feedback com fluxo completo.</p>
+    <div class="badge-row">
+      <span class="badge badge-green">Lista Encadeada</span>
+      <span class="badge badge-orange">Percurso e Busca</span>
+      <span class="badge badge-purple">Agregações</span>
+      <span class="badge badge-pink">Posição vs. Valor</span>
+      <span class="badge badge-yellow">Penúltimo e Pares</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section>
+    <div class="section-number">// código comum</div>
+    <h2>Funções e <span>dados de entrada</span></h2>
+    <p>Todas as questões usam o bloco abaixo. A lista foi construída com os dígitos da matrícula na ordem original.</p>
+    <pre><code>/* ── Estrutura ──────────────────────────────────────────────────── */
+typedef struct No { int dado; struct No *prox; } No;
+
+/* Lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL   (n=9)
+          dígitos de 232037937 na ordem original         */
+
+/* ── Funções ────────────────────────────────────────────────────── */
+int tamanho(No *l) {
+    int c = 0;
+    for (No *p = l; p; p = p-&gt;prox) c++;
+    return c;
+}
+
+int nth(No *l, int k) {              /* elemento no índice k (base 0) */
+    for (int i = 0; l &amp;&amp; i &lt; k; i++) l = l-&gt;prox;
+    return l ? l-&gt;dado : -1;
+}
+
+int soma(No *l) {
+    int s = 0;
+    for (No *p = l; p; p = p-&gt;prox) s += p-&gt;dado;
+    return s;
+}
+
+int busca(No *l, int x) {            /* posição da 1ª ocorrência      */
+    int pos = 0;
+    for (No *p = l; p; p = p-&gt;prox, pos++)
+        if (p-&gt;dado == x) return pos;
+    return -1;
+}
+
+int maximo(No *l) {
+    int m = l-&gt;dado;
+    for (No *p = l-&gt;prox; p; p = p-&gt;prox)
+        if (p-&gt;dado &gt; m) m = p-&gt;dado;
+    return m;
+}
+
+int contaMaior(No *l, int x) {       /* nós com dado &gt; x              */
+    int c = 0;
+    for (No *p = l; p; p = p-&gt;prox)
+        if (p-&gt;dado &gt; x) c++;
+    return c;
+}
+
+int penultimo(No *l) {               /* dado do nó penúltimo          */
+    if (!l || !l-&gt;prox) return -1;
+    while (l-&gt;prox-&gt;prox) l = l-&gt;prox;
+    return l-&gt;dado;
+}
+
+int somaPos(No *l) {                 /* soma dos dados em pos pares (0,2,4,…) */
+    int s = 0, i = 0;
+    for (No *p = l; p; p = p-&gt;prox, i++)
+        if (i % 2 == 0) s += p-&gt;dado;
+    return s;
+}</code></pre>
+  </section>
+
+  <div class="score-bar">Pontuação atual: <span id="score-val">0</span> / 10</div>
+
+  <div class="quiz">
+    <div class="quiz-title">Analise o código e responda</div>
+
+    <!-- Q1 -->
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>tamanho(l)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) &nbsp;8</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) &nbsp;9 &nbsp;&nbsp;(1 nó por dígito da matrícula)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) &nbsp;10</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) &nbsp;7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">✔ Correto! A lista tem 9 nós, um por dígito da matrícula 232037937.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+─────────────────────────────────────────────────
+p=2(c=1) → p=3(c=2) → p=2(c=3) → p=0(c=4)
+→ p=3(c=5) → p=7(c=6) → p=9(c=7) → p=3(c=8)
+→ p=7(c=9) → p=NULL → para
+─────────────────────────────────────────────────
+return 9</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">✘ Conte todos os nós — 9 dígitos em 232037937 = 9 nós.
+<pre>
+  l = 2→3→2→0→3→7→9→3→7→NULL
+      ↑                  ↑
+    nó 1              nó 9   →  return 9</pre>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>nth(l, 5)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) &nbsp;3 &nbsp;&nbsp;(índice 4)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) &nbsp;7 &nbsp;&nbsp;(elemento no índice 5)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) &nbsp;9 &nbsp;&nbsp;(índice 6)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) &nbsp;0 &nbsp;&nbsp;(índice 3)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">✔ Correto! O 6º elemento (índice 5, base 0) é o dígito 7.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+        0   1   2   3   4   5   6   7   8    ← índices
+─────────────────────────────────────────────────
+nth(l, 5): avança i=0,1,2,3,4 (5 passos)
+  i=0 → aponta para nó 3
+  i=1 → aponta para nó 2
+  i=2 → aponta para nó 0
+  i=3 → aponta para nó 3
+  i=4 → aponta para nó 7  (condição i&lt;5 falha em i=5)
+─────────────────────────────────────────────────
+l→dado = 7   →   return 7</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">✘ nth avança k=5 vezes a partir do cabeça (índice 0).
+<pre>
+  pos 0=2, pos 1=3, pos 2=2, pos 3=0, pos 4=3, pos 5=7
+  k=5 → dado = 7</pre>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Qual o valor retornado por <code>soma(l)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) &nbsp;37</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) &nbsp;36 &nbsp;&nbsp;(soma dos 9 dígitos)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) &nbsp;35</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) &nbsp;38</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">✔ Correto! Soma dos dígitos de 232037937 é 36.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+─────────────────────────────────────────────────
+s=0 +2=2 +3=5 +2=7 +0=7 +3=10 +7=17 +9=26 +3=29 +7=36
+p=NULL → para
+─────────────────────────────────────────────────
+return 36
+Curiosidade: 36 = 4×9 → matrícula divisível por 9.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">✘ Some todos os 9 dígitos: 2+3+2+0+3+7+9+3+7 = 36.
+<pre>
+  (2+3) + (2+0+3) + (7+9+3+7)
+  =  5  +    5   +    26     = 36</pre>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Qual o valor retornado por <code>busca(l, 9)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) &nbsp;5 &nbsp;&nbsp;(índice do 7)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) &nbsp;7 &nbsp;&nbsp;(outro 3)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) &nbsp;6 &nbsp;&nbsp;(posição da 1ª ocorrência de 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) &nbsp;-1 &nbsp;&nbsp;(9 não existe)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">✔ Correto! O dígito 9 está na posição 6 (índice 0-based).
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+        0   1   2   3   4   5   6   7   8
+─────────────────────────────────────────────────
+pos=0: 2≠9  pos=1: 3≠9  pos=2: 2≠9  pos=3: 0≠9
+pos=4: 3≠9  pos=5: 7≠9
+pos=6: 9==9  ✓  ENCONTRADO
+─────────────────────────────────────────────────
+return 6</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">✘ Conte as posições a partir de 0 — o 9 é o 7º nó = posição 6.
+<pre>
+  ✘ 5: seria o 7 (índice 5)
+  ✘ 7: seria o 3 (índice 7)
+  ✓ 6: o 9 está no índice 6</pre>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Qual o valor retornado por <code>busca(l, 1)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) &nbsp;0 &nbsp;&nbsp;(1º índice)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) &nbsp;8 &nbsp;&nbsp;(último índice)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">c) &nbsp;-1 &nbsp;&nbsp;(1 não aparece em 232037937)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) &nbsp;1</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">✔ Correto! O dígito 1 não aparece em 232037937.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+─────────────────────────────────────────────────
+2≠1, 3≠1, 2≠1, 0≠1, 3≠1, 7≠1, 9≠1, 3≠1, 7≠1
+p=NULL → loop termina sem encontrar
+─────────────────────────────────────────────────
+return -1
+Dígitos em 232037937: {0, 2, 3, 7, 9} — sem o 1.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">✘ O dígito 1 não aparece na matrícula 232037937.
+<pre>
+  Dígitos: 2,3,2,0,3,7,9,3,7 — nenhum é 1.
+  busca percorre todos os 9 nós sem achar 1 → return -1</pre>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>maximo(l)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) &nbsp;7 &nbsp;&nbsp;(aparece mais vezes, mas não é o maior)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) &nbsp;9 &nbsp;&nbsp;(maior dígito da matrícula)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) &nbsp;3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) &nbsp;8</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">✔ Correto! O maior dígito de 232037937 é 9.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+─────────────────────────────────────────────────
+m = 2  (inicia com o cabeça)
+p=3:  3&gt;2? SIM  m=3
+p=2:  2&gt;3? não
+p=0:  0&gt;3? não
+p=3:  3&gt;3? não
+p=7:  7&gt;3? SIM  m=7
+p=9:  9&gt;7? SIM  m=9  ◄─ novo máximo
+p=3:  3&gt;9? não
+p=7:  7&gt;9? não
+p=NULL → para
+─────────────────────────────────────────────────
+return 9</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">✘ 7 aparece duas vezes, mas 9>7 — o máximo é 9.
+<pre>
+  9 &gt; 7  →  return 9 (não 7, mesmo que 7 seja mais frequente)</pre>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Qual o valor retornado por <code>contaMaior(l, 3)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) &nbsp;2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">b) &nbsp;4 &nbsp;&nbsp;(inclui os 3's erroneamente)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">c) &nbsp;3 &nbsp;&nbsp;(7, 9, 7 são estritamente &gt; 3)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) &nbsp;5</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">✔ Correto! Os dígitos maiores que 3 são: 7, 9, 7 — total 3.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+─────────────────────────────────────────────────
+2&gt;3? não   3&gt;3? não  (3 NÃO é maior que 3!)
+2&gt;3? não   0&gt;3? não   3&gt;3? não
+7&gt;3? SIM c=1  ◄─
+9&gt;3? SIM c=2  ◄─
+3&gt;3? não
+7&gt;3? SIM c=3  ◄─
+─────────────────────────────────────────────────
+return 3   (condição é &gt;, não ≥)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">✘ Condição é &gt; (estritamente maior) — os três 3's NÃO contam.
+<pre>
+  ✘ 4: incluiu algum 3 (3&gt;3 é falso)
+  ✓ 3: apenas 7(pos5), 9(pos6), 7(pos8) são &gt; 3</pre>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Qual o valor retornado por <code>penultimo(l)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) &nbsp;7 &nbsp;&nbsp;(é o último, não o penúltimo)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) &nbsp;9 &nbsp;&nbsp;(antepenúltimo)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">c) &nbsp;3 &nbsp;&nbsp;(nó cujo prox→prox = NULL)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) &nbsp;-1 &nbsp;&nbsp;(lista tem ≥ 2 nós)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">✔ Correto! O penúltimo nó contém o dígito 3 (antes do 7 final).
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+                                    ↑   ↑
+                                penúlt último
+─────────────────────────────────────────────────
+penultimo(l): avança enquanto l→prox→prox ≠ NULL
+  Para quando l→prox = nó(7) e nó(7)→prox = NULL
+  l = nó(3, pos 7)
+─────────────────────────────────────────────────
+return l→dado = 3</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">✘ Penúltimo = nó cujo prox→prox é NULL (não o último).
+<pre>
+  Último nó:     7 (pos 8)
+  Penúltimo nó:  3 (pos 7)  ← return 3
+  ✘ 7 é o último; o penúltimo é o 3 antes dele.</pre>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor retornado por <code>somaPos(l)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) &nbsp;13 &nbsp;&nbsp;(soma das posições ímpares)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) &nbsp;21</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) &nbsp;23 &nbsp;&nbsp;(índices 0,2,4,6,8 → 2+2+3+9+7)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) &nbsp;20</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">✔ Correto! Posições pares: índices 0,2,4,6,8 → 2+2+3+9+7 = 23.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+        0   1   2   3   4   5   6   7   8
+─────────────────────────────────────────────────
+i=0 (par):  dado=2  s=2
+i=1 (ímpar): pula
+i=2 (par):  dado=2  s=4
+i=3 (ímpar): pula
+i=4 (par):  dado=3  s=7
+i=5 (ímpar): pula
+i=6 (par):  dado=9  s=16
+i=7 (ímpar): pula
+i=8 (par):  dado=7  s=23
+─────────────────────────────────────────────────
+return 23</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">✘ Selecione apenas os índices pares: 0,2,4,6,8 (cinco posições).
+<pre>
+  Pos pares:  i=0→2, i=2→2, i=4→3, i=6→9, i=8→7
+  2+2+3+9+7 = 23
+  ✘ 13: são as posições ímpares (3+0+7+3 = 13)</pre>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Qual o valor retornado por <code>busca(l, 7)</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) &nbsp;4 &nbsp;&nbsp;(índice de outro 3)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) &nbsp;6 &nbsp;&nbsp;(índice do 9)</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">c) &nbsp;5 &nbsp;&nbsp;(1ª ocorrência de 7)</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) &nbsp;8 &nbsp;&nbsp;(2ª ocorrência de 7)</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">✔ Correto! A primeira ocorrência do 7 está na posição 5.
+<pre>
+l = 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+        0   1   2   3   4   5   6   7   8
+─────────────────────────────────────────────────
+pos=0: 2≠7  pos=1: 3≠7  pos=2: 2≠7
+pos=3: 0≠7  pos=4: 3≠7
+pos=5: 7==7  ✓  PRIMEIRA OCORRÊNCIA  →  return 5
+─────────────────────────────────────────────────
+(O 7 em pos=8 não é alcançado — retorna na 1ª)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">✘ busca retorna na PRIMEIRA ocorrência — não chega ao segundo 7.
+<pre>
+  l = 2→3→2→0→3→7→9→3→7
+                   ^      ^
+                 pos=5   pos=8   (ambos têm dado=7)
+  Retorna pos=5 (1ª), nunca chega a pos=8 (2ª).</pre>
+      </div>
+    </div>
+
+  </div><!-- .quiz -->
+
+</div><!-- .container -->
+
+<footer>
+  <strong>EDA · UnB Gama</strong> — Simulado: Estruturas Lineares · Matrícula 232037937
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>

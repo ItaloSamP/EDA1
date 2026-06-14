@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulado Prova P2 — Modelo 4 · EDA 1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13; --surface: #17171e; --surface2: #1e1e28;
+      --border: #2a2a38; --accent: #c46af7; --accent2: #a44ad7;
+      --accent3: #e0a0ff; --text: #e8e8f0; --text-muted: #7a7a9a; --code-bg: #12121a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.6; }
+    header { background: linear-gradient(135deg, #130820 0%, #1e1030 50%, #130820 100%); border-bottom: 1px solid var(--border); padding: 2.5rem 2rem 2rem; position: relative; overflow: hidden; }
+    header::before { content: ''; position: absolute; top: -60%; right: -20%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(196,106,247,0.12) 0%, transparent 70%); pointer-events: none; }
+    header::after { content: 'SIMULADO'; position: absolute; top: 50%; right: 2rem; transform: translateY(-50%); font-family: 'Fraunces', serif; font-size: 5rem; font-weight: 900; color: rgba(196,106,247,0.06); letter-spacing: 0.1em; pointer-events: none; user-select: none; }
+    .header-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+    .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    h1 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 900; color: var(--text); line-height: 1.2; margin-bottom: 0.5rem; }
+    h1 span { color: var(--accent); }
+    .header-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+    .badge-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); }
+    .badge strong { color: var(--accent); }
+    .score-bar { max-width: 900px; margin: 1.5rem auto; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
+    .score-label { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    .score-val { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+    .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; }
+    .code-block-title { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem; }
+    .code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--text); line-height: 1.6; white-space: pre; overflow-x: auto; }
+    .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .quiz-title { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1rem; opacity: 0.8; }
+    .quiz-q p { font-size: 0.95rem; margin-bottom: 1rem; }
+    .quiz-q code { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; background: var(--code-bg); padding: 0.1rem 0.4rem; border-radius: 4px; color: var(--accent3); }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 1rem; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--surface2); }
+    .quiz-opt.correct { background: #0d2e1a; border-color: #3d9e5e; color: #7fdd9a; }
+    .quiz-opt.wrong { background: #2e0d0d; border-color: #9e3d3d; color: #dd7f7f; }
+    .quiz-feedback { display: none; margin-top: 1rem; padding: 1rem; border-radius: 8px; font-size: 0.9rem; line-height: 1.6; }
+    .quiz-feedback.ok { background: #0d2218; border: 1px solid #2a6640; color: #a0d4b0; }
+    .quiz-feedback.err { background: #1e0e0e; border: 1px solid #5a2020; color: #d4a0a0; }
+    .quiz-feedback pre { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin-top: 0.75rem; white-space: pre; overflow-x: auto; line-height: 1.5; color: var(--text); }
+    footer { text-align: center; padding: 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 2rem; }
+    @media (max-width: 600px) { h1 { font-size: 1.5rem; } header { padding: 1.5rem 1rem 1.25rem; } main { padding: 1rem 1rem 3rem; } header::after { display: none; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">EDA 1 · Estrutura de Dados e Algoritmos · P2</div>
+    <h1>Simulado — <span>Prova P2</span> · Modelo 4</h1>
+    <p class="header-sub">Recursão em Strings · Bubble/Selection em Chars · Complexidade Irregular · Listas Avançadas</p>
+    <div class="badge-row">
+      <div class="badge"><strong>Aluno:</strong> italo alves sampaio de oliveira</div>
+      <div class="badge"><strong>Matrícula:</strong> 232037937</div>
+      <div class="badge"><strong>Questões:</strong> 10</div>
+      <div class="badge"><strong>Modelo:</strong> 4 / 4</div>
+    </div>
+  </div>
+</header>
+
+<div class="score-bar">
+  <div class="score-label">Pontuação</div>
+  <div class="score-val" id="score-val">0</div>
+  <div class="score-label">/ 10</div>
+</div>
+
+<main>
+
+  <div class="code-block">
+    <div class="code-block-title">// Código de referência — leia antes de responder</div>
+    <pre>
+/* Parâmetros do aluno ───────────────────────────────────────────── */
+char nome[]  = "italo alves sampaio de oliveira"; /* n=31 */
+char ord[]   = "    aaaaadeeeiiiilllmoooprsstvv"; /* nome[] ordenado */
+char pnome[] = "italo";     /* primeiro nome, n=5  */
+char snome[] = "sampaio";   /* segundo nome,  n=7  */
+char unome[] = "oliveira";  /* último nome,   n=8  */
+int  mat[]   = {2, 3, 2, 0, 3, 7, 9, 3, 7};
+/* lista: 2→3→2→0→3→7→9→3→7→NULL */
+
+/* ── Q1 · Conta chars com ASCII maior que um limite ────────────── */
+int conta_maiores(char *s, char limite) {
+    if (*s == '\0') return 0;
+    return (*s &gt; limite ? 1 : 0) + conta_maiores(s + 1, limite);
+}
+
+/* ── Q2 · Primeira posição de char derivado de índice ───────────── */
+int primeiraPos(char *s, char c) {
+    for (int i = 0; s[i] != '\0'; i++)
+        if (s[i] == c) return i;
+    return -1;
+}
+
+/* ── Q3 · Busca binária em nome ordenado, conta iterações ───────── */
+int buscaNome(char *v, int n, char c) {
+    int ini = 0, fim = n - 1, pcont = 0;
+    while (ini &lt;= fim) {
+        pcont++;
+        int meio = (ini + fim) / 2;
+        if (v[meio] == c)      break;
+        else if (c &lt; v[meio])  fim  = meio - 1;
+        else                   ini  = meio + 1;
+    }
+    return pcont;
+}
+
+/* ── Q4 · Bubble sort (1ª passagem) em string, conta trocas ─────── */
+int bubblePasseStr(char *vet, int n) {
+    int trocas = 0; char aux;
+    for (int j = 0; j &lt; n - 1; j++)
+        if (vet[j] &gt; vet[j+1]) { aux=vet[j]; vet[j]=vet[j+1]; vet[j+1]=aux; trocas++; }
+    return trocas;
+}
+
+/* ── Q5 · Selection sort crescente em string, conta trocas ──────── */
+int minIdxStr(char *v, int ini, int n) {
+    int m = ini;
+    for (int i = ini + 1; i &lt; n; i++) if (v[i] &lt; v[m]) m = i;
+    return m;
+}
+int selSortStr(char *vet, int n) {
+    int trocas = 0; char aux;
+    for (int i = 0; i &lt; n - 1; i++) {
+        int m = minIdxStr(vet, i, n);
+        if (m != i) { aux=vet[i]; vet[i]=vet[m]; vet[m]=aux; trocas++; }
+    }
+    return trocas;
+}
+
+/* ── Q6 · Lista: conta nós com valor ≥ x ───────────────────────── */
+typedef struct No { int val; struct No *prox; } No;
+int contaMaiorIgual(No *l, int x) {
+    int c = 0;
+    while (l) { if (l-&gt;val &gt;= x) c++; l = l-&gt;prox; }
+    return c;
+}
+
+/* ── Q7 · Recursão: conta char em string completa ───────────────── */
+int contaChar(char *s, char c) {
+    if (*s == '\0') return 0;
+    return (*s == c ? 1 : 0) + contaChar(s + 1, c);
+}
+
+/* ── Q8 · Complexidade: loop com passo variável por linha ──────── */
+int p(int n) {
+    int c = 0;
+    for (int i = 1; i &lt;= n; i++)
+        for (int j = 1; j &lt;= n; j += i)
+            c++;
+    return c;
+}
+
+/* ── Q9 · Lista: k-ésimo a partir do final (dois ponteiros) ─────── */
+No* coda(No *l, int k) {
+    No *ini = l, *fim = l;
+    for (int i = 0; i &lt; k; i++) fim = fim-&gt;prox;
+    while (fim != NULL) { ini = ini-&gt;prox; fim = fim-&gt;prox; }
+    return ini;
+}
+
+/* ── Q10 · MDC de Euclides com valores derivados da lista ─────── */
+int soma(No *l)    { int s=0; while(l){s+=l-&gt;val; l=l-&gt;prox;} return s; }
+int tamanho(No *l) { int c=0; while(l){c++; l=l-&gt;prox;} return c; }
+int mdc(int a, int b) {
+    while (b != 0) { int r = a % b; a = b; b = r; }
+    return a;
+}</pre>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 1 — Recursão: Contagem Condicional em String</div>
+    <div class="quiz-q" id="q1">
+      <p><strong>Q1.</strong> Qual o valor retornado por <code>conta_maiores(nome, 'l')</code>, onde <code>nome="italo alves sampaio de oliveira"</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 14</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) 8</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) 11</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 9</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q1">
+        ✔ Correto! 11 chars do nome têm ASCII estritamente maior que 'l'(108).
+        <pre>
+conta_maiores(nome, 'l'): conta chars com ASCII &gt; 108
+
+nome = "italo alves sampaio de oliveira"
+
+char  ASCII  &gt;'l'(108)?
+'i'   105     NÃO
+'t'   116     SIM  c=1
+'a'    97     NÃO
+'l'   108     NÃO  (igual, não conta)
+'o'   111     SIM  c=2
+' '    32     NÃO
+'a'    97     NÃO
+'l'   108     NÃO
+'v'   118     SIM  c=3
+'e'   101     NÃO
+'s'   115     SIM  c=4
+' '    32     NÃO
+'s'   115     SIM  c=5
+'a'    97     NÃO
+'m'   109     SIM  c=6
+'p'   112     SIM  c=7
+'a'    97     NÃO
+'i'   105     NÃO
+'o'   111     SIM  c=8
+' '    32     NÃO
+'d'   100     NÃO
+'e'   101     NÃO
+' '    32     NÃO
+'o'   111     SIM  c=9
+'l'   108     NÃO
+'i'   105     NÃO
+'v'   118     SIM  c=10
+'e'   101     NÃO
+'i'   105     NÃO
+'r'   114     SIM  c=11
+'a'    97     NÃO
+'\0'          →  base, retorna acumulado
+
+return 11  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q1">
+        ✘ Errado. A condição é ESTRITAMENTE maior que 'l'(108). O 'l' próprio não conta. Chars que passam: t,o,v,s,s,m,p,o,o,v,r → 11 chars.
+        <pre>
+Chars &gt; 'l'(108) em "italo alves sampaio de oliveira":
+t(116), o(111), v(118), s(115), s(115),
+m(109), p(112), o(111), o(111), v(118), r(114)
+Total = 11</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 2 — Busca: Primeiro Índice de Char Derivado</div>
+    <div class="quiz-q" id="q2">
+      <p><strong>Q2.</strong> Qual o valor retornado por <code>primeiraPos(nome, nome[matricula % 31])</code>? <br><small>(matricula=232037937)</small></p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'correct','q2')">a) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 23</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) 18</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 0</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q2">
+        ✔ Correto! nome[23]='o', e a primeira ocorrência de 'o' em nome[] está no índice 4.
+        <pre>
+Passo 1 — derivar o índice de busca:
+  232037937 % 31 = 23
+  nome[23] = 'o'  (o 'o' inicial de "oliveira")
+
+Passo 2 — primeiraPos(nome, 'o'):
+nome = "italo alves sampaio de oliveira"
+idx  =  0 1 2 3 4 5 6 7 8 9 ...
+
+i=0: 'i' ≠ 'o'
+i=1: 't' ≠ 'o'
+i=2: 'a' ≠ 'o'
+i=3: 'l' ≠ 'o'
+i=4: 'o' == 'o' →  return 4  ✓
+
+A função retorna o PRIMEIRO índice onde encontrou 'o', não o que usou para derivar a chave.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q2">
+        ✘ Errado. Calcule a chave: nome[232037937%31] = nome[23] = 'o'. Depois primeiraPos busca a PRIMEIRA ocorrência de 'o' em nome[], que é o 'o' de "itaLO" no índice 4, não o índice 23.
+        <pre>
+nome[23] = 'o'  (usado para derivar a chave)
+primeiraPos(nome, 'o') → retorna o PRIMEIRO 'o' = índice 4
+                                                    ↑
+                     "italo"  →  idx 4 = 'o'</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 3 — Busca Binária em Ord, Iterações</div>
+    <div class="quiz-q" id="q3">
+      <p><strong>Q3.</strong> Quantas iterações executa <code>buscaNome(ord, 31, nome[matricula % 31])</code>? <br><small>(nome[23]='o')</small></p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">b) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q3')">c) 2</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 5</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q3">
+        ✔ Correto! Busca binária de 'o' em ord[] encontra na 2ª iteração (meio=23 cai direto em 'o').
+        <pre>
+ord = "    aaaaadeeeiiiilllmoooprsstvv"  (n=31)
+       0         1         2         3
+       0123456789012345678901234567890
+
+Busca de 'o' (ASCII 111):
+
+iter 1: ini=0  fim=30  meio=15  ord[15]='i'(105)  &lt; 'o'  →  ini=16  pcont=1
+iter 2: ini=16 fim=30  meio=23  ord[23]='o'(111) == 'o'  →  break   pcont=2
+
+return 2  ✓
+
+(O meio da segunda iteração cai exatamente em uma das ocorrências de 'o'!)</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q3">
+        ✘ Errado. Trace: ini=0,fim=30,meio=15,'i'&lt;'o'→ini=16; meio=23,'o'=='o'→break. Apenas 2 iterações.
+        <pre>
+ini=0  fim=30  meio=15  ord[15]='i' &lt; 'o'  →  ini=16
+ini=16 fim=30  meio=23  ord[23]='o' == 'o' →  PARA
+pcont = 2</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 4 — Bubble Sort (1ª Passagem) em String</div>
+    <div class="quiz-q" id="q4">
+      <p><strong>Q4.</strong> Após <code>bubblePasseStr(unome, 8)</code> com <code>unome="oliveira"</code>, qual a string resultante e o número de trocas?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) "iloeirav", 5 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">b) "lioeiarv", 6 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4')">c) "lioeirav", 6 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) "lioeirav", 5 trocas</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4">
+        ✔ Correto! Primeira passagem do bubble sort em "oliveira" faz 6 trocas e produz "lioeirav".
+        <pre>
+unome = ['o','l','i','v','e','i','r','a']  (ASCII: 111,108,105,118,101,105,114,97)
+
+j=0: 'o'(111) &gt; 'l'(108) → TROCA  ['l','o','i','v','e','i','r','a']  trocas=1
+j=1: 'o'(111) &gt; 'i'(105) → TROCA  ['l','i','o','v','e','i','r','a']  trocas=2
+j=2: 'o'(111) &gt; 'v'(118)? NÃO  (111 &lt; 118)
+j=3: 'v'(118) &gt; 'e'(101) → TROCA  ['l','i','o','e','v','i','r','a']  trocas=3
+j=4: 'v'(118) &gt; 'i'(105) → TROCA  ['l','i','o','e','i','v','r','a']  trocas=4
+j=5: 'v'(118) &gt; 'r'(114) → TROCA  ['l','i','o','e','i','r','v','a']  trocas=5
+j=6: 'v'(118) &gt; 'a'( 97) → TROCA  ['l','i','o','e','i','r','a','v']  trocas=6
+
+resultado = "lioeirav",  trocas = 6  ✓
+
+Nota: 'o' não trocou com 'v' (o &lt; v em ASCII), mas 'v' "borbulhou" até o final!</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q4">
+        ✘ Errado. Trace cada par adjacente: 'o'&lt;'v' em ASCII (111&lt;118) então j=2 NÃO troca. 'v' é o maior elemento e borbulha até o final. Total = 6 trocas, resultado = "lioeirav".
+        <pre>
+j=0: o&gt;l → swap   trocas=1
+j=1: o&gt;i → swap   trocas=2
+j=2: o&gt;v? NÃO     (o=111 &lt; v=118)
+j=3: v&gt;e → swap   trocas=3
+j=4: v&gt;i → swap   trocas=4
+j=5: v&gt;r → swap   trocas=5
+j=6: v&gt;a → swap   trocas=6
+final = "lioeirav"</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 5 — Selection Sort Crescente em String</div>
+    <div class="quiz-q" id="q5">
+      <p><strong>Q5.</strong> Após <code>selSortStr(snome, 7)</code> com <code>snome="sampaio"</code>, qual a string resultante e o número de trocas?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) "aaimops", 6 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) "aaimops", 5 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) "aaimpso", 5 trocas</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) "aaimops", 4 trocas</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5">
+        ✔ Correto! Selection sort em "sampaio" faz 5 trocas e produz "aaimops".
+        <pre>
+snome = ['s','a','m','p','a','i','o']
+
+i=0: minIdxStr[0..6]='a' em idx=1  ≠ 0 → TROCA vet[0]↔vet[1]
+     ['a','s','m','p','a','i','o']  trocas=1
+
+i=1: minIdxStr[1..6]:
+     's','m','p','a','i','o' → min='a' em idx=4  ≠ 1 → TROCA vet[1]↔vet[4]
+     ['a','a','m','p','s','i','o']  trocas=2
+
+i=2: minIdxStr[2..6]:
+     'm','p','s','i','o' → min='i' em idx=5  ≠ 2 → TROCA vet[2]↔vet[5]
+     ['a','a','i','p','s','m','o']  trocas=3
+
+i=3: minIdxStr[3..6]:
+     'p','s','m','o' → min='m' em idx=5  ≠ 3 → TROCA vet[3]↔vet[5]
+     ['a','a','i','m','s','p','o']  trocas=4
+
+i=4: minIdxStr[4..6]:
+     's','p','o' → min='o' em idx=6  ≠ 4 → TROCA vet[4]↔vet[6]
+     ['a','a','i','m','o','p','s']  trocas=5
+
+i=5: minIdxStr[5..6]:
+     'p','s' → min='p' em idx=5 == 5 → sem troca
+
+resultado = "aaimops",  trocas = 5  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q5">
+        ✘ Errado. Trace i=0..5: a iteração i=5 não gera troca ('p' já está na posição mínima). São 5 trocas no total. Resultado: "aaimops".
+        <pre>
+i=0 → swap s↔a  (trocas=1)
+i=1 → swap s↔a  (trocas=2)
+i=2 → swap m↔i  (trocas=3)
+i=3 → swap p↔m  (trocas=4)
+i=4 → swap s↔o  (trocas=5)
+i=5 → sem troca  (p já é mínimo)
+final = "aaimops"</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 6 — Lista: Contagem com ≥</div>
+    <div class="quiz-q" id="q6">
+      <p><strong>Q6.</strong> Qual o valor retornado por <code>contaMaiorIgual(lista, 3)</code>? (lista = 2→3→2→0→3→7→9→3→7→NULL)</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">b) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) 5</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q6')">d) 6</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q6">
+        ✔ Correto! Condição é ≥ 3 (maior OU igual). Os valores 3, 3, 7, 9, 3, 7 satisfazem.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+
+val ≥ 3?
+  2: 2≥3? NÃO
+  3: 3≥3? SIM  c=1   ← atenção: 3 conta!
+  2: 2≥3? NÃO
+  0: 0≥3? NÃO
+  3: 3≥3? SIM  c=2
+  7: 7≥3? SIM  c=3
+  9: 9≥3? SIM  c=4
+  3: 3≥3? SIM  c=5
+  7: 7≥3? SIM  c=6
+
+return 6  ✓
+
+Diferença para contaMaior(lista,3): essa função contaria apenas 7,9,7 = 3.
+contaMaiorIGUAL conta também os três 3's → 3+3 = 6.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q6">
+        ✘ Errado. A condição é ≥ (maior OU IGUAL), não > (estritamente maior). O valor 3 CONTA. Elementos ≥ 3: três 3's + 7 + 9 + 7 = 6 elementos.
+        <pre>
+Elementos ≥ 3: 3, 3, 7, 9, 3, 7
+Contagem = 6  (diferente de contaMaior onde seriam só 7,9,7 = 3)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 7 — Recursão: Contagem de Char em Nome Completo</div>
+    <div class="quiz-q" id="q7">
+      <p><strong>Q7.</strong> Qual o valor retornado por <code>contaChar(nome, 'a')</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 5</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 6</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) 3</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q7">
+        ✔ Correto! O caractere 'a' aparece 5 vezes em "italo alves sampaio de oliveira".
+        <pre>
+nome = "italo alves sampaio de oliveira"
+idx  =  0         1         2         3
+        0123456789012345678901234567890
+
+contaChar percorre recursivamente comparando cada char com 'a':
+
+idx  2: 'a' em "it[a]lo"          → conta
+idx  6: 'a' em "alves" [a]lves    → conta
+idx 13: 'a' em "s[a]mpaio"        → conta
+idx 16: 'a' em "samp[a]io"        → conta
+idx 30: 'a' em "olvieir[a]"       → conta
+
+Total = 5  ✓
+
+Recursão:
+  contaChar("italo...", 'a') = 0 + contaChar("talo...", 'a')
+  ...
+  Cada 'a' soma 1; os demais somam 0; base retorna 0.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q7">
+        ✘ Errado. Localize todos os 'a' em "italo alves sampaio de oliveira": posições 2,6,13,16,30 → 5 ocorrências.
+        <pre>
+"it[a]lo [a]lves s[a]mp[a]io de oliveirA"
+  idx 2   idx 6   idx13  idx16        idx30
+Total = 5</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 8 — Complexidade: Passo Variável por Linha</div>
+    <div class="quiz-q" id="q8">
+      <p><strong>Q8.</strong> Qual o valor retornado por <code>p(4)</code>? (loop interno: <code>j += i</code>)</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) 16</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">b) 10</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q8')">c) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q8')">d) 7</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q8">
+        ✔ Correto! O loop interno pula de i em i, então cada linha i contribui com ⌈n/i⌉ iterações.
+        <pre>
+p(4): n=4
+
+i=1: j = 1, 2, 3, 4  (j+=1, enquanto j≤4) →  4  iterações  c=4
+i=2: j = 1, 3        (j+=2)                →  2  iterações  c=6
+i=3: j = 1, 4        (j+=3)                →  2  iterações  c=8
+i=4: j = 1           (j+=4, próximo seria 5&gt;4) →  1 iteração  c=9
+
+return 9  ✓
+
+Explicação: para cada i, o loop interno executa ⌈n/i⌉ = ⌈4/i⌉ vezes.
+i=1: ⌈4/1⌉=4,  i=2: ⌈4/2⌉=2,  i=3: ⌈4/3⌉=2,  i=4: ⌈4/4⌉=1
+Soma = 4+2+2+1 = 9</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q8">
+        ✘ Errado. O loop interno começa em j=1 e salta de i em i (não de 1 em 1). Para i=3, j passa por 1 e 4 antes de 7&gt;4 parar → 2 iterações, não 1 nem 4.
+        <pre>
+i=1: j=1,2,3,4  → 4 iters
+i=2: j=1,3      → 2 iters
+i=3: j=1,4      → 2 iters
+i=4: j=1        → 1 iter
+Total = 9</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 9 — Lista: K-ésimo a Partir do Final</div>
+    <div class="quiz-q" id="q9">
+      <p><strong>Q9.</strong> Qual o valor de <code>coda(lista, 3)-&gt;val</code>? (3º nó a partir do final)</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) 3</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">b) 7</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q9')">c) 9</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) 0</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q9">
+        ✔ Correto! O algoritmo usa dois ponteiros: adianta `fim` em k=3 passos, depois move ambos até fim=NULL.
+        <pre>
+lista: 2 → 3 → 2 → 0 → 3 → 7 → 9 → 3 → 7 → NULL
+idx =  0   1   2   3   4   5   6   7   8
+
+Fase 1 — adianta `fim` por k=3 passos:
+  ini = nó0(2),  fim = nó0(2)
+  i=0: fim → nó1(3)
+  i=1: fim → nó2(2)
+  i=2: fim → nó3(0)
+
+Fase 2 — move ambos até fim=NULL:
+  fim=nó3(0)≠NULL: ini→nó1(3),   fim→nó4(3)
+  fim=nó4(3)≠NULL: ini→nó2(2),   fim→nó5(7)
+  fim=nó5(7)≠NULL: ini→nó3(0),   fim→nó6(9)
+  fim=nó6(9)≠NULL: ini→nó4(3),   fim→nó7(3)
+  fim=nó7(3)≠NULL: ini→nó5(7),   fim→nó8(7)
+  fim=nó8(7)≠NULL: ini→nó6(9),   fim→NULL
+  fim=NULL: PARA
+
+return ini = nó6(9)  →  val = 9  ✓
+
+Verificação: lista tem 9 nós, 3º do final = posição 9-3=6 (0-indexado) = val 9  ✓</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q9">
+        ✘ Errado. O algoritmo mantém uma janela de k=3 nós: quando `fim` chega ao NULL, `ini` está k posições antes do fim. Com 9 nós, o 3º do final está em idx=6 (val=9).
+        <pre>
+lista: 2  3  2  0  3  7  9  3  7  NULL
+idx:   0  1  2  3  4  5  6  7  8
+                          ↑     ↑
+                       ini=6  fim chega aqui (NULL)
+val = 9</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="quiz">
+    <div class="quiz-title">Questão 10 — MDC de Euclides com Valores da Lista</div>
+    <div class="quiz-q" id="q10">
+      <p><strong>Q10.</strong> Qual o valor retornado por <code>mdc(soma(lista), tamanho(lista))</code>?</p>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) 1</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) 4</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q10')">c) 36</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q10')">d) 9</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q10">
+        ✔ Correto! soma=36, tamanho=9. mdc(36,9): 36%9=0 → retorna 9 imediatamente.
+        <pre>
+Passo 1 — calcular os argumentos:
+  soma(lista)    = 2+3+2+0+3+7+9+3+7 = 36
+  tamanho(lista) = 9 nós
+
+Passo 2 — mdc(36, 9):
+
+  while (b != 0):
+    iter 1: r = 36 % 9 = 0,  a=9,  b=0
+  b=0 → para
+
+  return a = 9  ✓
+
+Verificação: 36 = 4 × 9  →  9 | 36  →  MDC = 9
+Nenhuma iteração adicional necessária pois 36 já é múltiplo de 9.</pre>
+      </div>
+      <div class="quiz-feedback err" id="fb_wrong_q10">
+        ✘ Errado. Calcule os argumentos: soma=36, tamanho=9. Depois mdc(36,9): 36÷9=4 exato, resto=0. O algoritmo para na primeira iteração e retorna 9.
+        <pre>
+soma = 2+3+2+0+3+7+9+3+7 = 36
+tamanho = 9
+mdc(36, 9): 36 % 9 = 0 → retorna 9 (36 é múltiplo de 9)</pre>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  EDA 1 · Simulado Prova P2 — Modelo 4 · Matrícula 232037937 · italo alves sampaio de oliveira
+</footer>
+
+<script>
+let score = 0;
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct'); score++;
+    document.getElementById('score-val').textContent = score;
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+</body>
+</html>
