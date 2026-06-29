@@ -1,0 +1,32 @@
+{
+  "doc_path": "docs/ARCHITECTURE.md",
+  "claims_checked": 22,
+  "claims_passed": 18,
+  "claims_failed": 4,
+  "failures": [
+    {
+      "line": 68,
+      "claim": "Q1–Q5(24.1).c",
+      "expected": "file exists at Provas/P2/ExemplosQuestões/Q1–Q5(24.1).c",
+      "actual": "file not found; individual files Q1(24.1).c through Q5(24.1).c exist instead"
+    },
+    {
+      "line": 78,
+      "claim": "simulado_prova1–4.html",
+      "expected": "file exists at Provas/P2/Simulados/simulado_prova1–4.html",
+      "actual": "file not found; individual files simulado_prova1.html through simulado_prova4.html exist instead"
+    },
+    {
+      "line": 38,
+      "claim": "README.md present in every topic directory (Recursão)",
+      "expected": "README.md exists in Recursão/",
+      "actual": "file not found at Recursão/README.md"
+    },
+    {
+      "line": 38,
+      "claim": "README.md present in every topic directory (AlocaçãoDinâmica)",
+      "expected": "README.md exists in AlocaçãoDinâmica/",
+      "actual": "file not found at AlocaçãoDinâmica/README.md"
+    }
+  ]
+}

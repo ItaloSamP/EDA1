@@ -1,0 +1,14 @@
+{
+  "doc_path": "docs/GETTING-STARTED.md",
+  "claims_checked": 13,
+  "claims_passed": 12,
+  "claims_failed": 1,
+  "failures": [
+    {
+      "line": 54,
+      "claim": "AlgoritmoDeBusca/MaiorElemVetor.c",
+      "expected": "file exists at AlgoritmoDeBusca/MaiorElemVetor.c",
+      "actual": "file not found at AlgoritmoDeBusca/MaiorElemVetor.c — file exists at Ponteiros/MaiorElemVetor.c instead"
+    }
+  ]
+}
