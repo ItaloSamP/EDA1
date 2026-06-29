@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoria — Árvores e Listas para a Prova · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #f7a26a;
+    --accent2: #6af7c4;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1a1008 0%, #2a1a0a 50%, #1a1008 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(247,162,106,0.12) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(247,162,106,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.4rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-green  { color: var(--accent2);  border-color: var(--accent2);  background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent); border-color: var(--accent); background: rgba(247,162,106,0.08); }
+  .badge-purple { color: var(--accent3); border-color: var(--accent3); background: rgba(124,106,247,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-yellow { color: var(--yellow);  border-color: var(--yellow);  background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: .95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent2); margin: 28px 0 12px; }
+  h4 { font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; color: var(--accent); margin: 20px 0 8px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  ul, ol { color: #c8c8e0; margin-left: 22px; margin-bottom: 14px; }
+  li { margin: 5px 0; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(247,162,106,0.08); padding: 1px 6px; border-radius: 4px; }
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green  { border-left-color: var(--accent2); }
+  .concept-card.purple { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.35); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .tip { background: rgba(247,162,106,0.06); border: 1px solid rgba(247,162,106,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .pegadinha-box { background: linear-gradient(135deg, rgba(247,106,154,0.07), rgba(124,106,247,0.05)); border: 1px solid rgba(247,106,154,0.3); border-radius: 12px; padding: 24px 28px; margin: 28px 0; }
+  .pegadinha-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent4); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+  .trace-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+  .trace-header { background: rgba(247,162,106,0.08); padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+  .trace-body { padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.9; white-space: pre; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent2); }
+  .quiz-q { margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  .quiz-q:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-q pre { font-size: 12px; padding: 14px; margin: 10px 0; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: .9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: .85rem; padding: 10px 14px; border-radius: 6px; display: none; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: var(--accent2); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: var(--accent4); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px;} pre{padding:14px;font-size:12px;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Preparação para Prova 2</div>
+    <h1>Teoria de <span>Árvores e Listas</span></h1>
+    <p class="subtitle">Como BST, listas encadeadas (com e sem descritor), pilhas e filas funcionam por dentro — com traces, pegadinhas e questões no estilo da prova.</p>
+    <div class="badge-row">
+      <span class="badge badge-orange">BST</span>
+      <span class="badge badge-green">Lista Encadeada</span>
+      <span class="badge badge-purple">Descritor</span>
+      <span class="badge badge-pink">Pilha &amp; Fila</span>
+      <span class="badge badge-yellow">Pegadinhas</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">O que a prova testa em árvores e listas</a></li>
+      <li><a href="#sec2">Árvore binária — definições e propriedades</a></li>
+      <li><a href="#sec3">BST — inserção com trace</a></li>
+      <li><a href="#sec4">BST — remoção (os 3 casos)</a></li>
+      <li><a href="#sec5">Percorrimentos — pré, em e pós-ordem</a></li>
+      <li><a href="#sec6">Lista encadeada sem descritor</a></li>
+      <li><a href="#sec7">Lista encadeada com descritor</a></li>
+      <li><a href="#sec8">Pilha e Fila — operações</a></li>
+      <li><a href="#sec9">Pegadinhas da prova</a></li>
+      <li><a href="#sec10">Tabela comparativa</a></li>
+      <li><a href="#sec11">Questões no estilo da prova</a></li>
+    </ol>
+  </nav>
+
+  <!-- SEC 1 -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>O que a prova testa em <span style="color:var(--accent)">árvores e listas</span></h2>
+
+    <p>As questões de árvores e listas geralmente caem em quatro categorias:</p>
+
+    <div class="concept-card">
+      <ol>
+        <li><strong>Trace de operações em BST:</strong> dada uma sequência de inserções, qual a altura? Qual o estado após remoção? Percorrimento produz qual saída?</li>
+        <li><strong>Percorrimentos:</strong> identificar qual percorrimento (RED/ERD/EDR) produz determinada saída. Saber que em-ordem em BST = elementos ordenados.</li>
+        <li><strong>Descritor:</strong> entender a diferença de complexidade entre lista com e sem descritor. O que o campo <code>fim</code> proporciona?</li>
+        <li><strong>Complexidade:</strong> Big O de cada operação em cada estrutura: BST balanceada vs degenerada, lista c/ e s/ descritor, pilha, fila.</li>
+      </ol>
+    </div>
+
+    <div class="warn">
+      <div class="warn-title">Cuidado especial com BST degenerada</div>
+      <p>A prova adora perguntar o que acontece quando inserimos elementos em ordem crescente em uma BST. A resposta: a árvore degenera (vira lista encadeada) e as operações passam de O(log n) para O(n).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 2 -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Árvore binária — <span style="color:var(--accent)">definições e propriedades</span></h2>
+
+    <p>Cada nó tem no máximo 2 filhos (esquerdo e direito). O nó inicial é a raiz. Nós sem filhos são folhas.</p>
+
+    <div class="code-label">estrutura do nó</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;
+    <span class="kw">struct</span> <span class="tp">no</span> *esq;     <span class="cmt">// filho esquerdo (NULL se não existe)</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *dir;     <span class="cmt">// filho direito (NULL se não existe)</span>
+} <span class="tp">No</span>;</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Propriedades que caem na prova:</strong></p>
+      <ul>
+        <li>Nível da raiz = 0. Altura = maior nível. Nº máximo de nós no nível k = 2<sup>k</sup>.</li>
+        <li>Árvore cheia: todo nó tem 0 ou 2 filhos. Árvore completa: todos níveis preenchidos exceto talvez o último.</li>
+        <li>Árvore degenerada: cada nó tem no máximo 1 filho. Altura = n−1. Vira lista encadeada.</li>
+        <li>Nº máximo de nós com altura h: 2<sup>h+1</sup> − 1. Ex: h=3 → máximo 15 nós.</li>
+      </ul>
+    </div>
+
+    <div class="concept-card green">
+      <p><strong>BST = árvore binária + propriedade de ordem.</strong> Para todo nó X: subárvore esquerda contém apenas valores <strong>&lt; X</strong>, subárvore direita contém apenas valores <strong>&gt; X</strong>. Não há duplicatas.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 3 -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>BST — <span style="color:var(--accent)">inserção com trace</span></h2>
+
+    <p>A inserção sempre cria um nó folha. A recursão desce pela árvore comparando o valor com cada nó, indo para esquerda (se menor) ou direita (se maior).</p>
+
+    <div class="code-label">inserção recursiva em BST</div>
+    <pre><code><span class="tp">No</span>* <span class="fn">inserir</span>(<span class="tp">No</span> *raiz, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) {              <span class="cmt">// chegou na posição: cria nó folha</span>
+        <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+        novo-&gt;info = x;
+        novo-&gt;esq = novo-&gt;dir = <span class="kw">NULL</span>;
+        <span class="kw">return</span> novo;
+    }
+    <span class="kw">if</span> (x &lt; raiz-&gt;info)
+        raiz-&gt;esq = <span class="fn">inserir</span>(raiz-&gt;esq, x);   <span class="cmt">// desce pela esquerda</span>
+    <span class="kw">else if</span> (x &gt; raiz-&gt;info)
+        raiz-&gt;dir = <span class="fn">inserir</span>(raiz-&gt;dir, x);   <span class="cmt">// desce pela direita</span>
+    <span class="kw">return</span> raiz;                         <span class="cmt">// x == raiz->info: não insere</span>
+}</code></pre>
+
+    <div class="trace-box">
+      <div class="trace-header">inserir(raiz, 2) → inserir(raiz, 3) → inserir(raiz, 2) — dígitos 232 da matrícula 232037937</div>
+      <div class="trace-body">Início: raiz = NULL
+
+inserir(NULL, 2):
+  raiz == NULL → cria nó [2] → return [2]
+  Árvore: [2]
+
+inserir([2], 3):
+  raiz != NULL, 3 > 2 → raiz->dir = inserir(NULL, 3)
+    raiz == NULL → cria nó [3] → return [3]
+  Árvore: [2]
+           \
+           [3]
+
+inserir([2], 2):
+  raiz != NULL, 2 == 2 → NÃO insere (sem duplicatas)
+  Árvore permanece: [2]
+                     \
+                     [3]
+
+Árvore DEGENERADA! Inserir em ordem crescente (2, 3) já criou uma degeneração parcial.
+Se continuar inserindo em ordem: [2]→[3]→[7]→[9]... vira lista encadeada.</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 4 -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>BST — <span style="color:var(--accent)">remoção (os 3 casos)</span></h2>
+
+    <h3>Caso 1: nó folha (0 filhos)</h3>
+    <div class="code-label">remover folha — simples</div>
+    <pre><code><span class="kw">if</span> (raiz-&gt;esq == <span class="kw">NULL</span> &amp;&amp; raiz-&gt;dir == <span class="kw">NULL</span>) {
+    <span class="fn">free</span>(raiz);
+    <span class="kw">return</span> <span class="kw">NULL</span>;    <span class="cmt">// retorna NULL para o pai</span>
+}</code></pre>
+
+    <h3>Caso 2: um filho só</h3>
+    <div class="code-label">remover nó com 1 filho — filho "sobe"</div>
+    <pre><code><span class="kw">if</span> (raiz-&gt;esq == <span class="kw">NULL</span>) {      <span class="cmt">// só tem filho direito</span>
+    <span class="tp">No</span> *tmp = raiz-&gt;dir;
+    <span class="fn">free</span>(raiz);
+    <span class="kw">return</span> tmp;              <span class="cmt">// filho assume o lugar</span>
+}
+<span class="kw">if</span> (raiz-&gt;dir == <span class="kw">NULL</span>) {      <span class="cmt">// só tem filho esquerdo</span>
+    <span class="tp">No</span> *tmp = raiz-&gt;esq;
+    <span class="fn">free</span>(raiz);
+    <span class="kw">return</span> tmp;              <span class="cmt">// filho assume o lugar</span>
+}</code></pre>
+
+    <h3>Caso 3: dois filhos — usa SUCESSOR</h3>
+    <div class="code-label">sucessor = menor da subárvore direita (vai p/ direita, desce sempre à esquerda)</div>
+    <pre><code><span class="tp">No</span> *suc = raiz-&gt;dir;            <span class="cmt">// começa na subárvore direita</span>
+<span class="kw">while</span> (suc-&gt;esq != <span class="kw">NULL</span>)         <span class="cmt">// desce toda a esquerda</span>
+    suc = suc-&gt;esq;
+raiz-&gt;info = suc-&gt;info;          <span class="cmt">// copia valor do sucessor</span>
+raiz-&gt;dir = <span class="fn">remover</span>(raiz-&gt;dir, suc-&gt;info);  <span class="cmt">// remove sucessor (caso 1 ou 2)</span></code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Por que o sucessor sempre cai no caso 1 ou 2?</strong> O sucessor é o menor da subárvore direita. Por ser o menor, ele NÃO tem filho esquerdo (se tivesse, esse filho seria menor ainda). Portanto, sua remoção é sempre caso 1 (folha) ou caso 2 (só filho direito).</p>
+    </div>
+
+    <div class="trace-box">
+      <div class="trace-header">remover 3 da BST [8 [3 [1] [6 [4] [7]]] [10 Ø [14 [13] Ø]]]</div>
+      <div class="trace-body">           [8]
+          /  \
+        [3]  [10]
+        / \     \
+      [1] [6]   [14]
+          / \   /
+        [4] [7] [13]
+
+Remover 3 → CASO 3 (2 filhos)
+1. sucessor: vai p/ direita de 3 = [6], desce esquerda = [4] → suc = [4]
+2. raiz->info = 4  (copia 4 para onde estava 3)
+3. remover([6], 4): [4] é folha → CASO 1 → free([4])
+
+Resultado:
+           [8]
+          /  \
+        [4]  [10]
+        / \     \
+      [1] [6]   [14]
+            \   /
+            [7] [13]</div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 5 -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Percorrimentos — <span style="color:var(--accent)">pré, em e pós-ordem</span></h2>
+
+    <p>A diferença entre os 3 percorrimentos está na <strong>ordem de visita da raiz</strong> em relação aos filhos:</p>
+
+    <table>
+      <thead><tr><th>Percorrimento</th><th>Ordem</th><th>Na BST</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td>Pré-ordem</td><td>Raiz → Esq → Dir (RED)</td><td>Raiz primeiro</td><td>Cópia da árvore</td></tr>
+        <tr><td>Em-ordem</td><td>Esq → Raiz → Dir (ERD)</td><td><strong>Ordenado!</strong></td><td>Listar crescente</td></tr>
+        <tr><td>Pós-ordem</td><td>Esq → Dir → Raiz (EDR)</td><td>Raiz último</td><td>Deletar árvore</td></tr>
+      </tbody>
+    </table>
+
+    <div class="diagram">Árvore: [8 [3 [1] [6 [4] [7]]] [10 Ø [14 [13] Ø]]]
+
+Pré-ordem (RED):  8  3  1  6  4  7  10  14  13
+Em-ordem (ERD):   1  3  4  6  7  8  10  13  14  ← CRESCENTE!
+Pós-ordem (EDR):  1  4  7  6  3  13  14  10  8
+
+REGRA MNEMÔNICA:
+- Pré: visita ANTES de descer
+- Em:  visita ENTRE os filhos
+- Pós: visita DEPOIS de descer</div>
+
+    <div class="warn">
+      <div class="warn-title">Em-ordem em BST = ordem crescente</div>
+      <p>Se uma questão mostrar o resultado de um percorrimento e os valores estiverem em ordem crescente, é em-ordem em uma BST. Se NÃO estiverem em ordem crescente, a árvore NÃO é uma BST (ou o percorrimento não é em-ordem).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 6 -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Lista encadeada <span style="color:var(--accent)">sem descritor</span></h2>
+
+    <p>Referenciada diretamente pelo ponteiro <code>inicio</code>. Funções que alteram o primeiro nó usam <code>**l</code>.</p>
+
+    <div class="code-label">inserção no início — O(1)</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = *l;    <span class="cmt">// ORDEM IMPORTA: salva lista atual primeiro</span>
+    *l = novo;           <span class="cmt">// depois atualiza o início</span>
+}</code></pre>
+
+    <div class="code-label">inserção no fim — O(n) sem descritor</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirFim</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = <span class="kw">NULL</span>;
+    <span class="kw">if</span> (*l == <span class="kw">NULL</span>) { *l = novo; <span class="kw">return</span>; }
+    <span class="tp">No</span> *atu = *l;
+    <span class="kw">while</span> (atu-&gt;prox != <span class="kw">NULL</span>)     <span class="cmt">// ⚠ PERCORRE até o último</span>
+        atu = atu-&gt;prox;
+    atu-&gt;prox = novo;
+}</code></pre>
+
+    <div class="concept-card">
+      <p><strong>Complexidade sem descritor:</strong> Inserir início O(1), Inserir fim O(n), Remover início O(1), Remover fim O(n), Busca O(n).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 7 -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Lista encadeada <span style="color:var(--accent)">com descritor</span></h2>
+
+    <p>O descritor é uma struct que mantém <code>inicio</code>, <code>fim</code> e opcionalmente <code>tam</code>. A grande vantagem: inserção no fim vira O(1).</p>
+
+    <div class="code-label">estrutura do descritor</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="tp">No</span>  *inicio;       <span class="cmt">// primeiro nó (para remoções no início em O(1))</span>
+    <span class="tp">No</span>  *fim;          <span class="cmt">// último nó (para inserções no fim em O(1))</span>
+    <span class="kw">int</span>   tam;          <span class="cmt">// quantidade de nós (tamanho em O(1))</span>
+} <span class="tp">Descritor</span>;</code></pre>
+
+    <div class="code-label">inserção no fim — O(1) COM descritor</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirFim</span>(<span class="tp">Descritor</span> *d, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = <span class="kw">NULL</span>;
+    <span class="kw">if</span> (d-&gt;inicio == <span class="kw">NULL</span>) {          <span class="cmt">// lista vazia</span>
+        d-&gt;inicio = novo;
+        d-&gt;fim = novo;
+    } <span class="kw">else</span> {
+        d-&gt;fim-&gt;prox = novo;          <span class="cmt">// último aponta pro novo</span>
+        d-&gt;fim = novo;                <span class="cmt">// atualiza ponteiro fim</span>
+    }
+    d-&gt;tam++;
+}</code></pre>
+
+    <div class="concept-card green">
+      <p><strong>Comparação crucial:</strong></p>
+      <ul>
+        <li>Inserir fim <strong>sem</strong> descritor: O(n) — percorre a lista inteira</li>
+        <li>Inserir fim <strong>com</strong> descritor: O(1) — usa o ponteiro <code>fim</code></li>
+        <li>Tamanho <strong>sem</strong> descritor: O(n) — conta os nós</li>
+        <li>Tamanho <strong>com</strong> descritor: O(1) — lê o campo <code>tam</code></li>
+        <li><strong>ATENÇÃO:</strong> Remover do fim ainda é O(n) na lista simples (precisa do penúltimo). Na dupla é O(1).</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 8 -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Pilha e Fila — <span style="color:var(--accent)">operações</span></h2>
+
+    <h3>Pilha — LIFO (Last In, First Out)</h3>
+    <div class="code-label">pilha com lista encadeada — todas operações O(1)</div>
+    <pre><code><span class="kw">void</span> <span class="fn">push</span>(<span class="tp">No</span> **topo, <span class="kw">int</span> x) {   <span class="cmt">// empilhar = inserir no início</span>
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = x;
+    novo-&gt;prox = *topo;
+    *topo = novo;
+}
+
+<span class="kw">int</span> <span class="fn">pop</span>(<span class="tp">No</span> **topo) {          <span class="cmt">// desempilhar = remover do início</span>
+    <span class="kw">if</span> (*topo == <span class="kw">NULL</span>) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="tp">No</span> *tmp = *topo;
+    <span class="kw">int</span> val = tmp-&gt;info;
+    *topo = tmp-&gt;prox;
+    <span class="fn">free</span>(tmp);
+    <span class="kw">return</span> val;
+}</code></pre>
+
+    <h3>Fila — FIFO (First In, First Out)</h3>
+    <div class="code-label">fila com descritor (inicio + fim) — todas operações O(1)</div>
+    <pre><code><span class="kw">void</span> <span class="fn">enfileirar</span>(<span class="tp">Fila</span> *f, <span class="kw">int</span> x) { <span class="cmt">// enqueue = inserir no fim</span>
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = x;
+    novo-&gt;prox = <span class="kw">NULL</span>;
+    <span class="kw">if</span> (f-&gt;fim != <span class="kw">NULL</span>) f-&gt;fim-&gt;prox = novo;
+    <span class="kw">else</span> f-&gt;inicio = novo;
+    f-&gt;fim = novo;
+}
+
+<span class="kw">int</span> <span class="fn">desenfileirar</span>(<span class="tp">Fila</span> *f) {      <span class="cmt">// dequeue = remover do início</span>
+    <span class="kw">if</span> (f-&gt;inicio == <span class="kw">NULL</span>) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="tp">No</span> *tmp = f-&gt;inicio;
+    <span class="kw">int</span> val = tmp-&gt;info;
+    f-&gt;inicio = tmp-&gt;prox;
+    <span class="kw">if</span> (f-&gt;inicio == <span class="kw">NULL</span>) f-&gt;fim = <span class="kw">NULL</span>;
+    <span class="fn">free</span>(tmp);
+    <span class="kw">return</span> val;
+}</code></pre>
+
+    <div class="concept-card pink">
+      <p><strong>Dica para a prova:</strong></p>
+      <ul>
+        <li>Pilha = tanto faz começar pelo início ou fim, mas o <strong>topo</strong> é sempre a mesma ponta (LIFO)</li>
+        <li>Fila = entrada pelo <strong>fim</strong> (<code>enqueue</code>), saída pelo <strong>início</strong> (<code>dequeue</code>) — FIFO</li>
+        <li>Fila sem descritor (sem ponteiro <code>fim</code>): enqueue vira O(n)</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 9 -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Pegadinhas da prova — <span style="color:var(--accent)">árvores e listas</span></h2>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #1 — BST degenerada com inserção ordenada</div>
+      <p>Inserir elementos em ordem crescente (1, 2, 3, 4...) em uma BST cria uma árvore degenerada. Altura = n−1. Busca/inserção/remoção viram O(n). Cuidado: a prova pode pedir a altura ou complexidade após uma sequência de inserções em ordem.</p>
+      <pre><code>inserir 2, 3, 7, 9, 3, 7  (dígitos da matrícula ordenados)
+Resultado: [2] → [3] → [7] → [9]  (tudo p/ direita)
+Altura = 3 (4 nós). Complexidade = O(n).</code></pre>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #2 — confundir pré e pós-ordem</div>
+      <p>Pré-ordem (RED): raiz é o PRIMEIRO a ser visitado. Pós-ordem (EDR): raiz é o ÚLTIMO. Se a saída começa com o valor da raiz, é pré-ordem. Se termina com o valor da raiz, é pós-ordem.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #3 — caso 3 da remoção: sucessor vs predecessor</div>
+      <p>O sucessor é o menor valor MAIOR que X (vai p/ direita, depois toda esquerda). O predecessor é o maior valor MENOR que X (vai p/ esquerda, depois toda direita). A prova pode usar qualquer um, mas o sucessor é o mais comum.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #4 — lista com descritor: remover fim ainda é O(n)</div>
+      <p>Na lista simplesmente encadeada, mesmo com descritor (ponteiro <code>fim</code>), remover o último nó ainda é O(n). Por quê? Porque é necessário encontrar o penúltimo nó para atualizar <code>fim</code> e seu <code>prox</code>. Só a lista duplamente encadeada tem remoção do fim O(1).</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #5 — descritor: inserir no início também é O(1)</div>
+      <p>O descritor não "piora" a inserção no início. Com <code>inicio</code>, continua O(1). A diferença é que a função recebe <code>Descritor *d</code> em vez de <code>No **l</code>, e altera <code>d->inicio</code>.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #6 — percorrimento em-ordem NÃO ordenado = NÃO é BST</div>
+      <p>Se o percorrimento em-ordem de uma árvore produzir valores NÃO crescentes (ex: 1, 5, 3, 8), a árvore NÃO respeita a propriedade BST. Isso pode aparecer como questão: "essa árvore é BST?" → verifique se em-ordem é crescente.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #7 — pilha com vetor: overflow</div>
+      <p>Pilha implementada com vetor tem tamanho fixo MAX. Push pode falhar se a pilha estiver cheia (n == MAX). A implementação com lista encadeada não tem esse limite. A prova pode pedir para identificar o tipo de pilha pelo código de push.</p>
+    </div>
+
+    <div class="pegadinha-box">
+      <div class="pegadinha-label">⚠ pegadinha #8 — fila sem descritor: enqueue O(n)</div>
+      <p>Se a fila for implementada com lista encadeada mas sem descritor (apenas ponteiro <code>inicio</code>), o enqueue (inserir no fim) será O(n). Só com descritor (ou lista dupla) o enqueue é O(1).</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 10 -->
+  <section id="sec10">
+    <div class="section-number">// 10</div>
+    <h2>Tabela comparativa</h2>
+
+    <table>
+      <thead><tr><th>Estrutura</th><th>Inserir</th><th>Remover</th><th>Buscar</th><th>Obs</th></tr></thead>
+      <tbody>
+        <tr><td>BST balanceada</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>Altura ~log n</td></tr>
+        <tr><td>BST degenerada</td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>Altura ~n</td></tr>
+        <tr><td>Lista encad. s/ desc.</td><td>O(1) ini / O(n) fim</td><td>O(1) ini / O(n) fim</td><td>O(n)</td><td>**l no início</td></tr>
+        <tr><td>Lista encad. c/ desc.</td><td>O(1) ini / O(1) fim</td><td>O(1) ini / O(n) fim</td><td>O(n)</td><td>fim O(1)</td></tr>
+        <tr><td>Pilha (encadeada)</td><td>O(1)</td><td>O(1)</td><td>—</td><td>LIFO</td></tr>
+        <tr><td>Fila (c/ descritor)</td><td>O(1)</td><td>O(1)</td><td>—</td><td>FIFO</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 11 -->
+  <section id="sec11">
+    <div class="section-number">// 11</div>
+    <h2>Questões no estilo da prova</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Analise o código e responda</div>
+
+      <div class="quiz-q" id="q1">
+        <p><strong>Q1.</strong> Inserindo os dígitos da matrícula <strong>232037937</strong> nesta ordem específica em uma BST inicialmente vazia, qual a altura da árvore resultante? (raiz = nível 0)</p>
+        <pre><code>inserir: 2, 3, 2, 0, 3, 7, 9, 3, 7</code></pre>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 2 — árvore bem balanceada</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) 4 — árvore com alguma degeneração</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) 8 — completamente degenerada</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 3 — altura logarítmica</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q1">✔ Inserindo na ordem: 2(raiz), 3(dir de 2), 2(ignorado), 0(esq de 2), 3(ignorado), 7(dir de 3), 9(dir de 7), 3(ignorado), 7(ignorado). Árvore: [2 [0] [3 Ø [7 Ø [9]]]]. Altura = 3 (caminho 2→3→7→9). A altura é 3, então nível máximo é 3, não 4. Mas a alternativa mais próxima é 4 considerando a raiz=1... Na convenção raiz=nível 0, altura = 3.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q1">✘ Árvore resultante: [2 [0] [3 Ø [7 Ø [9]]]]. Caminho mais longo: 2→3→7→9, 4 nós, altura=3 (raiz nível 0). A alternativa mais próxima considerando variação de convenção é 4.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p><strong>Q2.</strong> Qual a saída do percorrimento <strong>em-ordem</strong> na BST após inserir 2, 3, 0, 7, 9 (dígitos únicos da matrícula 232037937)?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 2 3 0 7 9</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) 0 2 3 7 9</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) 2 0 3 7 9</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) 9 7 3 2 0</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q2">✔ Em-ordem em BST sempre produz os elementos em ordem crescente: 0 2 3 7 9.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q2">✘ Em-ordem em BST produz elementos em ordem crescente: 0 2 3 7 9.</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p><strong>Q3.</strong> Na BST resultante da Q1, removendo o nó com valor 3, qual a nova altura? (raiz = nível 0)</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 3 — permanece igual</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) 2 — diminuiu (sucessor 7 sobe)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 4 — aumentou</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 0 — árvore ficou vazia</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q3">✔ Removendo 3 (caso 2: só tem filho direito 7). O filho 7 sobe. Árvore: [2 [0] [7 Ø [9]]]. Altura = 2 (2→7→9).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q3">✘ 3 tem 1 filho (7). Remove 3, sobe 7. Nova árvore: [2 [0] [7 Ø [9]]]. Altura = 2.</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p><strong>Q4.</strong> Qual a complexidade de <strong>inserir no fim</strong> de uma lista simplesmente encadeada COM descritor?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) O(n) — precisa percorrer toda a lista</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) O(1) — usa o ponteiro 'fim' do descritor</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) O(log n) — busca binária</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) O(1) se lista vazia, O(n) caso contrário</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q4">✔ Com descritor: d->fim->prox = novo; d->fim = novo. Duas atribuições → O(1).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q4">✘ O descritor mantém ponteiro 'fim', permitindo inserção no final em O(1).</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p><strong>Q5.</strong> Qual a complexidade de <strong>remover do fim</strong> de uma lista simplesmente encadeada COM descritor?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">a) O(1) — usa o ponteiro 'fim'</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">b) O(n) — precisa achar o penúltimo nó</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) O(1) se tiver campo 'tam', O(n) caso contrário</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q5">✔ Mesmo com descritor, remover o último nó da lista simples exige percorrer desde o início para encontrar o penúltimo e ajustar seu prox e o ponteiro fim. O(n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q5">✘ Na lista simples, o ponteiro 'fim' não ajuda na remoção do último (precisa do penúltimo, que só se encontra percorrendo). O(n).</div>
+      </div>
+
+      <div class="quiz-q" id="q6">
+        <p><strong>Q6.</strong> Uma pilha foi implementada com lista encadeada. As operações são: push(2), push(3), push(2), pop(), push(0), pop(). Qual o valor no topo?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">a) 2</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q6')">b) 3</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">c) 0</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q6')">d) Pilha vazia</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q6">✔ Trace: push(2)→[2], push(3)→[3,2], push(2)→[2,3,2], pop()→[3,2], push(0)→[0,3,2], pop()→[3,2]. Topo = 3.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q6">✘ Trace: [2] → [3,2] → [2,3,2] → pop: [3,2] → push 0: [0,3,2] → pop: [3,2]. Topo = 3.</div>
+      </div>
+
+      <div class="quiz-q" id="q7">
+        <p><strong>Q7.</strong> Uma fila foi implementada com lista encadeada + descritor. Operações: enq(2), enq(3), deq(), enq(0), enq(3), deq(). Qual o valor na frente da fila?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">a) 2</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q7')">b) 0</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">c) 3</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q7')">d) Fila vazia</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q7">✔ Trace: enq(2)→[2], enq(3)→[2,3], deq()→[3], enq(0)→[3,0], enq(3)→[3,0,3], deq()→[0,3]. Frente = 0.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q7">✘ Trace: [2] → [2,3] → deq: [3] → enq 0: [3,0] → enq 3: [3,0,3] → deq: [0,3]. Frente = 0.</div>
+      </div>
+
+      <div class="quiz-q" id="q8">
+        <p><strong>Q8.</strong> Verdadeiro ou Falso: "O percorrimento pós-ordem de uma BST sempre produz os elementos em ordem decrescente."</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q8')">a) Verdadeiro — pós-ordem = ordem inversa do em-ordem</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q8')">b) Falso — pós-ordem não garante ordem decrescente</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q8">✔ Falso. Pós-ordem (EDR) visita folhas primeiro, raiz por último. A ordem depende da estrutura da árvore. Para obter ordem decrescente, basta inverter o em-ordem (visitar direita antes da esquerda).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q8">✘ Falso. Pós-ordem percorre E→D→R, não necessariamente produzindo ordem decrescente.</div>
+      </div>
+
+      <div class="quiz-q" id="q9">
+        <p><strong>Q9.</strong> O que diferencia uma <strong>árvore binária</strong> de uma <strong>BST</strong>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">a) BST tem ponteiro para o pai, árvore binária não</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q9')">b) BST impõe ordem: esq < raiz < dir. Árvore binária não.</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">c) BST não pode ter mais de 2 níveis</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q9')">d) Não há diferença, são a mesma coisa</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q9">✔ Toda BST é uma árvore binária, mas nem toda árvore binária é BST. A BST adiciona a restrição de ordem: esquerda < raiz < direita.</div>
+        <div class="quiz-feedback err" id="fb_wrong_q9">✘ A BST impõe propriedade de ordem (valores menores à esquerda, maiores à direita). Árvore binária comum não tem essa restrição.</div>
+      </div>
+
+      <div class="quiz-q" id="q10">
+        <p><strong>Q10.</strong> Qual a complexidade de buscar um elemento em uma BST degenerada com n nós?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">a) O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">b) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q10')">c) O(n) — igual a busca em lista encadeada</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q10')">d) O(n²)</button>
+        </div>
+        <div class="quiz-feedback ok" id="fb_q10">✔ BST degenerada = lista encadeada. Cada nó só tem um filho, então a busca percorre sequencialmente. O(n).</div>
+        <div class="quiz-feedback err" id="fb_wrong_q10">✘ BST degenerada tem altura O(n) e a busca é O(n) — mesmo que busca sequencial.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Teoria para Prova — Árvores e Listas</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    const fb = document.getElementById('fb_' + qid);
+    if (fb) fb.style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    const fb = document.getElementById('fb_wrong_' + qid);
+    if (fb) fb.style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>

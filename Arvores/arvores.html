@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Árvores, Listas, Pilhas e Filas — EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #6af7c4;
+    --accent3: #f7a26a;
+    --accent4: #f76a9a;
+    --accent5: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+    --yellow: #f7e06a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2a1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%);
+  }
+  header::after {
+    content: '🌳'; position: absolute; right: 50px; top: 10px;
+    font-size: 200px; font-family: 'Fraunces', serif;
+    color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none;
+  }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 720px; position: relative; }
+  .badge-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+  .badge-green  { color: var(--accent); border-color: var(--accent); background: rgba(106,247,196,0.08); }
+  .badge-orange { color: var(--accent3); border-color: var(--accent3); background: rgba(247,162,106,0.08); }
+  .badge-pink   { color: var(--accent4); border-color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .badge-purple { color: #7c6af7; border-color: #7c6af7; background: rgba(124,106,247,0.08); }
+  .badge-yellow { color: var(--yellow); border-color: var(--yellow); background: rgba(247,224,106,0.08); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 40px 0; padding: 28px 32px; }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color .2s; }
+  .toc a:hover { color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-number { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 900; margin-bottom: 20px; line-height: 1.2; }
+  h3 { font-family: 'DM Sans', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--accent3); margin: 28px 0 12px; }
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+
+  .concept-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .concept-card.green { border-left-color: var(--accent2); }
+  .concept-card.orange { border-left-color: var(--accent3); }
+  .concept-card.pink   { border-left-color: var(--accent4); }
+  .concept-card.purple { border-left-color: #7c6af7; }
+  .concept-card.yellow { border-left-color: var(--yellow); }
+
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; overflow-x: auto; margin: 20px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.7; color: #c8c8e0; }
+  .code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 8px; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #9898c0; line-height: 1.8; white-space: pre; overflow-x: auto; }
+
+  .analogy { background: linear-gradient(135deg, rgba(106,247,196,0.07), rgba(247,162,106,0.04)); border: 1px dashed var(--accent); border-radius: 10px; padding: 20px 24px; margin: 20px 0; }
+  .analogy-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 8px; }
+
+  .warn { background: rgba(247,106,154,0.08); border: 1px solid rgba(247,106,154,0.3); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .warn::before { content: '\26A0 '; color: var(--accent4); font-weight: 700; }
+  .tip { background: rgba(106,247,196,0.06); border: 1px solid rgba(106,247,196,0.25); border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+  .tip::before { content: '\1F4A1 '; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .compare-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; }
+  .compare-card h4 { font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+  .compare-card p { font-size: 0.9rem; margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+  thead { background: var(--surface2); }
+  th { padding: 12px 16px; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: #c8c8e0; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .quiz { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 32px 0; }
+  .quiz-title { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--accent3); }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-q p { font-weight: 500; color: var(--text); margin-bottom: 10px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.9rem; transition: all .2s; color: var(--text-muted); text-align: left; }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 10px; font-size: 0.85rem; display: none; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){
+    header { padding: 40px 20px; }
+    header::after { display: none; }
+    .container { padding: 0 16px; }
+    pre { padding: 14px; font-size: 12px; }
+    .toc, .quiz { padding: 20px; }
+    .diagram { font-size: 11px; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">EDA — UnB Gama · Material de Apoio - Nilton Correia da Silva</div>
+    <h1>Árvores &amp; <span>Listas Encadeadas</span></h1>
+    <p class="subtitle">Árvore binária, BST, lista encadeada (com e sem descritor), pilha e fila — conceitos, operações, Big O e traces de execução</p>
+    <div class="badge-row">
+      <span class="badge badge-green">Árvore Binária</span>
+      <span class="badge badge-orange">BST</span>
+      <span class="badge badge-pink">Lista Encadeada</span>
+      <span class="badge badge-purple">Descritor</span>
+      <span class="badge badge-yellow">Pilha &amp; Fila</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <div class="toc-title">// índice</div>
+    <ol>
+      <li><a href="#sec1">Árvore binária — conceitos e propriedades</a></li>
+      <li><a href="#sec2">Árvore binária de busca (BST)</a></li>
+      <li><a href="#sec3">Remoção em BST — os 3 casos</a></li>
+      <li><a href="#sec4">Percorrimentos em árvores</a></li>
+      <li><a href="#sec5">Lista encadeada sem descritor</a></li>
+      <li><a href="#sec6">Lista encadeada com descritor</a></li>
+      <li><a href="#sec7">Pilha — revisão</a></li>
+      <li><a href="#sec8">Fila — revisão</a></li>
+      <li><a href="#sec9">Tabela comparativa — Big O completo</a></li>
+      <li><a href="#sec10">Quiz rápido</a></li>
+    </ol>
+  </nav>
+
+  <!-- SEC 1 -->
+  <section id="sec1">
+    <div class="section-number">// 01</div>
+    <h2>Árvore binária — <span style="color:var(--accent)">conceitos e propriedades</span></h2>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Uma árvore binária é como uma árvore genealógica onde cada pessoa tem no máximo 2 filhos: um filho "esquerdo" e um filho "direito". A raiz é o ancestral comum. Cada pessoa sem filhos é uma "folha" da árvore.</p>
+    </div>
+
+    <p>Uma <strong>árvore binária</strong> é uma estrutura hierárquica definida recursivamente: é vazia OU um nó raiz com duas subárvores binárias (esquerda e direita). Cada nó tem um campo de dado e dois ponteiros para os filhos.</p>
+
+    <div class="code-label">estrutura do nó — C</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;       <span class="cmt">// dado armazenado no nó</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *esq;        <span class="cmt">// ponteiro para o filho esquerdo</span>
+    <span class="kw">struct</span> <span class="tp">no</span> *dir;        <span class="cmt">// ponteiro para o filho direito</span>
+} <span class="tp">No</span>;</code></pre>
+
+    <h3>Propriedades fundamentais</h3>
+
+    <table>
+      <thead><tr><th>Propriedade</th><th>Fórmula / Valor</th></tr></thead>
+      <tbody>
+        <tr><td>Nº máximo de nós no nível k</td><td>2<sup>k</sup> (raiz: nível 0)</td></tr>
+        <tr><td>Nº máximo de nós total (altura h)</td><td>2<sup>h+1</sup> − 1</td></tr>
+        <tr><td>Altura mínima com n nós</td><td>⌊log<sub>2</sub> n⌋ (balanceada)</td></tr>
+        <tr><td>Altura máxima com n nós</td><td>n − 1 (degenerada)</td></tr>
+        <tr><td>Nº de folhas em árvore cheia</td><td>2<sup>h</sup></td></tr>
+      </tbody>
+    </table>
+
+    <div class="diagram">     [8]                ← raiz (nível 0)
+     /  \
+   [3]   [10]           ← nível 1
+   / \     \
+ [1] [6]  [14]          ← nível 2
+     / \   /
+   [4] [7] [13]         ← nível 3
+
+  Nós: 9  ·  Altura: 3  ·  Folhas: {1,4,7,13} (4 folhas)</div>
+
+    <div class="concept-card green">
+      <p><strong>Termos importantes:</strong></p>
+      <ul style="color:#c8c8e0; margin-left:20px;">
+        <li><strong>Nó folha:</strong> nó sem filhos (esq == NULL && dir == NULL)</li>
+        <li><strong>Árvore cheia:</strong> todo nó tem 0 ou 2 filhos (nenhum filho único)</li>
+        <li><strong>Árvore completa:</strong> todos os níveis exceto o último estão preenchidos</li>
+        <li><strong>Árvore degenerada:</strong> cada nó tem no máximo 1 filho → vira lista encadeada</li>
+        <li><strong>Árvore balanceada:</strong> altura O(log n)</li>
+      </ul>
+    </div>
+
+    <div class="warn">
+      <strong>Árvore degenerada = pior caso.</strong> Uma BST degenerada tem altura O(n) e todas as operações viram O(n) — igual a uma lista encadeada. Isso acontece inserindo elementos em ordem crescente (ou decrescente).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 2 -->
+  <section id="sec2">
+    <div class="section-number">// 02</div>
+    <h2>Árvore binária de busca — <span style="color:var(--accent)">BST</span></h2>
+
+    <p>Uma <strong>BST (Binary Search Tree)</strong> impõe a <strong>propriedade de ordem</strong>: para todo nó X, todos os valores na subárvore esquerda são <strong>menores</strong> que X e todos na subárvore direita são <strong>maiores</strong> que X. <strong>Não há duplicatas</strong> (valores iguais não são inseridos).</p>
+
+    <div class="diagram">           [8]
+          /  \
+        [3]  [10]
+        / \     \
+      [1] [6]   [14]
+
+Propriedade BST verificada:
+- Esquerda de 8: {1,3,6} — todos < 8  ✓
+- Direita de 8:  {10,14} — todos > 8  ✓
+- Esquerda de 3: {1} — 1 < 3  ✓
+- Direita de 3:  {6} — 6 > 3  ✓</div>
+
+    <h3>Busca em BST</h3>
+
+    <div class="code-label">busca recursiva — O(log n) balanceada, O(n) degenerada</div>
+    <pre><code><span class="tp">No</span>* <span class="fn">buscar</span>(<span class="tp">No</span> *raiz, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">NULL</span>;        <span class="cmt">// não encontrou (base)</span>
+    <span class="kw">if</span> (raiz-&gt;info == x) <span class="kw">return</span> raiz;        <span class="cmt">// encontrou!</span>
+    <span class="kw">if</span> (x &lt; raiz-&gt;info)
+        <span class="kw">return</span> <span class="fn">buscar</span>(raiz-&gt;esq, x);     <span class="cmt">// vai p/ esquerda (menores)</span>
+    <span class="kw">else</span>
+        <span class="kw">return</span> <span class="fn">buscar</span>(raiz-&gt;dir, x);     <span class="cmt">// vai p/ direita (maiores)</span>
+}</code></pre>
+
+    <h3>Inserção em BST</h3>
+
+    <div class="code-label">inserção recursiva — O(log n) balanceada, O(n) degenerada</div>
+    <pre><code><span class="tp">No</span>* <span class="fn">inserir</span>(<span class="tp">No</span> *raiz, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) {              <span class="cmt">// chegou na posição correta</span>
+        <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+        novo-&gt;info = x;
+        novo-&gt;esq = novo-&gt;dir = <span class="kw">NULL</span>;
+        <span class="kw">return</span> novo;
+    }
+    <span class="kw">if</span> (x &lt; raiz-&gt;info)
+        raiz-&gt;esq = <span class="fn">inserir</span>(raiz-&gt;esq, x);
+    <span class="kw">else if</span> (x &gt; raiz-&gt;info)
+        raiz-&gt;dir = <span class="fn">inserir</span>(raiz-&gt;dir, x);
+    <span class="cmt">// se x == raiz->info: não insere (sem duplicatas)</span>
+    <span class="kw">return</span> raiz;
+}</code></pre>
+
+    <div class="tip">
+      <strong>Inserção sempre cria nó folha.</strong> O novo nó é sempre inserido como folha — nunca no meio da árvore. A recursão desce até encontrar NULL e aloca lá.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 3 -->
+  <section id="sec3">
+    <div class="section-number">// 03</div>
+    <h2>Remoção em BST — <span style="color:var(--accent)">os 3 casos</span></h2>
+
+    <p>A remoção é a operação mais complexa da BST. Existem <strong>3 casos</strong> distintos, dependendo do número de filhos do nó a ser removido.</p>
+
+    <div class="code-label">remoção em BST — implementação completa</div>
+    <pre><code><span class="tp">No</span>* <span class="fn">remover</span>(<span class="tp">No</span> *raiz, <span class="kw">int</span> x) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="kw">NULL</span>;         <span class="cmt">// valor não encontrado</span>
+
+    <span class="kw">if</span> (x &lt; raiz-&gt;info)
+        raiz-&gt;esq = <span class="fn">remover</span>(raiz-&gt;esq, x);
+    <span class="kw">else if</span> (x &gt; raiz-&gt;info)
+        raiz-&gt;dir = <span class="fn">remover</span>(raiz-&gt;dir, x);
+    <span class="kw">else</span> {                               <span class="cmt">// ENCONTROU o nó a remover</span>
+
+        <span class="cmt">// CASO 1: nó folha (0 filhos)</span>
+        <span class="kw">if</span> (raiz-&gt;esq == <span class="kw">NULL</span> &amp;&amp; raiz-&gt;dir == <span class="kw">NULL</span>) {
+            <span class="fn">free</span>(raiz);
+            <span class="kw">return</span> <span class="kw">NULL</span>;
+        }
+
+        <span class="cmt">// CASO 2: um filho só (esquerdo OU direito)</span>
+        <span class="kw">if</span> (raiz-&gt;esq == <span class="kw">NULL</span>) {         <span class="cmt">// só tem filho direito</span>
+            <span class="tp">No</span> *tmp = raiz-&gt;dir;
+            <span class="fn">free</span>(raiz);
+            <span class="kw">return</span> tmp;                 <span class="cmt">// filho sobe no lugar</span>
+        }
+        <span class="kw">if</span> (raiz-&gt;dir == <span class="kw">NULL</span>) {         <span class="cmt">// só tem filho esquerdo</span>
+            <span class="tp">No</span> *tmp = raiz-&gt;esq;
+            <span class="fn">free</span>(raiz);
+            <span class="kw">return</span> tmp;                 <span class="cmt">// filho sobe no lugar</span>
+        }
+
+        <span class="cmt">// CASO 3: dois filhos — usa SUCESSOR (menor da direita)</span>
+        <span class="tp">No</span> *suc = raiz-&gt;dir;
+        <span class="kw">while</span> (suc-&gt;esq != <span class="kw">NULL</span>)
+            suc = suc-&gt;esq;               <span class="cmt">// vai até o menor da subárvore direita</span>
+        raiz-&gt;info = suc-&gt;info;            <span class="cmt">// copia o valor do sucessor</span>
+        raiz-&gt;dir = <span class="fn">remover</span>(raiz-&gt;dir, suc-&gt;info); <span class="cmt">// remove sucessor (caso 1 ou 2)</span>
+    }
+    <span class="kw">return</span> raiz;
+}</code></pre>
+
+    <div class="diagram">Removendo 3 da BST:           Removendo 10 da BST:
+       [8]                            [8]
+      /  \                           /  \
+    [3]  [10]          →            [4]  [14]
+    / \     \                       / \     /
+  [1] [6]  [14]                  [1] [6] [13]
+      / \   /                        / \
+    [4] [7] [13]                  [4] [7]
+
+Caso 3: 2 filhos                    Caso 2: 1 filho
+Sucessor de 3 = 4                   10 só tem filho direito
+Copia 4, remove 4 (caso 1)         Sobe [14] no lugar</div>
+
+    <table>
+      <thead><tr><th>Caso</th><th>Filhos</th><th>Ação</th><th>Complexidade</th></tr></thead>
+      <tbody>
+        <tr><td>Caso 1</td><td>0 (folha)</td><td>free(raiz), retorna NULL</td><td>O(log n)</td></tr>
+        <tr><td>Caso 2</td><td>1 filho</td><td>free(raiz), retorna o filho</td><td>O(log n)</td></tr>
+        <tr><td>Caso 3</td><td>2 filhos</td><td>Substitui pelo sucessor, remove sucessor</td><td>O(log n)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card orange">
+      <p><strong>Sucessor = menor da subárvore direita.</strong> O sucessor de um nó X é o menor valor MAIOR que X. Basta ir uma vez para a direita e depois descer sempre à esquerda até NULL. O sucessor sempre tem no máximo 1 filho (o direito) — portanto sua remoção é sempre caso 1 ou 2.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 4 -->
+  <section id="sec4">
+    <div class="section-number">// 04</div>
+    <h2>Percorrimentos em árvores — <span style="color:var(--accent)">pré, em e pós-ordem</span></h2>
+
+    <p>Três tipos de percorrimento DFS (depth-first search). A diferença está na <strong>ordem de visita</strong> da raiz em relação aos filhos.</p>
+
+    <div class="code-label">pré-ordem (RED): Raiz → Esquerda → Direita</div>
+    <pre><code><span class="kw">void</span> <span class="fn">preOrdem</span>(<span class="tp">No</span> *raiz) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) <span class="kw">return</span>;
+    <span class="fn">printf</span>(<span class="str">"%d "</span>, raiz-&gt;info);        <span class="cmt">// visita raiz PRIMEIRO</span>
+    <span class="fn">preOrdem</span>(raiz-&gt;esq);
+    <span class="fn">preOrdem</span>(raiz-&gt;dir);
+}</code></pre>
+
+    <div class="code-label">em-ordem (ERD): Esquerda → Raiz → Direita</div>
+    <pre><code><span class="kw">void</span> <span class="fn">emOrdem</span>(<span class="tp">No</span> *raiz) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) <span class="kw">return</span>;
+    <span class="fn">emOrdem</span>(raiz-&gt;esq);
+    <span class="fn">printf</span>(<span class="str">"%d "</span>, raiz-&gt;info);        <span class="cmt">// visita raiz NO MEIO</span>
+    <span class="fn">emOrdem</span>(raiz-&gt;dir);
+}</code></pre>
+
+    <div class="code-label">pós-ordem (EDR): Esquerda → Direita → Raiz</div>
+    <pre><code><span class="kw">void</span> <span class="fn">posOrdem</span>(<span class="tp">No</span> *raiz) {
+    <span class="kw">if</span> (raiz == <span class="kw">NULL</span>) <span class="kw">return</span>;
+    <span class="fn">posOrdem</span>(raiz-&gt;esq);
+    <span class="fn">posOrdem</span>(raiz-&gt;dir);
+    <span class="fn">printf</span>(<span class="str">"%d "</span>, raiz-&gt;info);        <span class="cmt">// visita raiz POR ÚLTIMO</span>
+}</code></pre>
+
+    <div class="diagram">Árvore de exemplo:
+           [8]
+          /  \
+        [3]  [10]
+        / \     \
+      [1] [6]   [14]
+          / \   /
+        [4] [7] [13]
+
+Pré-ordem (RED):  8  3  1  6  4  7  10  14  13
+Em-ordem (ERD):   1  3  4  6  7  8  10  13  14  ← ordem crescente!
+Pós-ordem (EDR):  1  4  7  6  3  13  14  10  8</div>
+
+    <table>
+      <thead><tr><th>Percorrimento</th><th>Abrev.</th><th>Resultado em BST</th><th>Uso típico</th></tr></thead>
+      <tbody>
+        <tr><td>Pré-ordem</td><td>RED</td><td>Raiz primeiro</td><td>Copiar árvore, expressão prefixa</td></tr>
+        <tr><td>Em-ordem</td><td>ERD</td><td><strong>Ordem crescente!</strong></td><td>Listar elementos ordenados</td></tr>
+        <tr><td>Pós-ordem</td><td>EDR</td><td>Raiz por último</td><td>Deletar árvore (libera folhas primeiro), expressão posfixa</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card green">
+      <p><strong>Em-ordem em BST = elementos em ordem crescente.</strong> Esta é uma propriedade exclusiva da BST. Se o percorrimento em-ordem não produzir valores crescentes, a árvore NÃO é uma BST válida.</p>
+    </div>
+
+    <div class="warn">
+      <strong>Complexidade dos percorrimentos: O(n).</strong> Todo percorrimento visita cada nó exatamente uma vez. A recursão usa a pilha de chamadas como estrutura auxiliar implícita.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 5 -->
+  <section id="sec5">
+    <div class="section-number">// 05</div>
+    <h2>Lista encadeada <span style="color:var(--accent)">sem descritor</span></h2>
+
+    <p>A lista é referenciada diretamente pelo ponteiro para o primeiro nó. Lista vazia = <code>NULL</code>. Funções que alteram o primeiro nó precisam de <code>**l</code>.</p>
+
+    <div class="code-label">estrutura e inserção no início</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;
+} <span class="tp">No</span>;
+
+<span class="kw">void</span> <span class="fn">inserirInicio</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = *l;                  <span class="cmt">// novo aponta p/ antigo primeiro</span>
+    *l = novo;                        <span class="cmt">// início atualizado</span>
+}</code></pre>
+
+    <div class="compare-grid">
+      <div class="compare-card">
+        <h4>Vantagens</h4>
+        <p>Tamanho dinâmico, inserção/remoção no início O(1), sem desperdício de memória, sem deslocamento.</p>
+      </div>
+      <div class="compare-card">
+        <h4>Desvantagens</h4>
+        <p>Acesso sequencial O(n), inserção no fim O(n) (precisa percorrer toda a lista), remoção no fim O(n).</p>
+      </div>
+    </div>
+
+    <div class="code-label">remoção por valor — com ponteiro anterior</div>
+    <pre><code><span class="kw">int</span> <span class="fn">remover</span>(<span class="tp">No</span> **l, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *ant = <span class="kw">NULL</span>, *atu = *l;
+    <span class="kw">while</span> (atu != <span class="kw">NULL</span> &amp;&amp; atu-&gt;info != valor) {
+        ant = atu;
+        atu = atu-&gt;prox;
+    }
+    <span class="kw">if</span> (atu == <span class="kw">NULL</span>) <span class="kw">return</span> <span class="num">0</span>;          <span class="cmt">// não encontrado</span>
+    <span class="kw">if</span> (ant == <span class="kw">NULL</span>) <span class="cmt">// removendo o primeiro</span>
+        *l = atu-&gt;prox;
+    <span class="kw">else</span>              <span class="cmt">// removendo do meio ou fim</span>
+        ant-&gt;prox = atu-&gt;prox;
+    <span class="fn">free</span>(atu);
+    <span class="kw">return</span> <span class="num">1</span>;
+}</code></pre>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 6 -->
+  <section id="sec6">
+    <div class="section-number">// 06</div>
+    <h2>Lista encadeada <span style="color:var(--accent)">com descritor</span></h2>
+
+    <p>O <strong>descritor</strong> é uma struct que encapsula metadados da lista: ponteiro para o primeiro nó, ponteiro para o último e opcionalmente o tamanho.</p>
+
+    <div class="code-label">estrutura com descritor</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;
+} <span class="tp">No</span>;
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="tp">No</span>  *inicio;       <span class="cmt">// ponteiro p/ primeiro nó</span>
+    <span class="tp">No</span>  *fim;          <span class="cmt">// ponteiro p/ último nó (chave p/ O(1) no fim)</span>
+    <span class="kw">int</span>   tam;          <span class="cmt">// quantidade de nós (opcional mas útil)</span>
+} <span class="tp">Descritor</span>;</code></pre>
+
+    <div class="code-label">inserção no fim — O(1) com descritor</div>
+    <pre><code><span class="kw">void</span> <span class="fn">inserirFim</span>(<span class="tp">Descritor</span> *d, <span class="kw">int</span> valor) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = valor;
+    novo-&gt;prox = <span class="kw">NULL</span>;
+
+    <span class="kw">if</span> (d-&gt;inicio == <span class="kw">NULL</span>) {           <span class="cmt">// lista vazia</span>
+        d-&gt;inicio = novo;
+        d-&gt;fim = novo;
+    } <span class="kw">else</span> {
+        d-&gt;fim-&gt;prox = novo;           <span class="cmt">// conecta no último</span>
+        d-&gt;fim = novo;                 <span class="cmt">// atualiza ponteiro fim</span>
+    }
+    d-&gt;tam++;
+}</code></pre>
+
+    <div class="concept-card purple">
+      <p><strong>Vantagem chave do descritor: inserção no fim O(1).</strong> Sem descritor, inserir no fim exige percorrer toda a lista (O(n)). Com o ponteiro <code>fim</code>, a inserção é direta. O campo <code>tam</code> também evita percorrer para saber o tamanho.</p>
+    </div>
+
+    <div class="warn">
+      <strong>Remover do fim ainda é O(n).</strong> Na lista simplesmente encadeada, mesmo com descritor, remover o último nó exige encontrar o penúltimo para ajustar <code>fim</code> — e isso custa O(n). Na lista duplamente encadeada com descritor, a remoção do fim é O(1).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 7 -->
+  <section id="sec7">
+    <div class="section-number">// 07</div>
+    <h2>Pilha — <span style="color:var(--accent)">revisão</span></h2>
+
+    <p>Estrutura <strong>LIFO</strong> (Last In, First Out). O último elemento inserido é o primeiro a ser removido. Implementada com lista encadeada (dinâmica) ou vetor (estática).</p>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Uma pilha de pratos: você coloca pratos no topo (push) e retira do topo (pop). Não pode tirar um prato do meio sem derrubar a pilha.</p>
+    </div>
+
+    <div class="code-label">pilha com lista encadeada</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;
+} <span class="tp">No</span>;
+
+<span class="tp">No</span> *topo = <span class="kw">NULL</span>;              <span class="cmt">// pilha vazia</span>
+
+<span class="cmt">// push — insere no topo (início da lista)</span>
+<span class="kw">void</span> <span class="fn">push</span>(<span class="tp">No</span> **topo, <span class="kw">int</span> x) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = x;
+    novo-&gt;prox = *topo;
+    *topo = novo;
+}
+
+<span class="cmt">// pop — remove do topo (início da lista)</span>
+<span class="kw">int</span> <span class="fn">pop</span>(<span class="tp">No</span> **topo) {
+    <span class="kw">if</span> (*topo == <span class="kw">NULL</span>) <span class="kw">return</span> -<span class="num">1</span>;   <span class="cmt">// pilha vazia</span>
+    <span class="tp">No</span> *tmp = *topo;
+    <span class="kw">int</span> val = tmp-&gt;info;
+    *topo = tmp-&gt;prox;
+    <span class="fn">free</span>(tmp);
+    <span class="kw">return</span> val;
+}
+
+<span class="cmt">// peek (topo) — consulta sem remover</span>
+<span class="kw">int</span> <span class="fn">peek</span>(<span class="tp">No</span> *topo) {
+    <span class="kw">if</span> (topo == <span class="kw">NULL</span>) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="kw">return</span> topo-&gt;info;
+}</code></pre>
+
+    <div class="concept-card pink">
+      <p><strong>Complexidade da pilha:</strong> Push O(1), Pop O(1), Peek O(1) — todas as operações no topo. Pilha implementada com vetor também é O(1), mas com limite de capacidade (MAX).</p>
+    </div>
+
+    <div class="tip">
+      <strong>Toda função recursiva usa a pilha de chamadas.</strong> Cada chamada recursiva empilha um frame (parâmetros, endereço de retorno). Estourar a pilha = stack overflow = recursão muito profunda.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 8 -->
+  <section id="sec8">
+    <div class="section-number">// 08</div>
+    <h2>Fila — <span style="color:var(--accent)">revisão</span></h2>
+
+    <p>Estrutura <strong>FIFO</strong> (First In, First Out). O primeiro a entrar é o primeiro a sair. Implementada com lista encadeada + descritor ou vetor circular.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">analogia do dia a dia</div>
+      <p>Fila de banco: quem chega primeiro é atendido primeiro. Novas pessoas entram no fim da fila (enqueue), o atendimento ocorre no início (dequeue).</p>
+    </div>
+
+    <div class="code-label">fila com lista encadeada + descritor</div>
+    <pre><code><span class="kw">typedef</span> <span class="kw">struct</span> <span class="tp">no</span> {
+    <span class="kw">int</span>          info;
+    <span class="kw">struct</span> <span class="tp">no</span> *prox;
+} <span class="tp">No</span>;
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+    <span class="tp">No</span> *inicio;       <span class="cmt">// frente da fila (dequeue sai daqui)</span>
+    <span class="tp">No</span> *fim;          <span class="cmt">// final da fila (enqueue entra aqui)</span>
+} <span class="tp">Fila</span>;
+
+<span class="cmt">// enqueue — insere no fim (igual inserirFim com descritor)</span>
+<span class="kw">void</span> <span class="fn">enfileirar</span>(<span class="tp">Fila</span> *f, <span class="kw">int</span> x) {
+    <span class="tp">No</span> *novo = (<span class="tp">No</span>*) <span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="tp">No</span>));
+    novo-&gt;info = x;
+    novo-&gt;prox = <span class="kw">NULL</span>;
+    <span class="kw">if</span> (f-&gt;fim != <span class="kw">NULL</span>)
+        f-&gt;fim-&gt;prox = novo;
+    <span class="kw">else</span>
+        f-&gt;inicio = novo;         <span class="cmt">// fila vazia: primeiro nó</span>
+    f-&gt;fim = novo;
+}
+
+<span class="cmt">// dequeue — remove do início (frente da fila)</span>
+<span class="kw">int</span> <span class="fn">desenfileirar</span>(<span class="tp">Fila</span> *f) {
+    <span class="kw">if</span> (f-&gt;inicio == <span class="kw">NULL</span>) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="tp">No</span> *tmp = f-&gt;inicio;
+    <span class="kw">int</span> val = tmp-&gt;info;
+    f-&gt;inicio = tmp-&gt;prox;
+    <span class="kw">if</span> (f-&gt;inicio == <span class="kw">NULL</span>)     <span class="cmt">// fila ficou vazia</span>
+        f-&gt;fim = <span class="kw">NULL</span>;
+    <span class="fn">free</span>(tmp);
+    <span class="kw">return</span> val;
+}</code></pre>
+
+    <div class="concept-card yellow">
+      <p><strong>Complexidade da fila:</strong> Enqueue O(1), Dequeue O(1), Peek O(1). A fila com vetor circular também é O(1) para todas as operações. O descritor com <code>inicio</code> e <code>fim</code> é essencial para garantir O(1) em ambas as pontas.</p>
+    </div>
+
+    <div class="diagram">Operações na fila:
+  inicio → [10|→] → [20|→] → [30|→] → NULL
+            ↑                     ↑
+          frente                fim (último)
+
+  enfileirar(40):
+  inicio → [10|→] → [20|→] → [30|→] → [40|NULL]
+            ↑                             ↑
+          frente                        fim
+
+  desenfileirar() → retorna 10:
+  inicio → [20|→] → [30|→] → [40|NULL]
+            ↑                     ↑
+          frente                fim</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 9 -->
+  <section id="sec9">
+    <div class="section-number">// 09</div>
+    <h2>Tabela comparativa — <span style="color:var(--accent)">Big O completo</span></h2>
+
+    <table>
+      <thead><tr><th>Estrutura</th><th>Inserir</th><th>Remover</th><th>Buscar</th><th>Mín/Máx</th></tr></thead>
+      <tbody>
+        <tr><td><strong>BST balanceada</strong></td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td><td>O(log n)</td></tr>
+        <tr><td><strong>BST degenerada</strong></td><td>O(n)</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Lista sequencial</td><td>O(1)* fim / O(n) ini</td><td>O(1) fim / O(n) ini</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Lista encad. s/ desc.</td><td>O(1) ini / O(n) fim</td><td>O(1) ini / O(n) fim</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td>Lista encad. c/ desc.</td><td>O(1) ini / <strong>O(1) fim</strong></td><td>O(1) ini / O(n) fim</td><td>O(n)</td><td>O(n)</td></tr>
+        <tr><td><strong>Pilha</strong></td><td>O(1) push</td><td>O(1) pop</td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Fila</strong></td><td>O(1) enq</td><td>O(1) deq</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.85rem;color:var(--text-muted);">* Na lista sequencial, inserir no fim é O(1) apenas se n &lt; MAX.</p>
+
+    <div class="concept-card green">
+      <p><strong>Resumo prático:</strong></p>
+      <ul style="color:#c8c8e0; margin-left:20px;">
+        <li>Dados ordenados + busca frequente → <strong>BST</strong> (O(log n) se balanceada)</li>
+        <li>Cuidado: inserção em ordem crescente → BST degenera → O(n)</li>
+        <li>Muitas inserções/remoções no fim → <strong>Lista com descritor</strong> (O(1))</li>
+        <li>Precisa de "desfazer", recursão, backtracking → <strong>Pilha</strong></li>
+        <li>Processamento em ordem de chegada (FIFO) → <strong>Fila</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SEC 10 -->
+  <section id="sec10">
+    <div class="section-number">// 10</div>
+    <h2>Quiz rápido</h2>
+
+    <div class="quiz">
+      <div class="quiz-title">Teste seus conhecimentos</div>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Qual percorrimento em uma BST produz os elementos em ordem crescente?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) Pré-ordem</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q1')">b) Em-ordem</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">c) Pós-ordem</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) Largura (BFS)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q1" style="color:var(--accent2)">✔ Em-ordem (ERD) visita esquerda → raiz → direita, produzindo a sequência ordenada em uma BST.</div>
+        <div class="quiz-feedback" id="fb_wrong_q1" style="color:var(--accent4)">✘ Em-ordem (ERD) é o percorrimento que produz elementos em ordem crescente em uma BST.</div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Qual a complexidade de remover um nó folha em uma BST balanceada?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q2')">b) O(log n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q2')">d) O(n²)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q2" style="color:var(--accent2)">✔ O(log n): primeiro é preciso buscar o nó (O(log n) na árvore balanceada), depois a remoção é O(1).</div>
+        <div class="quiz-feedback" id="fb_wrong_q2" style="color:var(--accent4)">✘ A busca pelo nó custa O(log n) na árvore balanceada. A remoção em si é O(1), mas o custo total é dominado pela busca: O(log n).</div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Qual a principal vantagem do descritor em uma lista encadeada?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) Acesso aleatório O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) Inserção no fim O(1) com ponteiro 'fim'</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) Remoção no fim O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) Usa menos memória</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q3" style="color:var(--accent2)">✔ O descritor mantém ponteiro para o último nó (fim), permitindo inserção no final em O(1). Remoção do fim ainda é O(n) na lista simples.</div>
+        <div class="quiz-feedback" id="fb_wrong_q3" style="color:var(--accent4)">✘ A grande vantagem é o ponteiro 'fim', que torna a inserção no final O(1).</div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. O que acontece se inserirmos elementos em ordem crescente em uma BST sem balanceamento?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">a) A árvore fica perfeitamente balanceada</button>
+          <button class="quiz-opt" onclick="answer(this,'correct','q4')">b) A árvore degenera: altura O(n), todas operações O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">c) Algo irá dar erro na inserção</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q4')">d) A árvore fica mais rápida</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q4" style="color:var(--accent2)">✔ A árvore vira uma lista encadeada (só filhos direitos). Altura = n-1, busca/inserção/remoção viram O(n).</div>
+        <div class="quiz-feedback" id="fb_wrong_q4" style="color:var(--accent4)">✘ Inserir em ordem crescente produz uma árvore degenerada (todos os nós à direita), altura O(n).</div>
+      </div>
+
+      <div class="quiz-q" id="q5">
+        <p>5. Qual a complexidade de push e pop em uma pilha implementada com lista encadeada?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this,'correct','q5')">a) Ambos O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">b) Push O(1), Pop O(n)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">c) Push O(n), Pop O(1)</button>
+          <button class="quiz-opt" onclick="answer(this,'wrong','q5')">d) Ambos O(n)</button>
+        </div>
+        <div class="quiz-feedback" id="fb_q5" style="color:var(--accent2)">✔ Tanto push quanto pop operam no topo (início da lista), ambas são O(1).</div>
+        <div class="quiz-feedback" id="fb_wrong_q5" style="color:var(--accent4)">✘ Ambas as operações são no início da lista: push insere no início, pop remove do início. Ambas O(1).</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Universidade de Brasília — Faculdade do Gama &nbsp;·&nbsp;
+  Estruturas de Dados e Algoritmos &nbsp;·&nbsp;
+  <strong>Material de Apoio — Árvores, Listas, Pilhas e Filas</strong>
+</footer>
+
+<script>
+function answer(btn, result, qid) {
+  const q = document.getElementById(qid);
+  q.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    document.getElementById('fb_' + qid).style.display = 'block';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('fb_wrong_' + qid).style.display = 'block';
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'"))
+        o.classList.add('correct');
+    });
+  }
+}
+</script>
+
+</body>
+</html>
