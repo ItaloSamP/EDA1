@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova Real 2/2024 — Nos labirintos recursivos · EDA/UnB</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #6af7c4;
+    --accent2: #f7a26a;
+    --accent3: #7c6af7;
+    --accent4: #f76a9a;
+    --yellow: #f7e06a;
+    --text: #e8e8f0;
+    --text-muted: #7a7a9a;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; line-height: 1.7; font-size: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #081a12 0%, #0a2a1a 50%, #081810 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative; overflow: hidden;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(106,247,196,0.12) 0%, transparent 70%); }
+  header::after { content: 'PROVA'; position: absolute; right: 40px; top: 10px; font-size: 160px; font-family: 'Fraunces', serif; color: rgba(106,247,196,0.04); line-height: 1; pointer-events: none; }
+  .header-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 14px; position: relative; }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; line-height: 1.05; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p.subtitle { margin-top: 16px; color: var(--text-muted); font-size: 1.05rem; max-width: 640px; position: relative; }
+  .aluno-box { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; position: relative; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .aluno-box span { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: var(--text-muted); }
+  .aluno-box b { color: var(--accent); font-weight: 600; }
+  .badge { display: inline-block; margin-top: 18px; padding: 5px 14px; border-radius: 20px; background: rgba(247,106,154,0.15); border: 1px solid rgba(247,106,154,0.4); font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent4); text-transform: uppercase; letter-spacing: 2px; position: relative; }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .instrucoes { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2); border-radius: 10px; padding: 22px 26px; margin: 36px 0; }
+  .instrucoes-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .instrucoes ul { margin-left: 20px; color: #c8c8e0; }
+  .instrucoes li { margin: 4px 0; }
+  .ruler { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; white-space: pre; overflow-x: auto; color: #9898c0; margin: 10px 0; }
+
+  p { margin-bottom: 14px; color: #c8c8e0; }
+  strong { color: var(--text); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); background: rgba(106,247,196,0.08); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #c8c8e0; background: none; padding: 0; }
+  .kw  { color: #7c6af7; font-weight: 600; }
+  .fn  { color: #6af7c4; }
+  .str { color: #f7a26a; }
+  .cmt { color: #4a4a6a; font-style: italic; }
+  .num { color: #f7e06a; }
+  .tp  { color: #f76a9a; }
+
+  .param-box { background: rgba(247,162,106,0.06); border: 1px solid rgba(247,162,106,0.3); border-radius: 8px; padding: 12px 18px; margin: 12px 0; font-size: .92rem; }
+  .param-box .pb-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+  .param-box ul { margin-left: 20px; margin-bottom: 0; color: #c8c8e0; }
+
+  .quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin: 30px 0; }
+  .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .q-pts { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--yellow); background: rgba(247,224,106,0.08); border: 1px solid rgba(247,224,106,0.2); border-radius: 4px; padding: 2px 8px; margin-left: 10px; }
+  .quiz-q > p.enunciado { font-weight: 500; color: var(--text); margin-bottom: 10px; font-size: 1.02rem; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+  .quiz-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 16px; cursor: pointer; font-size: .92rem; transition: all .2s; color: var(--text-muted); text-align: left; font-family: 'DM Sans', sans-serif; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { border-color: var(--accent); color: var(--accent); background: rgba(106,247,196,0.08); }
+  .quiz-opt.wrong   { border-color: var(--accent4); color: var(--accent4); background: rgba(247,106,154,0.08); }
+  .quiz-feedback { margin-top: 14px; font-size: .88rem; padding: 14px 18px; border-radius: 8px; display: none; line-height: 1.7; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; }
+  .quiz-feedback.ok  { background: rgba(106,247,196,0.07); color: #9ef7d4; border: 1px solid rgba(106,247,196,0.25); }
+  .quiz-feedback.err { background: rgba(247,106,154,0.07); color: #f7a3bd; border: 1px solid rgba(247,106,154,0.3); }
+
+  .sub-q { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .sub-q-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent3); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+
+  .input-resp { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .input-resp input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; width: 200px; outline: none; transition: border-color .2s; }
+  .input-resp input:focus { border-color: var(--accent); }
+  .input-resp input.correct { border-color: var(--accent); color: var(--accent); }
+  .input-resp input.wrong   { border-color: var(--accent4); color: var(--accent4); }
+  .btn-check { background: rgba(106,247,196,0.1); border: 1px solid rgba(106,247,196,0.35); color: var(--accent); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 12px; transition: all .2s; }
+  .btn-check:hover { background: rgba(106,247,196,0.18); }
+  .btn-check:disabled { opacity: .5; cursor: default; }
+
+  .lacuna-box { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .lacuna-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .lacuna-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--yellow); min-width: 50px; }
+  .lacuna-input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; width: 360px; outline: none; transition: border-color .2s; }
+  .lacuna-input:focus { border-color: var(--accent); }
+  .lacuna-input.correct { border-color: var(--accent); color: var(--accent); }
+  .lacuna-input.wrong   { border-color: var(--accent4); color: var(--accent4); }
+  .lacuna-feedback { font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 4px; display: none; }
+  .lacuna-feedback.ok  { color: var(--accent); }
+  .lacuna-feedback.err { color: var(--accent4); }
+
+  .placar { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 24px 30px; margin: 40px 0; text-align: center; }
+  .placar h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 8px; }
+  .placar p { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin: 0; color: var(--text-muted); }
+  .placar span#score { color: var(--yellow); font-weight: 700; }
+
+  .section-sep { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+  .section-title { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 900; color: var(--text); margin: 40px 0 6px; }
+  .section-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 24px; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: .85rem; }
+  footer strong { color: var(--accent); }
+
+  @media(max-width:640px){ header{padding:40px 20px;} header::after{display:none;} .container{padding:0 16px 40px;} pre{padding:14px;font-size:12px;} .quiz-q{padding:20px;} .lacuna-input{width:100%;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">FCTE/UnB · EDA · Prova Real — Semestre 2/2024 · 28/01/2025</div>
+    <h1>Prova — <span>Nos labirintos recursivos<br>das buscas e ordenações</span></h1>
+    <p class="subtitle">Reprodução interativa da prova aplicada em 28/01/2025. Código real da prova, parâmetros com seus dados. Gabarito completo com trace.</p>
+    <div class="aluno-box">
+      <span>Nome: <b>italo alves sampaio de oliveira</b></span>
+      <span>Matrícula: <b>232037937</b></span>
+      <span>Prof: <b>Dr. Nilton Correia da Silva</b></span>
+    </div>
+    <div class="badge">prova real · 6 questões · 10 pontos</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="instrucoes">
+    <div class="instrucoes-title">// referência rápida — seus dados</div>
+    <ul>
+      <li>Índices do nome completo:</li>
+    </ul>
+    <div class="ruler">índice:  0         1         2         3
+         0123456789012345678901234567890
+nome:    "italo alves sampaio de oliveira"  (31 chars)</div>
+    <ul>
+      <li>Primeiro nome: <code>"italo"</code> (5 letras) · Último sobrenome: <code>"oliveira"</code> (8 letras)</li>
+      <li>Nome completo <strong>ordenado</strong> (espaços no início): <code>"    aaaaadeeeiiiilllmoooprsstvv"</code> (31 chars)</li>
+      <li><code>matricula % 10 = 7</code> · <code>matricula % 100 = 37</code> · <code>37 % 26 = 11 → 'l'</code></li>
+      <li>Dígitos de 232037937: <code>[2,3,2,0,3,7,9,3,7]</code></li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">// questão 01 <span class="q-pts">1½ pts</span></div>
+    <p class="enunciado">Qual o resultado retornado pela chamada à função <code>Q1</code> passando seu <strong>primeiro nome</strong> e <code>0</code> (zero) como parâmetros de entrada?</p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q1</span>(<span class="kw">char</span> *Nome, <span class="kw">int</span> qtde) {
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">if</span> (*Nome == <span class="str">'\0'</span>)
+        <span class="kw">return</span> qtde;
+    <span class="kw">while</span> (Nome[i] != <span class="str">'\0'</span>)
+        i++;
+    <span class="kw">return</span> <span class="fn">Q1</span>(Nome + <span class="num">1</span>, qtde + i);
+}</code></pre>
+    <div class="param-box">
+      <div class="pb-title">chamada</div>
+      <ul>
+        <li><code>Nome</code> = "italo" · <code>qtde</code> = 0</li>
+      </ul>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">a) 5</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">b) 10</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q1')">c) 15</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q1')">d) 20</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q1">✔ CORRETO — resposta: 15
+
+Cada chamada recursiva soma strlen(Nome_atual) ao acumulador qtde.
+
+Q1("italo", 0):
+  i = strlen("italo") = 5  →  Q1("talo", 0+5)
+Q1("talo", 5):
+  i = strlen("talo") = 4   →  Q1("alo", 5+4)
+Q1("alo", 9):
+  i = strlen("alo") = 3    →  Q1("lo", 9+3)
+Q1("lo", 12):
+  i = strlen("lo") = 2     →  Q1("o", 12+2)
+Q1("o", 14):
+  i = strlen("o") = 1      →  Q1("", 14+1)
+Q1("", 15):
+  *Nome == '\0' → return 15
+
+Soma: 5+4+3+2+1 = 15 = n*(n+1)/2 com n=5.
+Essa é a soma triangular do comprimento do nome!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q1">✘ ERRADO — resposta certa: c) 15
+
+A cada chamada, i conta strlen(Nome_atual) — não é 1!
+  "italo" → soma 5, "talo" → soma 4, ..., "o" → soma 1.
+Total: 5+4+3+2+1 = 15.
+
+5 seria apenas o comprimento de "italo".
+10 = 5+4+1 (esqueceu 3 e 2).
+20 = duplicou algo.
+
+Trace a recursão marcando qtde em cada nível!</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">// questão 02 <span class="q-pts">1½ pts</span></div>
+    <p class="enunciado">Qual o resultado retornado pela chamada à função <code>Q2</code> passando seu <strong>nome completo em letras minúsculas</strong> e sua <strong>matrícula</strong> como parâmetros de entrada?</p>
+    <pre><code><span class="cmt">// Retorna a letra minúscula do alfabeto na posição P.</span>
+<span class="cmt">// 'a' = P=0, 'z' = P=25.</span>
+<span class="kw">char</span> <span class="fn">letraCorrespondente</span>(<span class="kw">int</span> P) {
+    P = P % <span class="num">26</span>;
+    <span class="kw">return</span> <span class="str">'a'</span> + P;
+}
+
+<span class="kw">int</span> <span class="fn">Q2</span>(<span class="kw">char</span> *NomeCompleto, <span class="kw">int</span> matricula) {
+    <span class="kw">int</span> p = <span class="num">0</span>, ret = <span class="num">0</span>;
+    <span class="kw">char</span> chave = <span class="fn">letraCorrespondente</span>(matricula % <span class="num">100</span>);
+    <span class="kw">while</span> (NomeCompleto[p] != <span class="str">'\0'</span>) {
+        <span class="kw">if</span> (chave == NomeCompleto[p])
+            ret += p;
+        p++;
+    }
+    <span class="kw">return</span> ret;
+}</code></pre>
+    <div class="param-box">
+      <div class="pb-title">chamada</div>
+      <ul>
+        <li><code>NomeCompleto</code> = "italo alves sampaio de oliveira"</li>
+        <li><code>matricula</code> = 232037937</li>
+      </ul>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">a) 11</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">b) 24</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q2')">c) 3</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q2')">d) 34</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q2">✔ CORRETO — resposta: 34
+
+Passo 1 — calcular a chave:
+  matricula % 100 = 37
+  letraCorrespondente(37): 37 % 26 = 11 → 'a' + 11 = 'l'
+  (a=0 b=1 c=2 d=3 e=4 f=5 g=6 h=7 i=8 j=9 k=10 l=11)
+
+Passo 2 — NOT retorna posição. Soma TODAS as posições onde 'l' aparece:
+  "italo alves sampaio de oliveira"
+   i(0) t(1) a(2) l(3) o(4) ␣(5) a(6) l(7) v(8) ...
+   ... o(23) l(24) i(25) v(26) e(27) i(28) r(29) a(30)
+
+  'l' nas posições: 3, 7, 24
+  ret = 3 + 7 + 24 = 34
+
+Diferença vital: ret += p (SOMA posições), não ret = p (última)!
+11 = valor de P%26. 24 = última posição. 3 = primeira.</div>
+    <div class="quiz-feedback err" id="fb_wrong_q2">✘ ERRADO — resposta certa: d) 34
+
+Chave: 232037937 % 100 = 37 → letraCorrespondente(37)
+→ 37 % 26 = 11 → 'a' + 11 = 'l'
+
+O loop usa ret += p (SOMA), não ret = p (última ocorrência).
+'l' aparece em 3 ("ita_l_o"), 7 ("a_l_ves"), 24 ("o_l_iveira").
+ret = 3 + 7 + 24 = 34.
+
+11 = resultado do cálculo P%26, não a resposta.
+24 = confundiu com função que guarda a ÚLTIMA posição.
+3 = confundiu com busca linear que retorna a PRIMEIRA.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">// questão 03 <span class="q-pts">1 pt</span></div>
+    <p class="enunciado">Qual o resultado retornado pela função <code>Q3</code> no caso de você invocá-la passando o conjunto de parâmetros abaixo?</p>
+    <div class="param-box">
+      <div class="pb-title">parâmetros</div>
+      <ul>
+        <li><strong>Nome:</strong> letras do nome completo em minúsculas e em <strong>ordem alfabética</strong>. Espaços ficam no início. Exemplo: "joao da silva" → <code>"  aaadijlosv"</code></li>
+        <li><strong>Tamanho:</strong> quantidade de caracteres do nome completo (incluindo espaços) = <strong>31</strong></li>
+        <li><strong>Matrícula:</strong> 232037937</li>
+      </ul>
+    </div>
+    <pre><code><span class="kw">int</span> <span class="fn">Q3</span>(<span class="kw">char</span> *Nome, <span class="kw">int</span> tamanho, <span class="kw">int</span> matricula) {
+    <span class="kw">int</span> inicio = <span class="num">0</span>, meio, fim = tamanho - <span class="num">1</span>, pcont = <span class="num">0</span>;
+    <span class="kw">char</span> chave = Nome[matricula % <span class="num">10</span>];
+    <span class="kw">while</span> (inicio &lt;= fim) {
+        pcont++;
+        meio = (inicio + fim) / <span class="num">2</span>;
+        <span class="kw">if</span> (chave == Nome[meio])
+            <span class="kw">break</span>;
+        <span class="kw">else</span> <span class="kw">if</span> (chave &lt; Nome[meio])
+            fim = meio - <span class="num">1</span>;
+        <span class="kw">else</span>
+            inicio = meio + <span class="num">1</span>;
+    }
+    <span class="kw">return</span> pcont;
+}</code></pre>
+    <div class="param-box">
+      <div class="pb-title">seus dados</div>
+      <ul>
+        <li><code>Nome</code> = <code>"    aaaaadeeeiiiilllmoooprsstvv"</code> (31 chars, espaços no início)</li>
+        <li><code>tamanho</code> = 31 · <code>matricula</code> = 232037937</li>
+        <li><code>chave</code> = Nome[232037937 % 10] = Nome[7] = <code>'a'</code></li>
+      </ul>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">a) 1</button>
+      <button class="quiz-opt" onclick="answer(this,'correct','q3')">b) 2</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">c) 3</button>
+      <button class="quiz-opt" onclick="answer(this,'wrong','q3')">d) 5</button>
+    </div>
+    <div class="quiz-feedback ok" id="fb_q3">✔ CORRETO — resposta: 2
+
+chave = nomeOrdenado[7] = 'a'
+(posições 0-3 são espaços, 4-8 são 'a' → índice 7 é 'a')
+
+Trace da busca binária (tamanho=31):
+it1: inicio=0  fim=30  meio=15  Nome[15]='i'
+     'a' < 'i' → fim = 14        pcont=1
+it2: inicio=0  fim=14  meio=7   Nome[7]='a'
+     'a' == 'a' → BREAK!         pcont=2
+
+Retorna pcont = 2.
+
+A chave caiu exatamente num meio da 2ª iteração.
+5 seria o pior caso (⌈log₂ 32⌉ = 5).
+Sempre trace — não use o pior caso como resposta!</div>
+    <div class="quiz-feedback err" id="fb_wrong_q3">✘ ERRADO — resposta certa: b) 2
+
+chave = Nome[7] = 'a'
+(nomeOrdenado = "    aaaaad..." → posições 0-3 são espaços,
+4,5,6,7,8 são 'a' → índice 7 = 'a')
+
+it1: inicio=0, fim=30 → meio=15 → Nome[15]='i'
+     'a' < 'i' → fim=14   (pcont=1)
+it2: inicio=0, fim=14 → meio=7  → Nome[7]='a' = chave
+     BREAK → return 2
+
+1 = achou de primeira (não foi o caso — meio[0]=15≠7).
+3 = iteração a mais que não acontece.
+5 = pior caso teórico, mas essa chave achou em 2.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">// questão 04 <span class="q-pts">2 pts</span></div>
+    <p class="enunciado">Suponha que a variável <code>Nome</code> contém seu <strong>primeiro nome</strong> em letras minúsculas e que <code>Q</code> é a <strong>quantidade de letras do seu primeiro nome</strong>. Considere a seguinte chamada: <code>int R = Q4(Nome, Q);</code></p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q4</span>(<span class="kw">char</span> *vet, <span class="kw">int</span> tam) {
+    <span class="kw">int</span> i, j, pcont = <span class="num">0</span>;
+    <span class="kw">char</span> aux;
+    <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; tam; i++)
+        <span class="kw">for</span> (j = i + <span class="num">1</span>; j &lt; tam; j++)
+            <span class="kw">if</span> (vet[i] &lt; vet[j]) {
+                aux = vet[i]; vet[i] = vet[j]; vet[j] = aux; pcont++;
+            }
+    <span class="kw">return</span> pcont;
+}</code></pre>
+
+    <!-- 4.1 -->
+    <div class="sub-q" id="q4a">
+      <div class="sub-q-num">// 4.1 — (1 ponto) qual o valor de R?</div>
+      <div class="input-resp">
+        <input type="text" id="in_q4a" placeholder="resposta..." onkeydown="if(event.key==='Enter') checkInput('q4a','6','R = 6')">
+        <button class="btn-check" onclick="checkInput('q4a','6','R = 6')">verificar</button>
+      </div>
+      <div class="quiz-feedback" id="fb_q4a"></div>
+    </div>
+
+    <!-- 4.2 -->
+    <div class="sub-q" id="q4b">
+      <div class="sub-q-num">// 4.2 — (0,3 pontos) qual o valor de Nome após a chamada?</div>
+      <div class="input-resp">
+        <input type="text" id="in_q4b" placeholder="ex: italo" onkeydown="if(event.key==='Enter') checkInput('q4b','tolia','Nome = tolia')">
+        <button class="btn-check" onclick="checkInput('q4b','tolia','Nome = tolia')">verificar</button>
+      </div>
+      <div class="quiz-feedback" id="fb_q4b"></div>
+    </div>
+
+    <!-- 4.3 -->
+    <div class="sub-q" id="q4c">
+      <div class="sub-q-num">// 4.3 — (0,7 pontos) assinale qual tipo de algoritmo</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4c')">[ ] Insertsort</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4c')">[ ] BubbleSort</button>
+        <button class="quiz-opt" onclick="answer(this,'correct','q4c')">[ ] SelectionSort</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q4c')">[ ] Selectionsort descendente</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q4c">✔ CORRETO — SelectionSort (ordem decrescente)
+
+Dois loops aninhados: outer i, inner j=i+1..tam-1.
+Condição: if(vet[i] < vet[j]) → TROCA quando encontra
+elemento MAIOR à direita de i.
+
+Isso coloca o MAIOR elemento na posição i a cada
+iteração do loop externo → ordena em ordem DECRESCENTE.
+
+Trace com "italo" (i t a l o):
+i=0('i'): j=1 'i'<'t'→swap→"talo" pcont=1
+           j=2 't'<'a'? não
+           j=3 't'<'l'? não
+           j=4 't'<'o'? não
+i=1('i'): j=2 'i'<'a'? não
+           j=3 'i'<'l'? sim→swap→"to_l_ai" pcont=2? ...
+→ Após ordenação: "tolia" (t>o>l>i>a), pcont=6</div>
+      <div class="quiz-feedback err" id="fb_wrong_q4c">✘ ERRADO — resposta: SelectionSort (decrescente)
+
+Estrutura: for(i) for(j=i+1) if(vet[i]<vet[j]) swap
+→ Para cada posição i, coloca o MAIOR restante ali.
+= Selection Sort.
+
+A condição vet[i] < vet[j] (ao invés de >) faz a
+ordenação em ordem DECRESCENTE.
+
+InsertSort: loop interno enquanto vet[j]>chave, j--.
+BubbleSort: compara adjacentes vet[j] vs vet[j+1].
+MergeSort: divisão recursiva + merge.</div>
+    </div>
+
+    <div class="quiz-feedback ok" id="fb_q4_detail" style="display:block; margin-top:20px; background: rgba(124,106,247,0.05); border: 1px solid rgba(124,106,247,0.2); color: #c0b8f7;">Trace completo de Q4("italo", 5):
+
+vet = ['i','t','a','l','o']
+
+i=0('i'), j=1('t'): 'i'<'t' → swap → [t,i,a,l,o] pcont=1
+i=0('t'), j=2('a'): 't'<'a'? não
+i=0('t'), j=3('l'): 't'<'l'? não
+i=0('t'), j=4('o'): 't'<'o'? não
+i=1('i'), j=2('a'): 'i'<'a'? não
+i=1('i'), j=3('l'): 'i'<'l' → swap → [t,l,a,i,o] pcont=2
+i=1('l'), j=4('o'): 'l'<'o' → swap → [t,o,a,i,l] pcont=3
+i=2('a'), j=3('i'): 'a'<'i' → swap → [t,o,i,a,l] pcont=4
+i=2('i'), j=4('l'): 'i'<'l' → swap → [t,o,l,a,i] pcont=5
+i=3('a'), j=4('i'): 'a'<'i' → swap → [t,o,l,i,a] pcont=6
+
+R = 6  ·  Nome = "tolia"</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">// questão 05 <span class="q-pts">2 pts</span></div>
+    <p class="enunciado">Suponha que a variável <code>Nome</code> contém seu <strong>último sobrenome</strong> em letras minúsculas e que <code>Q</code> é a <strong>quantidade de letras do seu último sobrenome</strong>. Considere: <code>int R = Q5(Nome, Q);</code></p>
+    <pre><code><span class="kw">int</span> <span class="fn">Q5</span>(<span class="kw">char</span> vetor[], <span class="kw">int</span> tamanho) {
+    <span class="kw">int</span> trocas = <span class="num">0</span>, j, i;
+    <span class="kw">char</span> chave;
+    <span class="kw">for</span> (i = <span class="num">1</span>; i &lt; tamanho; i++) {
+        chave = vetor[i];
+        j = i - <span class="num">1</span>;
+        <span class="kw">while</span> (j &gt;= <span class="num">0</span> &amp;&amp; vetor[j] &gt; chave) {
+            vetor[j + <span class="num">1</span>] = vetor[j];
+            j--;
+            trocas++;
+        }
+        vetor[j + <span class="num">1</span>] = chave;
+    }
+    <span class="kw">return</span> trocas;
+}</code></pre>
+
+    <!-- 5.1 -->
+    <div class="sub-q" id="q5a">
+      <div class="sub-q-num">// 5.1 — (1 ponto) qual o valor de R?</div>
+      <div class="input-resp">
+        <input type="text" id="in_q5a" placeholder="resposta..." onkeydown="if(event.key==='Enter') checkInput('q5a','18','R = 18')">
+        <button class="btn-check" onclick="checkInput('q5a','18','R = 18')">verificar</button>
+      </div>
+      <div class="quiz-feedback" id="fb_q5a"></div>
+    </div>
+
+    <!-- 5.2 -->
+    <div class="sub-q" id="q5b">
+      <div class="sub-q-num">// 5.2 — (0,3 pontos) qual o valor de Nome depois da chamada?</div>
+      <div class="input-resp">
+        <input type="text" id="in_q5b" placeholder="ex: oliveira" onkeydown="if(event.key==='Enter') checkInput('q5b','aeiilorv','Nome = aeiilorv')">
+        <button class="btn-check" onclick="checkInput('q5b','aeiilorv','Nome = aeiilorv')">verificar</button>
+      </div>
+      <div class="quiz-feedback" id="fb_q5b"></div>
+    </div>
+
+    <!-- 5.3 -->
+    <div class="sub-q" id="q5c">
+      <div class="sub-q-num">// 5.3 — (0,7 pontos) assinale qual tipo de algoritmo</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this,'correct','q5c')">[ ] Insertsort</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5c')">[ ] BubbleSort</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5c')">[ ] SelectionSort</button>
+        <button class="quiz-opt" onclick="answer(this,'wrong','q5c')">[ ] MergeSort</button>
+      </div>
+      <div class="quiz-feedback ok" id="fb_q5c">✔ CORRETO — InsertionSort
+
+Identificadores clássicos do InsertionSort:
+  • Loop externo i começa em 1 (não 0)
+  • chave = vetor[i] (salva o elemento atual)
+  • Loop interno while(j>=0 && vetor[j]>chave) { vetor[j+1]=vetor[j]; j--; }
+  • Reinsere: vetor[j+1] = chave
+
+Ordena em ordem CRESCENTE (vetor[j] > chave → empurra pra direita).</div>
+      <div class="quiz-feedback err" id="fb_wrong_q5c">✘ ERRADO — resposta: InsertionSort
+
+Assinatura canônica:
+  for(i=1; i<n; i++) {
+    chave = v[i];
+    j = i-1;
+    while(j>=0 && v[j]>chave) { v[j+1]=v[j]; j--; trocas++; }
+    v[j+1] = chave;
+  }
+
+BubbleSort: compara v[j] vs v[j+1] adjacentes, loop duplo i+j.
+SelectionSort: loop interno acha mínimo/máximo e faz 1 swap por i.
+MergeSort: divide recursivamente e faz merge.</div>
+    </div>
+
+    <div class="quiz-feedback ok" id="fb_q5_detail" style="display:block; margin-top:20px; background: rgba(124,106,247,0.05); border: 1px solid rgba(124,106,247,0.2); color: #c0b8f7;">Trace de Q5("oliveira", 8) — InsertionSort crescente:
+
+vetor = o l i v e i r a
+         0 1 2 3 4 5 6 7
+
+i=1, chave='l': j=0, 'o'>'l' → move o→pos1, j=-1, trocas=1
+  vetor = l o i v e i r a → insere 'l' em 0
+i=2, chave='i': j=1, 'o'>'i'→move, j=0, 'l'>'i'→move, j=-1, trocas=3
+  vetor = i l o v e i r a
+i=3, chave='v': j=2, 'o'>'v'? não → trocas=0 adicionais
+  vetor = i l o v e i r a
+i=4, chave='e': j=3, 'v'>'e'→j=2 'o'>'e'→j=1 'l'>'e'→j=0 'i'>'e'→j=-1, trocas=4
+  vetor = e i l o v i r a
+i=5, chave='i': j=4, 'v'>'i'→j=3 'o'>'i'→j=2 'l'>'i'→j=1 'i'>'i'? não, trocas=3
+  vetor = e i i l o v r a
+i=6, chave='r': j=5, 'v'>'r'→j=4, 'o'>'r'? não, trocas=1
+  vetor = e i i l o r v a
+i=7, chave='a': j=6 'v'→j=5 'r'→j=4 'o'→j=3 'l'→j=2 'i'→j=1 'i'→j=0 'e'→j=-1, trocas=7
+  vetor = a e i i l o r v → "aeiilorv"
+
+Total trocas: 1+2+0+4+3+1+7 = 18
+R = 18  ·  Nome = "aeiilorv"</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">// questão 06 <span class="q-pts">2 pts</span></div>
+    <p class="enunciado">O que deve ser preenchido nos trechos de código da questão 6 (Q6) para que a função <code>identifica_formacao</code> funcione corretamente?</p>
+
+    <pre><code><span class="cmt">// Tipo pilha</span>
+<span class="kw">typedef struct</span> no {
+    <span class="kw">char</span> caracter;
+    <span class="kw">struct</span> no *proximo;
+} <span class="tp">No</span>;
+
+<span class="cmt">// forma_par(f, d): retorna 1 se f é o fechamento de d; 0 caso contrário.</span>
+<span class="cmt">// Assinatura: int forma_par(char f, char d);</span>
+
+<span class="cmt">// Empilha x em pilha. Assinatura: No *Empilha(No *pilha, char x);</span>
+<span class="cmt">// Desempilha. Assinatura: No *Desempilha(No *pilha);</span>
+
+<span class="cmt">// Identifica se a expressão x[] tem parênteses/colchetes/chaves bem formados.</span>
+<span class="cmt">// Retorna 0 = não bem formada · 1 = bem formada</span>
+<span class="kw">int</span> <span class="fn">identifica_formacao</span>(<span class="kw">char</span> x[]) {
+    <span class="tp">No</span> *pilha = <span class="num">NULL</span>;
+    <span class="kw">int</span> i = <span class="num">0</span>;
+    <span class="kw">while</span> (x[i] != <span class="str">'\0'</span>)
+    {
+        <span class="kw">if</span> (x[i] == <span class="str">'('</span> || x[i] == <span class="str">'['</span> || x[i] == <span class="str">'{'</span>)
+            <span class="str">[-A-]</span>;
+        <span class="kw">else if</span> (x[i] == <span class="str">')'</span> || x[i] == <span class="str">']'</span> || x[i] == <span class="str">'}'</span>)
+        {
+            <span class="kw">if</span> (pilha == <span class="num">NULL</span>)
+                <span class="kw">return</span> <span class="num">0</span>;
+            <span class="kw">if</span> (<span class="str">[-B-]</span>)
+                <span class="kw">return</span> <span class="num">0</span>;
+            <span class="str">[-C-]</span>;
+        }
+        i++;
+    }
+    <span class="kw">if</span> (<span class="str">[-D-]</span>)
+        <span class="kw">return</span> <span class="num">1</span>;
+    <span class="kw">else</span>
+        <span class="kw">return</span> <span class="num">0</span>;
+}</code></pre>
+
+    <div class="lacuna-box">
+
+      <div>
+        <div class="lacuna-item">
+          <span class="lacuna-label">[-A-]:</span>
+          <input class="lacuna-input" id="lac_a" type="text" placeholder="preencha aqui..."
+            onkeydown="if(event.key==='Enter') checkLacuna('a')">
+          <button class="btn-check" onclick="checkLacuna('a')">verificar</button>
+        </div>
+        <div class="lacuna-feedback" id="lac_fb_a"></div>
+      </div>
+
+      <div>
+        <div class="lacuna-item">
+          <span class="lacuna-label">[-B-]:</span>
+          <input class="lacuna-input" id="lac_b" type="text" placeholder="preencha aqui..."
+            onkeydown="if(event.key==='Enter') checkLacuna('b')">
+          <button class="btn-check" onclick="checkLacuna('b')">verificar</button>
+        </div>
+        <div class="lacuna-feedback" id="lac_fb_b"></div>
+      </div>
+
+      <div>
+        <div class="lacuna-item">
+          <span class="lacuna-label">[-C-]:</span>
+          <input class="lacuna-input" id="lac_c" type="text" placeholder="preencha aqui..."
+            onkeydown="if(event.key==='Enter') checkLacuna('c')">
+          <button class="btn-check" onclick="checkLacuna('c')">verificar</button>
+        </div>
+        <div class="lacuna-feedback" id="lac_fb_c"></div>
+      </div>
+
+      <div>
+        <div class="lacuna-item">
+          <span class="lacuna-label">[-D-]:</span>
+          <input class="lacuna-input" id="lac_d" type="text" placeholder="preencha aqui..."
+            onkeydown="if(event.key==='Enter') checkLacuna('d')">
+          <button class="btn-check" onclick="checkLacuna('d')">verificar</button>
+        </div>
+        <div class="lacuna-feedback" id="lac_fb_d"></div>
+      </div>
+
+      <button class="btn-check" style="margin-top:8px; align-self:flex-start; padding:10px 20px;" onclick="revelarQ6()">revelar gabarito completo</button>
+      <div class="quiz-feedback" id="fb_q6_gabarito">✔ GABARITO — Q6 Completo
+
+[-A-]: pilha = Empilha(pilha, x[i])
+  → Abertura encontrada: empilha o caractere.
+
+[-B-]: !forma_par(x[i], pilha->caracter)
+  → Fechamento encontrado: verifica se NÃO é par do topo.
+  → forma_par(x[i], pilha->caracter) retorna 1 se for par.
+  → Se NÃO for par (!) → expressão malformada → return 0.
+  Exemplos de pares: ')' fecha '(' · ']' fecha '[' · '}' fecha '{'
+
+[-C-]: pilha = Desempilha(pilha)
+  → Par confirmado: desempilha o topo (a abertura correspondente).
+
+[-D-]: pilha == NULL
+  → Fim da string: se pilha vazia → todos os pares fecharam → return 1.
+  → Se pilha != NULL → sobrou abertura sem fechamento → return 0.
+
+Lógica completa:
+  abertura → empilha
+  fechamento sem pilha → return 0 (fechamento sem abertura)
+  fechamento com topo errado → return 0 (par errado)
+  fechamento correto → desempilha
+  fim com pilha vazia → return 1 (bem formada)
+  fim com pilha não vazia → return 0 (abertura sem fechamento)</div>
+    </div>
+  </div>
+
+  <!-- placar -->
+  <div class="placar">
+    <h3>placar</h3>
+    <p>questões objetivas: <span id="score">0</span> / 8</p>
+  </div>
+
+</div>
+
+<footer>
+  <strong>EDA · UnB · 2/2024</strong> · Prova real 28/01/2025 · Dr. Nilton Correia da Silva<br>
+  Reprodução interativa para estudo — italo alves sampaio de oliveira · 232037937
+</footer>
+
+<script>
+  let scores = {};
+  let totalQ = 8;
+
+  function updateScore() {
+    let n = Object.values(scores).filter(v => v).length;
+    document.getElementById('score').textContent = n;
+  }
+
+  function answer(btn, verdict, qid) {
+    let container = btn.closest('.quiz-q') || btn.closest('.sub-q');
+    container.querySelectorAll('.quiz-opt').forEach(b => {
+      b.disabled = true;
+      b.classList.remove('correct','wrong');
+    });
+    btn.classList.add(verdict);
+    let fbOk  = document.getElementById('fb_' + qid);
+    let fbErr = document.getElementById('fb_wrong_' + qid);
+    if (verdict === 'correct') {
+      if (fbOk)  { fbOk.style.display = 'block'; }
+      scores[qid] = true;
+    } else {
+      if (fbErr) { fbErr.style.display = 'block'; }
+      if (fbOk)  { fbOk.style.display = 'block'; }
+      scores[qid] = false;
+    }
+    updateScore();
+  }
+
+  function checkInput(qid, expected, label) {
+    let input = document.getElementById('in_' + qid);
+    let fb    = document.getElementById('fb_' + qid);
+    let val   = input.value.trim().toLowerCase();
+    let exp   = expected.toLowerCase();
+    input.disabled = true;
+    document.querySelector('#' + qid + ' .btn-check').disabled = true;
+    if (val === exp) {
+      input.classList.add('correct');
+      fb.className = 'quiz-feedback ok';
+      fb.textContent = '✔ CORRETO — ' + label;
+      fb.style.display = 'block';
+      scores[qid] = true;
+    } else {
+      input.classList.add('wrong');
+      fb.className = 'quiz-feedback err';
+      fb.textContent = '✘ ERRADO — resposta correta: ' + label;
+      fb.style.display = 'block';
+      scores[qid] = false;
+    }
+    updateScore();
+  }
+
+  const lacunas = {
+    a: {
+      correct: ['pilha = empilha(pilha, x[i])', 'pilha=empilha(pilha,x[i])'],
+      label: 'pilha = Empilha(pilha, x[i])',
+      hint: 'Encontrou abertura → empilha o caractere x[i] na pilha.'
+    },
+    b: {
+      correct: ['!forma_par(x[i], pilha->caracter)', '!forma_par(x[i],pilha->caracter)'],
+      label: '!forma_par(x[i], pilha->caracter)',
+      hint: 'Se o fechamento x[i] NÃO é par do topo → expressão malformada.'
+    },
+    c: {
+      correct: ['pilha = desempilha(pilha)', 'pilha=desempilha(pilha)'],
+      label: 'pilha = Desempilha(pilha)',
+      hint: 'Par confirmado → desempilha o topo.'
+    },
+    d: {
+      correct: ['pilha == null', 'pilha==null'],
+      label: 'pilha == NULL',
+      hint: 'Se pilha vazia ao final → todos os pares fecharam → bem formada.'
+    }
+  };
+
+  function checkLacuna(id) {
+    let input = document.getElementById('lac_' + id);
+    let fb    = document.getElementById('lac_fb_' + id);
+    let val   = input.value.trim().toLowerCase().replace(/\s+/g, '');
+    let lac   = lacunas[id];
+    let ok    = lac.correct.some(c => val === c.replace(/\s+/g, ''));
+    input.disabled = true;
+    if (ok) {
+      input.classList.add('correct');
+      fb.className = 'lacuna-feedback ok';
+      fb.textContent = '✔ ' + lac.label;
+    } else {
+      input.classList.add('wrong');
+      fb.className = 'lacuna-feedback err';
+      fb.textContent = '✘ resposta: ' + lac.label + ' — ' + lac.hint;
+    }
+    fb.style.display = 'block';
+    scores['lac_' + id] = ok;
+    updateScore();
+  }
+
+  function revelarQ6() {
+    let fb = document.getElementById('fb_q6_gabarito');
+    fb.className = 'quiz-feedback ok';
+    fb.style.display = 'block';
+    ['a','b','c','d'].forEach(id => {
+      let input = document.getElementById('lac_' + id);
+      if (!input.disabled) {
+        input.disabled = true;
+        let btn = input.parentElement.querySelector('.btn-check');
+        if (btn) btn.disabled = true;
+        let fb2 = document.getElementById('lac_fb_' + id);
+        let lac = lacunas[id];
+        fb2.className = 'lacuna-feedback ok';
+        fb2.textContent = lac.label;
+        fb2.style.display = 'block';
+        input.classList.add('correct');
+        input.value = lac.label;
+      }
+    });
+  }
+</script>
+</body>
+</html>
